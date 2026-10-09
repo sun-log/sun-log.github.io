@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F5A73">
+<title>Log Alat Suneeday</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --bg:#F3F1EC; --surface:#FFFFFF; --surface-2:#ECE9E2; --line:#D9D4CA;
+    --ink:#1C2126; --ink-dim:#4D555C; --ink-faint:#7A8188;
+    --accent:#1F5A73; --accent-ink:#FFFFFF; --accent-soft:#DCEAF0; --accent-soft-ink:#1A4A5E;
+    --ok:#3F7D4E; --ok-soft:#DDEEDF; --ok-ink:#24502F;
+    --info:#5B4B9A; --info-soft:#E6E1F5; --info-ink:#3F3373;
+    --danger:#B23A3A; --danger-soft:#F6DEDB; --danger-ink:#7E2222;
+    --warn:#C98A12; --warn-soft:#F7EBCF; --warn-ink:#6E4A05;
+    --radius:12px; --radius-sm:8px; --radius-lg:18px;
+    --shadow:0 1px 2px rgba(20,24,28,.06),0 4px 14px rgba(20,24,28,.06);
+    --font-display:'Oswald',system-ui,sans-serif; --font-body:'IBM Plex Sans',system-ui,sans-serif; --font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#14181C; --surface:#1C2227; --surface-2:#242B31; --line:#323B42;
+      --ink:#E8ECEF; --ink-dim:#B3BCC3; --ink-faint:#86909A;
+      --accent:#6BB3CC; --accent-ink:#0E2129; --accent-soft:#1D3640; --accent-soft-ink:#A9D6E5;
+      --ok:#6FBF82; --ok-soft:#1E3324; --ok-ink:#A8DDB3;
+      --info:#A898E6; --info-soft:#2A2545; --info-ink:#CFC5F3;
+      --danger:#E07A7A; --danger-soft:#3A2020; --danger-ink:#F2B3B3;
+      --warn:#E5B04A; --warn-soft:#3A2E14; --warn-ink:#F2D594;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:16px; line-height:1.45; -webkit-text-size-adjust:100%;}
+  h1,h2,h3{font-family:var(--font-display); font-weight:600; letter-spacing:.01em; margin:0;}
+  button,input,select{font-family:inherit; font-size:16px;}
+  .wrap{max-width:720px; margin:0 auto; padding:0 16px;}
+  main{padding:18px 0 72px;}
+
+  .topbar{background:var(--surface); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:20;}
+  .topbar-inner{max-width:720px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px;}
+  .brand{display:flex; align-items:center; gap:8px; color:var(--accent); flex:1; min-width:0;}
+  .brand b{font-family:var(--font-display); font-size:1.05rem; letter-spacing:.03em; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .userchip{font-size:.8rem; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:40vw;}
+  .tabbar{display:flex; gap:2px; max-width:720px; margin:0 auto; padding:0 10px; overflow-x:auto;}
+  .tabbtn{appearance:none; border:none; background:none; padding:10px 12px; min-height:44px; font-family:var(--font-display); font-size:.92rem; letter-spacing:.02em; color:var(--ink-dim); border-bottom:3px solid transparent; white-space:nowrap; cursor:pointer;}
+  .tabbtn.active{color:var(--accent); border-bottom-color:var(--accent);}
+
+  .btn{appearance:none; border:1px solid transparent; border-radius:var(--radius-sm); padding:10px 16px; min-height:44px; font-weight:600; font-size:.95rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; touch-action:manipulation; transition:transform .06s ease, opacity .15s;}
+  .btn:active{transform:scale(.98);}
+  .btn:disabled{opacity:.55; cursor:default;}
+  .btn-primary{background:var(--accent); color:var(--accent-ink);}
+  .btn-ok{background:var(--ok); color:#fff;}
+  .btn-warn{background:var(--warn); color:#241a05;}
+  .btn-danger{background:var(--danger); color:#fff;}
+  .btn-ghost{background:var(--surface-2); color:var(--ink); border-color:var(--line);}
+  .btn-outline{background:transparent; color:var(--accent); border-color:var(--accent);}
+  .btn-sm{padding:6px 12px; min-height:38px; font-size:.85rem;}
+  .btn-block{width:100%;}
+  .btn-xl{width:100%; min-height:64px; font-family:var(--font-display); font-size:1.35rem; letter-spacing:.06em; border-radius:var(--radius);}
+  .linkbtn{appearance:none; border:none; background:none; color:var(--ink-dim); text-decoration:underline; font-size:.85rem; padding:6px; cursor:pointer;}
+
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px;}
+  .section{margin-bottom:26px;}
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:10px;}
+  .section-head h2{font-size:1.12rem;}
+  .sub{color:var(--ink-dim); font-size:.86rem;}
+  .faint{color:var(--ink-faint); font-size:.8rem;}
+  .mono{font-family:var(--font-mono);}
+  .empty{color:var(--ink-faint); font-size:.9rem; padding:14px; text-align:center;}
+
+  .pill{display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:999px; font-size:.74rem; font-weight:600; white-space:nowrap;}
+  .pill-ok{background:var(--ok-soft); color:var(--ok-ink);}
+  .pill-info{background:var(--info-soft); color:var(--info-ink);}
+  .pill-danger{background:var(--danger-soft); color:var(--danger-ink);}
+  .pill-warn{background:var(--warn-soft); color:var(--warn-ink);}
+  .pill-neutral{background:var(--surface-2); color:var(--ink-dim);}
+  .tag{font-family:var(--font-mono); font-size:.72rem; background:var(--surface-2); color:var(--ink-dim); padding:1px 6px; border-radius:5px;}
+
+  .banner{display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:var(--radius-sm); font-size:.92rem;}
+  .banner p{margin:0 0 4px;} .banner p:last-child{margin:0;}
+  .banner svg{flex:none; margin-top:2px;}
+  .banner.ok{background:var(--ok-soft); color:var(--ok-ink);}
+  .banner.info{background:var(--info-soft); color:var(--info-ink);}
+  .banner.danger{background:var(--danger-soft); color:var(--danger-ink);}
+  .banner.warn{background:var(--warn-soft); color:var(--warn-ink);}
+  .stack{display:flex; flex-direction:column; gap:10px;}
+
+  /* login */
+  .screen-center{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px;}
+  .login-card{width:100%; max-width:380px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow); padding:28px 24px;}
+  .login-mark{display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:20px; color:var(--accent); text-align:center;}
+  .login-mark h1{font-size:1.45rem; color:var(--ink);}
+  .login-mark span{font-size:.78rem; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.12em;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:.76rem; font-weight:600; color:var(--ink-dim); margin-bottom:5px; text-transform:uppercase; letter-spacing:.05em;}
+  .field input,.field select{width:100%; padding:11px 12px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:16px; min-height:44px;}
+  .field input:focus,.field select:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);}
+  .field input.pin{font-family:var(--font-mono); letter-spacing:.5em; font-size:1.3rem; text-align:center;}
+  .form-error{background:var(--danger-soft); color:var(--danger-ink); border-radius:var(--radius-sm); padding:9px 12px; font-size:.86rem; margin-bottom:14px;}
+  .scan-hint{background:var(--accent-soft); color:var(--accent-soft-ink); border-radius:var(--radius-sm); padding:10px 12px; font-size:.88rem; margin-bottom:16px;}
+  .form-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .form-row .field{flex:1; min-width:140px;}
+
+  /* tool landing page */
+  .tool-hero{padding:20px 18px;}
+  .tool-hero .meta{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;}
+  .tool-hero h1{font-size:1.7rem; line-height:1.15;}
+  .tool-hero .idline{font-family:var(--font-mono); color:var(--ink-faint); font-size:.85rem; margin-top:4px;}
+  .status-box{margin:18px 0 16px;}
+  .elapsed{font-family:var(--font-mono); font-size:2rem; font-weight:600; color:var(--accent); line-height:1.1; margin-top:6px;}
+  .result-note{margin-top:14px;}
+
+  /* lists */
+  .row{display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); margin-bottom:8px;}
+  .row .grow{flex:1; min-width:0;}
+  .row .nm{font-weight:600;}
+  .row .meta{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:3px; font-size:.8rem; color:var(--ink-faint);}
+  button.row{width:100%; text-align:left; font:inherit; color:inherit; cursor:pointer;}
+  .gedung-heading{font-family:var(--font-display); font-size:.82rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin:16px 0 8px;}
+  .searchbar input{width:100%; padding:11px 12px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:16px; margin-bottom:10px;}
+  .chiprow{display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;}
+  .chip{border:1px solid var(--line); background:var(--surface); color:var(--ink-dim); padding:7px 14px; min-height:36px; border-radius:999px; font-size:.84rem; font-weight:600; cursor:pointer;}
+  .chip.active{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  details.hist{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);}
+  details.hist summary{padding:12px 14px; cursor:pointer; font-weight:600; font-size:.92rem;}
+  .hrow{display:flex; justify-content:space-between; gap:12px; padding:10px 14px; border-top:1px solid var(--line); font-size:.86rem;}
+  .hrow .r{text-align:right; flex:none; font-family:var(--font-mono); color:var(--ink-dim); font-size:.8rem;}
+
+  /* admin */
+  .stat-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:20px;}
+  .stat{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;}
+  .stat .num{font-family:var(--font-mono); font-size:1.7rem; font-weight:600; line-height:1;}
+  .stat .lbl{font-size:.78rem; color:var(--ink-dim); margin-top:6px;}
+  .stat.ok .num{color:var(--ok);} .stat.info .num{color:var(--info);} .stat.danger .num{color:var(--danger);} .stat.warn .num{color:var(--warn);}
+  .tbl{width:100%; border-collapse:collapse; font-size:.85rem;}
+  .tbl th,.tbl td{padding:8px 10px; border-bottom:1px solid var(--line); text-align:left;}
+  .tbl th{font-size:.74rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); font-weight:600;}
+  .tbl td.num{text-align:right; font-family:var(--font-mono);}
+  .scroll-x{overflow-x:auto;}
+
+  /* qr */
+  .qr-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;}
+  .qr-card{border:1px solid var(--line); border-radius:var(--radius); background:#fff; color:#111; padding:12px; text-align:center;}
+  .qr-card .qbox{width:132px; height:132px; margin:0 auto 8px;}
+  .qr-card .qbox img{width:132px !important; height:132px !important; image-rendering:pixelated; display:block;}
+  .qr-card .nm{font-weight:700; font-size:.82rem; line-height:1.2;}
+  .qr-card .id{font-family:var(--font-mono); font-size:.72rem; color:#555; margin-top:2px;}
+  .qr-card .cta{font-size:.66rem; letter-spacing:.06em; text-transform:uppercase; color:#1F5A73; font-weight:700; margin-top:6px;}
+
+  /* toast & loading */
+  #toast-host{position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:60; pointer-events:none; width:max-content; max-width:92vw;}
+  .toast{background:var(--ink); color:var(--bg); padding:12px 18px; border-radius:999px; font-size:.88rem; box-shadow:var(--shadow); text-align:center;}
+  .loading{display:flex; align-items:center; justify-content:center; gap:10px; padding:40px 0; color:var(--ink-dim); font-size:.9rem;}
+  .spinner{width:18px; height:18px; border-radius:50%; border:2.5px solid var(--line); border-top-color:var(--accent); animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  @media print{
+    .no-print{display:none !important;}
+    body{background:#fff;}
+    main{padding:0;}
+    .qr-grid{grid-template-columns:repeat(3,1fr); gap:8px;}
+    .qr-card{break-inside:avoid; border:1px dashed #999; box-shadow:none;}
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast-host"></div>
+
+<script>
+/* QR generator (qrcode-generator 1.4.4, Kazuhiko Arase, MIT) — disisipkan langsung supaya tidak bergantung pada CDN */
+// Copyright (c) 2009 Kazuhiko Arase
+// Licensed under the MIT license:
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
+<script>
+(function(){
+  'use strict';
+  // Server data (Google Apps Script). Dipanggil tanpa cookie, jadi login Google di HP tidak berpengaruh.
+  var API_URL = 'https://script.google.com/macros/s/AKfycbznnP6WeTM8mu9hQcm611oVcMji1b-TmFvWqBIbttfEvAMlhKoqga8pgP7hkkp4pZJKWA/exec';
+  var PARAM_T = (new URLSearchParams(location.search).get('t') || '').trim().toUpperCase();
+  // baseUrl = alamat halaman ini sendiri, jadi QR selalu menunjuk ke halaman ini.
+  var BOOT = { toolId: PARAM_T, tool: null, baseUrl: location.origin + location.pathname };
+  var AUTH_KEY = 'logalat.auth.v1';
+
+  /* ---------- state ---------- */
+  var auth = loadAuth();
+  var view = BOOT.toolId ? 'tool' : 'home';
+  var tab = 'saya';
+  var toolState = { toolId: BOOT.toolId, tool: BOOT.tool, opens: [], loaded: false, note: null };
+  var home = null, admin = null;
+  var busy = false, cooldownUntil = 0, mutSeq = 0;
+  var ui = { gedung: 'Semua', query: '', adminGedung: 'Semua', histFilter: 'semua', qrGedung: 'Semua', loginError: '', toolErr: '', userErr: '' };
+
+  function loadAuth(){ try { var a = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); return (a && a.token && a.user) ? a : null; } catch(e){ return null; } }
+  function saveAuth(a){ auth = a; try { localStorage.setItem(AUTH_KEY, JSON.stringify(a)); } catch(e){} }
+  function clearAuth(){ auth = null; home = null; admin = null; try { localStorage.removeItem(AUTH_KEY); } catch(e){} }
+  function isAdmin(){ return !!(auth && auth.user && auth.user.role === 'admin'); }
+
+  /* ---------- server calls ---------- */
+  function call(fn){
+    var args = Array.prototype.slice.call(arguments, 1);
+    return fetch(API_URL, {
+      method: 'POST', credentials: 'omit', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ fn: fn, args: args })
+    })
+    .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(res){ return res || { ok:false, code:'ERR', message:'Respons kosong dari server.' }; })
+    .catch(function(){ return { ok:false, code:'NET', message:'Tidak bisa terhubung ke server. Cek internet lalu coba lagi.' }; });
+  }
+  /** Returns res if ok; otherwise handles auth/errors and returns null. */
+  function handle(res){
+    if (res && res.ok) return res;
+    if (res && res.code === 'AUTH') { clearAuth(); ui.loginError = res.message; render(); return null; }
+    toast((res && res.message) || 'Terjadi kesalahan.');
+    return null;
+  }
+
+  /* ---------- helpers ---------- */
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function fmtTime(iso){ try { return new Date(iso).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Jakarta'}); } catch(e){ return ''; } }
+  function fmtDay(iso){ try { return new Date(iso).toLocaleDateString('id-ID', {day:'numeric', month:'short', timeZone:'Asia/Jakarta'}); } catch(e){ return ''; } }
+  function minutesBetween(a, b){ return Math.max(0, Math.round(((b ? new Date(b) : new Date()) - new Date(a)) / 60000)); }
+  function fmtMin(m){ var j = Math.floor(m/60), r = m % 60; return j ? (j + 'j ' + r + 'm') : (r + 'm'); }
+  function fmtDur(a, b){ return fmtMin(minutesBetween(a, b)); }
+  function statusPill(st){
+    if (st === 'tersedia') return '<span class="pill pill-ok">Tersedia</span>';
+    if (st === 'dipakai') return '<span class="pill pill-info">Sedang dipakai</span>';
+    if (st === 'overlap') return '<span class="pill pill-danger">Overlap</span>';
+    return '<span class="pill pill-neutral">' + esc(st) + '</span>';
+  }
+  function toolUrl(id){ var b = BOOT.baseUrl || ''; return b + (b.indexOf('?') >= 0 ? '&' : '?') + 't=' + encodeURIComponent(id); }
+
+  var ICON = {
+    mark:'<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6.5" width="19" height="13" rx="2.5"/><circle cx="12" cy="13" r="3.6"/><path d="M8 6.5l1.6-2.5h4.8L16 6.5"/></svg>',
+    warn:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4.5M12 17.5v.01"/></svg>',
+    check:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg>',
+    info:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>',
+    back:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+    print:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>'
+  };
+
+  var toastTimer = null;
+  function toast(msg){
+    var host = document.getElementById('toast-host');
+    if (!host) return;
+    host.innerHTML = '<div class="toast" role="status">' + esc(msg) + '</div>';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ host.innerHTML = ''; }, 3600);
+  }
+  function loadingHtml(label){ return '<div class="loading"><span class="spinner"></span>' + esc(label || 'Memuat…') + '</div>'; }
+
+  /* ---------- render root ---------- */
+  function render(){
+    var root = document.getElementById('root');
+    if (!auth) { root.innerHTML = renderLogin(); bindLogin(); return; }
+    root.innerHTML = renderTopbar() + '<main><div class="wrap" id="content">' + (view === 'tool' ? renderTool() : renderHome()) + '</div></main>';
+    bindTopbar();
+    if (view === 'tool') bindTool(); else bindHome();
+  }
+
+  /* ---------- login ---------- */
+  function renderLogin(){
+    var hint = '';
+    if (BOOT.toolId) {
+      hint = '<div class="scan-hint" id="scan-hint">Login dulu untuk memakai: <strong>' + esc(BOOT.tool ? BOOT.tool.nama : BOOT.toolId) + '</strong>' + (BOOT.tool ? ' &middot; Gedung ' + esc(BOOT.tool.gedung) : '') + '</div>';
+    }
+    return '<div class="screen-center"><div class="login-card">'
+      + '<div class="login-mark">' + ICON.mark + '<h1>Log Alat Suneeday</h1><span>Pencatatan Pemakaian Alat</span></div>'
+      + hint
+      + (ui.loginError ? '<div class="form-error">' + esc(ui.loginError) + '</div>' : '')
+      + '<form id="login-form" autocomplete="on">'
+      + '<div class="field"><label for="f-username">Username</label><input id="f-username" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required></div>'
+      + '<div class="field"><label for="f-pin">PIN (4 digit)</label><input id="f-pin" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="current-password" required></div>'
+      + '<button type="submit" class="btn btn-primary btn-block" id="btn-login">Masuk</button>'
+      + '</form>'
+      + '<p class="faint" style="text-align:center; margin:14px 0 0;">Cukup login sekali — HP ini akan tetap masuk sampai Anda keluar.</p>'
+      + '</div></div>';
+  }
+  function bindLogin(){
+    var f = document.getElementById('login-form');
+    f.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      if (busy) return;
+      var btn = document.getElementById('btn-login');
+      busy = true; btn.disabled = true; btn.textContent = 'Memeriksa…';
+      call('apiLogin', document.getElementById('f-username').value, document.getElementById('f-pin').value).then(function(res){
+        busy = false;
+        if (!res.ok) { ui.loginError = res.message || 'Login gagal.'; render(); return; }
+        saveAuth({ token: res.token, user: res.user });
+        ui.loginError = '';
+        if (view === 'tool') { render(); refreshTool(); }
+        else { tab = isAdmin() ? 'admin' : 'saya'; render(); loadTab(); }
+      });
+    });
+  }
+
+  /* ---------- topbar ---------- */
+  function renderTopbar(){
+    var tabs = '';
+    if (view === 'home') {
+      tabs = '<div class="tabbar">'
+        + tabBtn('saya', 'Alat Saya') + tabBtn('semua', 'Semua Alat')
+        + (isAdmin() ? tabBtn('admin', 'Admin') + tabBtn('qr', 'Cetak QR') : '')
+        + '</div>';
+    }
+    return '<div class="topbar no-print"><div class="topbar-inner">'
+      + (view === 'tool'
+          ? '<button type="button" class="btn btn-ghost btn-sm" id="btn-home">' + ICON.back + ' Dashboard</button><div class="brand"></div>'
+          : '<div class="brand">' + ICON.mark + '<b>Log Alat Suneeday</b></div>')
+      + '<span class="userchip">' + esc(auth.user.nama) + '</span>'
+      + '<button type="button" class="linkbtn" id="btn-logout">Keluar</button>'
+      + '</div>' + tabs + '</div>';
+  }
+  function tabBtn(k, label){ return '<button type="button" class="tabbtn' + (tab === k ? ' active' : '') + '" data-tab="' + k + '">' + esc(label) + '</button>'; }
+  function bindTopbar(){
+    var lo = document.getElementById('btn-logout');
+    if (lo) lo.addEventListener('click', function(){ clearAuth(); view = BOOT.toolId ? 'tool' : 'home'; render(); });
+    var hb = document.getElementById('btn-home');
+    if (hb) hb.addEventListener('click', function(){ view = 'home'; tab = 'saya'; render(); loadTab(); });
+    document.querySelectorAll('[data-tab]').forEach(function(b){
+      b.addEventListener('click', function(){ tab = b.getAttribute('data-tab'); render(); loadTab(); });
+    });
+  }
+
+  /* ---------- tool landing page (hasil scan) ---------- */
+  function renderTool(){
+    var t = toolState.tool;
+    if (!toolState.loaded) return loadingHtml('Memuat data alat…');
+    if (!t) {
+      return '<div class="card tool-hero"><div class="banner danger">' + ICON.warn + '<div><p><strong>Alat tidak ditemukan.</strong></p><p>Kode <span class="mono">' + esc(toolState.toolId || '-') + '</span> tidak terdaftar. Hubungi admin.</p></div></div></div>';
+    }
+    var me = auth.user.id;
+    var mine = toolState.opens.filter(function(o){ return o.userId === me; })[0];
+    var others = toolState.opens.filter(function(o){ return o.userId !== me; });
+    var otherHtml = others.map(function(o){
+      return '<p>Sedang dipakai oleh <strong>' + esc(o.userNama) + '</strong> sejak <strong>' + esc(fmtTime(o.start)) + '</strong>' + (o.overdue ? ' (' + esc(fmtDay(o.start)) + ', belum ditutup)' : '') + ' &middot; ' + esc(fmtDur(o.start)) + '</p>';
+    }).join('');
+
+    var statusHtml, actionHtml;
+    if (mine) {
+      statusHtml = '<div class="banner ok">' + ICON.check + '<div><p>Sedang <strong>Anda pakai</strong> sejak <strong>' + esc(fmtTime(mine.start)) + '</strong>' + (mine.overdue ? ' (' + esc(fmtDay(mine.start)) + ')' : '') + '</p><div class="elapsed" id="elapsed">' + esc(fmtDur(mine.start)) + '</div></div></div>'
+        + (mine.overdue ? '<div class="banner warn" style="margin-top:10px;">' + ICON.warn + '<p>Sesi ini dari hari sebelumnya dan belum ditutup. Tutup sekarang kalau sudah selesai.</p></div>' : '')
+        + (others.length ? '<div class="banner danger" style="margin-top:10px;">' + ICON.warn + '<div>' + otherHtml + '</div></div>' : '');
+      actionHtml = '<button type="button" class="btn btn-danger btn-xl" id="btn-act" data-act="stop">SELESAI</button>';
+    } else if (others.length) {
+      statusHtml = '<div class="banner danger">' + ICON.warn + '<div>' + otherHtml + '<p>Anda tetap bisa memakai — sesi ini akan dicatat sebagai <strong>overlap</strong>.</p></div></div>';
+      actionHtml = '<button type="button" class="btn btn-warn btn-xl" id="btn-act" data-act="start">START (OVERLAP)</button>';
+    } else {
+      statusHtml = '<div class="banner ok">' + ICON.check + '<p>Alat <strong>tersedia</strong> dan siap dipakai.</p></div>';
+      actionHtml = '<button type="button" class="btn btn-ok btn-xl" id="btn-act" data-act="start">START</button>';
+    }
+    var note = toolState.note ? '<div class="result-note banner ' + toolState.note.kind + '">' + (toolState.note.kind === 'ok' ? ICON.check : ICON.info) + '<p>' + esc(toolState.note.text) + '</p></div>' : '';
+
+    return '<div class="card tool-hero">'
+      + '<div class="meta"><span class="pill pill-neutral">' + esc(t.jenis) + '</span><span class="pill pill-neutral">Gedung ' + esc(t.gedung) + '</span></div>'
+      + '<h1>' + esc(t.nama) + '</h1><div class="idline">' + esc(t.id) + '</div>'
+      + '<div class="status-box">' + statusHtml + '</div>'
+      + actionHtml
+      + note
+      + '</div>'
+      + '<p class="faint" style="text-align:center; margin-top:14px;">Masuk sebagai ' + esc(auth.user.nama) + '. Halaman ini boleh tetap dibuka — tombol Selesai bisa ditekan nanti tanpa scan ulang.</p>';
+  }
+  function bindTool(){
+    var b = document.getElementById('btn-act');
+    if (!b) return;
+    b.addEventListener('click', function(){
+      if (busy || Date.now() < cooldownUntil) return;
+      var act = b.getAttribute('data-act');
+      busy = true; mutSeq++; b.disabled = true; b.textContent = 'Memproses…';
+      call(act === 'stop' ? 'apiStop' : 'apiStart', auth.token, toolState.toolId).then(function(res){
+        busy = false; cooldownUntil = Date.now() + 1500;
+        var ok = handle(res);
+        if (!ok) { if (auth) render(); return; }
+        toolState.tool = ok.tool; toolState.opens = ok.opens || [];
+        toolState.note = { kind: ok.already ? 'info' : 'ok', text: ok.message };
+        home = null; admin = null;
+        render();
+        toast(ok.message);
+      });
+    });
+  }
+  function refreshTool(){
+    if (!auth || view !== 'tool' || busy) return;
+    var seq = mutSeq, forId = toolState.toolId;
+    call('apiTool', auth.token, forId).then(function(res){
+      // abaikan hasil yang sudah basi (ada Start/Selesai setelah request ini dikirim, atau pindah alat)
+      if (seq !== mutSeq || forId !== toolState.toolId) return;
+      var ok = handle(res);
+      if (!ok) return;
+      toolState.tool = ok.tool; toolState.opens = ok.opens || []; toolState.loaded = true;
+      if (view === 'tool' && !busy) render();
+    });
+  }
+
+  /* ---------- home ---------- */
+  function loadTab(){
+    if (!auth || view !== 'home') return;
+    if (tab === 'admin' || tab === 'qr') {
+      if (!isAdmin()) { tab = 'saya'; render(); return; }
+      call('apiAdmin', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; admin = ok; if (view === 'home' && (tab === 'admin' || tab === 'qr')) render(); });
+    } else {
+      call('apiHome', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; home = ok; if (view === 'home' && (tab === 'saya' || tab === 'semua')) render(); });
+    }
+  }
+  function renderHome(){
+    if (tab === 'admin') return admin ? renderAdmin() : loadingHtml();
+    if (tab === 'qr') return admin ? renderQr() : loadingHtml();
+    if (!home) return loadingHtml();
+    return tab === 'semua' ? renderSemua() : renderSaya();
+  }
+  function bindHome(){
+    if (tab === 'saya') bindSaya();
+    else if (tab === 'semua') bindSemua();
+    else if (tab === 'admin') bindAdmin();
+    else if (tab === 'qr') bindQr();
+  }
+
+  function renderSaya(){
+    var open = home.mineOpen;
+    var overdue = open.filter(function(s){ return s.overdue; });
+    var banner = overdue.length ? '<div class="section"><div class="banner warn">' + ICON.warn + '<div><p><strong>' + overdue.length + ' sesi belum ditutup</strong> dari hari sebelumnya (tercatat sebagai pelanggaran SOP).</p><p>Tekan Selesai di bawah kalau alatnya sudah tidak dipakai.</p></div></div></div>' : '';
+    var list = open.length ? open.map(function(s){
+      return '<div class="row"><div class="grow"><div class="nm">' + esc(s.toolNama) + '</div>'
+        + '<div class="meta"><span class="tag">' + esc(s.toolId) + '</span><span>Gedung ' + esc(s.gedung) + '</span><span>sejak ' + esc(fmtTime(s.start)) + (s.overdue ? ' ' + esc(fmtDay(s.start)) : '') + '</span>' + (s.status === 'overlap' ? statusPill('overlap') : '') + (s.overdue ? '<span class="pill pill-warn">Belum ditutup</span>' : '') + '</div>'
+        + '<div class="mono" style="color:var(--accent); font-weight:600; margin-top:4px;">' + esc(fmtDur(s.start)) + '</div></div>'
+        + '<button type="button" class="btn btn-danger btn-sm" data-stop="' + esc(s.toolId) + '">Selesai</button></div>';
+    }).join('') : '<div class="card empty">Tidak ada alat yang sedang Anda pakai.<br>Scan QR di alat untuk mulai.</div>';
+    var hist = home.hist.length ? home.hist.map(function(s){
+      return '<div class="hrow"><div><div style="font-weight:600;">' + esc(s.toolNama) + '</div><div class="faint">' + esc(fmtDay(s.start)) + ' &middot; ' + esc(fmtTime(s.start)) + '–' + esc(fmtTime(s.end)) + (s.status === 'overlap' ? ' &middot; overlap' : '') + '</div></div><div class="r">' + esc(fmtDur(s.start, s.end)) + '</div></div>';
+    }).join('') : '<div class="empty">Belum ada riwayat.</div>';
+    return banner
+      + '<div class="section"><div class="section-head"><h2>Sedang Saya Pakai</h2><span class="faint">' + open.length + ' alat</span></div>' + list + '</div>'
+      + '<div class="section"><details class="hist"><summary>Riwayat Pemakaian Saya (' + home.hist.length + ')</summary>' + hist + '</details></div>';
+  }
+  function bindSaya(){
+    document.querySelectorAll('[data-stop]').forEach(function(b){
+      b.addEventListener('click', function(){
+        if (busy) return;
+        busy = true; b.disabled = true; b.textContent = '…';
+        call('apiStop', auth.token, b.getAttribute('data-stop')).then(function(res){
+          busy = false;
+          var ok = handle(res);
+          if (ok) toast(ok.message);
+          loadTab();
+        });
+      });
+    });
+  }
+
+  function renderSemua(){
+    var chips = ['Semua','S25','S29'].map(function(g){ return '<button type="button" class="chip' + (ui.gedung === g ? ' active' : '') + '" data-gedung="' + g + '">' + g + '</button>'; }).join('');
+    return '<div class="section-head"><h2>Semua Alat</h2></div>'
+      + '<p class="sub" style="margin:-4px 0 12px;">Tanpa QR? Ketuk alat untuk membuka halamannya.</p>'
+      + '<div class="searchbar"><input id="f-search" type="search" placeholder="Cari nama atau kode alat…" value="' + esc(ui.query) + '"></div>'
+      + '<div class="chiprow">' + chips + '</div>'
+      + '<div id="tool-list">' + renderToolList() + '</div>';
+  }
+  function renderToolList(){
+    var q = ui.query.trim().toLowerCase();
+    var list = home.tools.filter(function(t){
+      if (ui.gedung !== 'Semua' && t.gedung !== ui.gedung) return false;
+      return !q || (t.nama + ' ' + t.id + ' ' + t.jenis).toLowerCase().indexOf(q) >= 0;
+    });
+    if (!list.length) return '<div class="empty">Tidak ada alat yang cocok.</div>';
+    var out = '', lastG = '';
+    list.forEach(function(t){
+      if (ui.gedung === 'Semua' && t.gedung !== lastG) { out += '<div class="gedung-heading">Gedung ' + esc(t.gedung) + '</div>'; lastG = t.gedung; }
+      var st = t.openCount === 0 ? 'tersedia' : (t.openCount > 1 ? 'overlap' : 'dipakai');
+      out += '<button type="button" class="row" data-open-tool="' + esc(t.id) + '"><div class="grow"><div class="nm">' + esc(t.nama) + '</div>'
+        + '<div class="meta">' + statusPill(st) + '<span class="tag">' + esc(t.id) + '</span>' + (t.holders.length ? '<span>' + esc(t.holders.join(', ')) + '</span>' : '') + '</div></div>'
+        + '<span class="pill ' + (t.mine ? 'pill-danger' : 'pill-ok') + '">' + (t.mine ? 'Selesai' : 'Start') + ' ›</span></button>';
+    });
+    return out;
+  }
+  function bindToolListClicks(){
+    document.querySelectorAll('[data-open-tool]').forEach(function(b){
+      b.addEventListener('click', function(){ openTool(b.getAttribute('data-open-tool')); });
+    });
+  }
+  function bindSemua(){
+    var s = document.getElementById('f-search');
+    if (s) s.addEventListener('input', function(){ ui.query = s.value; document.getElementById('tool-list').innerHTML = renderToolList(); bindToolListClicks(); });
+    document.querySelectorAll('[data-gedung]').forEach(function(c){ c.addEventListener('click', function(){ ui.gedung = c.getAttribute('data-gedung'); render(); }); });
+    bindToolListClicks();
+  }
+  function openTool(id){
+    view = 'tool';
+    toolState = { toolId: id, tool: null, opens: [], loaded: false, note: null };
+    render();
+    refreshTool();
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- admin ---------- */
+  function renderAdmin(){
+    var a = admin, k = a.kpi;
+    var stats = '<div class="stat-row">'
+      + '<div class="stat ok"><div class="num">' + k.tersedia + '</div><div class="lbl">Tersedia</div></div>'
+      + '<div class="stat info"><div class="num">' + k.dipakai + '</div><div class="lbl">Sedang Dipakai</div></div>'
+      + '<div class="stat danger"><div class="num">' + k.overlap + '</div><div class="lbl">Overlap Aktif</div></div>'
+      + '<div class="stat warn"><div class="num">' + k.belumDitutup + '</div><div class="lbl">Belum Ditutup</div></div></div>';
+
+    var gchips = ['Semua','S25','S29'].map(function(g){ return '<button type="button" class="chip' + (ui.adminGedung === g ? ' active' : '') + '" data-admin-gedung="' + g + '">' + g + '</button>'; }).join('');
+    var inG = function(g){ return ui.adminGedung === 'Semua' || g === ui.adminGedung; };
+    var status = a.status.filter(function(t){ return inG(t.gedung); }).map(function(t){
+      var who = t.opens.map(function(o){ return '<div class="faint" style="margin-top:2px;">' + esc(o.userNama) + ' &middot; sejak ' + esc(fmtTime(o.start)) + ' ' + esc(fmtDay(o.start)) + ' &middot; ' + esc(fmtDur(o.start)) + (o.overdue ? ' &middot; <strong>belum ditutup</strong>' : '') + '</div>'; }).join('');
+      return '<div class="row" style="align-items:flex-start;"><div class="grow"><div class="nm">' + esc(t.nama) + '</div><div class="meta">' + statusPill(t.status) + (t.opens.some(function(o){ return o.overdue; }) ? '<span class="pill pill-warn">Belum ditutup</span>' : '') + '<span class="tag">' + esc(t.id) + '</span></div>' + who + '</div></div>';
+    }).join('') || '<div class="empty">Tidak ada alat.</div>';
+
+    var hchips = [['semua','Semua Sesi'],['bermasalah','Bermasalah Saja']].map(function(c){ return '<button type="button" class="chip' + (ui.histFilter === c[0] ? ' active' : '') + '" data-hist="' + c[0] + '">' + c[1] + '</button>'; }).join('');
+    var sess = a.sessions.filter(function(s){ return inG(s.gedung) && (ui.histFilter !== 'bermasalah' || s.status === 'overlap' || s.overdue); });
+    var hist = sess.length ? sess.map(function(s){
+      var badge = s.status === 'overlap' ? statusPill('overlap') : (s.overdue ? '<span class="pill pill-warn">Belum ditutup</span>' : (s.end ? '<span class="pill pill-neutral">Selesai</span>' : '<span class="pill pill-ok">Berjalan</span>'));
+      var waktu = s.end ? esc(fmtTime(s.start)) + '–' + esc(fmtTime(s.end)) : 'sejak ' + esc(fmtTime(s.start));
+      return '<div class="hrow"><div><div style="font-weight:600;">' + esc(s.toolNama) + '</div><div class="faint" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">' + esc(s.userNama) + ' &middot; ' + esc(s.gedung) + ' &middot; ' + esc(fmtDay(s.start)) + ' ' + waktu + ' ' + badge + '</div></div><div class="r">' + esc(fmtDur(s.start, s.end)) + '</div></div>';
+    }).join('') : '<div class="empty">Tidak ada sesi untuk filter ini.</div>';
+
+    var rk = a.ringkasan.filter(function(r){ return inG(r.gedung); }).sort(function(x, y){ return y.overlap - x.overlap || y.menit - x.menit; });
+    var rkHtml = '<div class="scroll-x"><table class="tbl"><thead><tr><th>Alat</th><th class="num">Sesi</th><th class="num">Total</th><th class="num">Overlap</th></tr></thead><tbody>'
+      + rk.map(function(r){ return '<tr><td>' + esc(r.nama) + '<div class="faint mono">' + esc(r.id) + '</div></td><td class="num">' + r.sesi + '</td><td class="num">' + esc(fmtMin(r.menit)) + '</td><td class="num">' + (r.overlap ? '<strong style="color:var(--danger)">' + r.overlap + '</strong>' : '0') + '</td></tr>'; }).join('')
+      + '</tbody></table></div>';
+
+    var jenisOpts = ['Kamera','Lighting','Mic','Tripod','Lensa','Lainnya'].map(function(j){ return '<option>' + j + '</option>'; }).join('');
+    var userList = a.users.slice().sort(function(x, y){ return x.nama.localeCompare(y.nama); }).map(function(u){
+      return '<div class="hrow"><div><div style="font-weight:600;">' + esc(u.nama) + (u.role === 'admin' ? ' <span class="tag">Admin</span>' : '') + '</div><div class="faint">' + esc(u.username) + '</div></div><div class="r">PIN ' + esc(u.pin) + '</div></div>';
+    }).join('');
+
+    return stats
+      + '<div class="section"><div class="section-head"><h2>Status Semua Alat</h2><button type="button" class="linkbtn" id="btn-refresh">Muat ulang</button></div><div class="chiprow">' + gchips + '</div>' + status + '</div>'
+      + '<div class="section"><div class="section-head"><h2>Riwayat &amp; Sesi Bermasalah</h2></div><div class="chiprow">' + hchips + '</div><div class="card" style="padding:0; overflow:hidden;">' + hist + '</div></div>'
+      + '<div class="section"><div class="section-head"><h2>Ringkasan 30 Hari per Alat</h2></div><p class="sub" style="margin:-4px 0 10px;">Alat yang sering overlap = tanda stoknya kurang.</p><div class="card" style="padding:4px 6px;">' + rkHtml + '</div></div>'
+      + '<div class="section"><div class="section-head"><h2>Tambah Alat</h2></div><div class="card"><form id="form-tool">'
+      + (ui.toolErr ? '<div class="form-error">' + esc(ui.toolErr) + '</div>' : '')
+      + '<div class="form-row"><div class="field"><label for="ft-id">Kode Alat</label><input id="ft-id" type="text" placeholder="cth. S25-CAM-03" autocapitalize="characters" required></div>'
+      + '<div class="field"><label for="ft-gedung">Gedung</label><select id="ft-gedung"><option>S25</option><option>S29</option></select></div></div>'
+      + '<div class="form-row"><div class="field"><label for="ft-nama">Nama Alat</label><input id="ft-nama" type="text" placeholder="cth. Kamera Sony A7 IV" required></div>'
+      + '<div class="field"><label for="ft-jenis">Jenis</label><select id="ft-jenis">' + jenisOpts + '</select></div></div>'
+      + '<button type="submit" class="btn btn-primary">Tambah Alat</button></form></div></div>'
+      + '<div class="section"><div class="section-head"><h2>Tambah Akun / Personel</h2></div><div class="card"><form id="form-user">'
+      + (ui.userErr ? '<div class="form-error">' + esc(ui.userErr) + '</div>' : '')
+      + '<div class="form-row"><div class="field"><label for="fu-nama">Nama</label><input id="fu-nama" type="text" placeholder="cth. Putri Ayu" required></div>'
+      + '<div class="field"><label for="fu-role">Role</label><select id="fu-role"><option value="vg">Videographer</option><option value="admin">Admin</option></select></div></div>'
+      + '<div class="form-row"><div class="field"><label for="fu-username">Username</label><input id="fu-username" type="text" placeholder="cth. putri" autocapitalize="off" required></div>'
+      + '<div class="field"><label for="fu-pin">PIN (4 digit)</label><input id="fu-pin" type="text" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" required></div></div>'
+      + '<div style="display:flex; gap:8px; flex-wrap:wrap;"><button type="submit" class="btn btn-primary">Tambah Akun</button><button type="button" class="btn btn-ghost" id="btn-randpin">Acak PIN</button></div></form></div>'
+      + '<details class="hist" style="margin-top:10px;"><summary>Daftar Akun (' + a.users.length + ')</summary>' + userList + '</details></div>'
+      + '<div class="section"><div class="card"><p class="sub" style="margin:0 0 10px;">Semua data (alat, akun, sesi) tersimpan di Google Sheet. Edit atau hapus data langsung di sana.</p>'
+      + '<a class="btn btn-outline btn-sm" href="' + esc(a.sheetUrl) + '" target="_blank" rel="noopener">Buka Google Sheet</a></div></div>';
+  }
+  function bindAdmin(){
+    document.querySelectorAll('[data-admin-gedung]').forEach(function(c){ c.addEventListener('click', function(){ ui.adminGedung = c.getAttribute('data-admin-gedung'); render(); }); });
+    document.querySelectorAll('[data-hist]').forEach(function(c){ c.addEventListener('click', function(){ ui.histFilter = c.getAttribute('data-hist'); render(); }); });
+    var rf = document.getElementById('btn-refresh'); if (rf) rf.addEventListener('click', function(){ loadTab(); toast('Memuat ulang…'); });
+    var rp = document.getElementById('btn-randpin'); if (rp) rp.addEventListener('click', function(){ document.getElementById('fu-pin').value = String(Math.floor(1000 + Math.random() * 9000)); });
+    var ft = document.getElementById('form-tool');
+    if (ft) ft.addEventListener('submit', function(ev){
+      ev.preventDefault(); if (busy) return; busy = true;
+      var data = { id: val('ft-id'), nama: val('ft-nama'), jenis: val('ft-jenis'), gedung: val('ft-gedung') };
+      call('apiAddTool', auth.token, data).then(function(res){
+        busy = false;
+        if (res.ok) { ui.toolErr = ''; toast(res.message); loadTab(); }
+        else if (res.code === 'AUTH') handle(res);
+        else { ui.toolErr = res.message; render(); restore('ft-', data); }
+      });
+    });
+    var fu = document.getElementById('form-user');
+    if (fu) fu.addEventListener('submit', function(ev){
+      ev.preventDefault(); if (busy) return; busy = true;
+      var data = { nama: val('fu-nama'), username: val('fu-username'), pin: val('fu-pin'), role: val('fu-role') };
+      call('apiAddUser', auth.token, data).then(function(res){
+        busy = false;
+        if (res.ok) { ui.userErr = ''; toast(res.message); loadTab(); }
+        else if (res.code === 'AUTH') handle(res);
+        else { ui.userErr = res.message; render(); restore('fu-', data); }
+      });
+    });
+  }
+  function val(id){ var el = document.getElementById(id); return el ? el.value : ''; }
+  function restore(prefix, data){ Object.keys(data).forEach(function(k){ var el = document.getElementById(prefix + k); if (el) el.value = data[k]; }); }
+
+  /* ---------- cetak QR ---------- */
+  function renderQr(){
+    var base = BOOT.baseUrl || '';
+    var looksOk = /^https:\/\//.test(base);
+    var chips = ['Semua','S25','S29'].map(function(g){ return '<button type="button" class="chip' + (ui.qrGedung === g ? ' active' : '') + '" data-qr-gedung="' + g + '">' + g + '</button>'; }).join('');
+    var list = admin.tools.filter(function(t){ return ui.qrGedung === 'Semua' || t.gedung === ui.qrGedung; });
+    var cards = list.map(function(t){
+      return '<div class="qr-card"><div class="qbox" id="qr-' + esc(t.id) + '"></div><div class="nm">' + esc(t.nama) + '</div><div class="id">' + esc(t.id) + ' &middot; ' + esc(t.gedung) + '</div><div class="cta">Scan untuk Start / Selesai</div></div>';
+    }).join('');
+    return '<div class="no-print section">'
+      + '<div class="section-head"><h2>Cetak QR Alat</h2><button type="button" class="btn btn-primary btn-sm" id="btn-print">' + ICON.print + ' Cetak</button></div>'
+      + '<p class="sub" style="margin:0 0 10px;">1 stiker per alat. Scan langsung membuka halaman alat itu; tombol Start / Selesai muncul otomatis.</p>'
+      + (looksOk ? '' : '<div class="banner warn" style="margin-bottom:10px;">' + ICON.warn + '<p>Link di QR belum terlihat seperti link web app final (berakhiran <span class="mono">/exec</span>). Isi kolom BASE_URL di tab <strong>Config</strong> pada Google Sheet dengan link web app Anda, lalu muat ulang halaman ini.</p></div>')
+      + '<p class="faint" style="margin:0 0 10px; word-break:break-all;">Link di QR: <span class="mono">' + esc(base) + '?t=…</span></p>'
+      + '<div class="chiprow">' + chips + '</div>'
+      + '<p class="faint" style="margin:0 0 12px;">Kalau tombol Cetak tidak merespons, pakai menu browser → Print (atau Ctrl+P). Di HP, tekan lama gambar QR untuk menyimpannya.</p>'
+      + '</div>'
+      + '<div class="qr-grid">' + (cards || '<div class="empty">Belum ada alat.</div>') + '</div>';
+  }
+  function bindQr(){
+    document.querySelectorAll('[data-qr-gedung]').forEach(function(c){ c.addEventListener('click', function(){ ui.qrGedung = c.getAttribute('data-qr-gedung'); render(); }); });
+    var p = document.getElementById('btn-print');
+    if (p) p.addEventListener('click', function(){ try { window.print(); } catch(e){ toast('Pakai menu browser → Print.'); } });
+    admin.tools.forEach(function(t){
+      var el = document.getElementById('qr-' + t.id);
+      if (!el) return;
+      var text = toolUrl(t.id);
+      el.setAttribute('data-qr', text);
+      try {
+        var qr = qrcode(0, 'M'); qr.addData(text); qr.make();
+        el.innerHTML = qr.createImgTag(6, 12, 'QR ' + t.id);
+      } catch(e){ el.innerHTML = '<div class="faint">QR gagal dibuat</div>'; }
+    });
+  }
+
+  /* ---------- boot ---------- */
+  render();
+  if (auth) { if (view === 'tool') refreshTool(); else { if (isAdmin()) tab = 'admin'; render(); loadTab(); } }
+  else if (BOOT.toolId) {
+    call('apiToolInfo', BOOT.toolId).then(function(res){
+      if (!res.ok || !res.tool) return;
+      BOOT.tool = res.tool;
+      var h = document.getElementById('scan-hint');
+      if (h) h.innerHTML = 'Login dulu untuk memakai: <strong>' + esc(res.tool.nama) + '</strong> &middot; Gedung ' + esc(res.tool.gedung);
+    });
+  }
+
+  // live-ish: perbarui timer tiap 30 detik, dan ambil data terbaru saat tab HP dibuka lagi
+  setInterval(function(){
+    if (!auth || busy) return;
+    if (view === 'tool') { var e = document.getElementById('elapsed'); var me = auth.user.id; var m = toolState.opens.filter(function(o){ return o.userId === me; })[0]; if (e && m) e.textContent = fmtDur(m.start); }
+    else if (tab === 'saya' && home) render();
+  }, 30000);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState !== 'visible' || !auth || busy) return;
+    if (view === 'tool') refreshTool(); else if (tab === 'saya' || tab === 'semua') loadTab();
+  });
+})();
+</script>
+</body>
+</html>
