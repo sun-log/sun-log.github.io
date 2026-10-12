@@ -260,7 +260,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   /* ---------- helpers ---------- */
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function fmtTime(iso){ try { return new Date(iso).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', timeZone:'Asia/Jakarta'}); } catch(e){ return ''; } }
+  function fmtTime(iso){ try { return new Date(iso).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', hourCycle:'h23', timeZone:'Asia/Jakarta'}).replace('.', ':'); } catch(e){ return ''; } } // jam WIB
   function fmtDay(iso){ try { return new Date(iso).toLocaleDateString('id-ID', {day:'numeric', month:'short', timeZone:'Asia/Jakarta'}); } catch(e){ return ''; } }
   function minutesBetween(a, b){ return Math.max(0, Math.round(((b ? new Date(b) : new Date()) - new Date(a)) / 60000)); }
   function fmtMin(m){ var j = Math.floor(m/60), r = m % 60; return j ? (j + 'j ' + r + 'm') : (r + 'm'); }
@@ -457,12 +457,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var mine = toolState.opens.filter(function(o){ return o.userId === me; })[0];
     var others = toolState.opens.filter(function(o){ return o.userId !== me; });
     var otherHtml = others.map(function(o){
-      return '<p>Sedang dipakai oleh <strong>' + esc(o.userNama) + '</strong> sejak <strong>' + esc(fmtTime(o.start)) + '</strong>' + (o.overdue ? ' (' + esc(fmtDay(o.start)) + ', belum ditutup)' : '') + ' &middot; ' + esc(fmtDur(o.start)) + '</p>';
+      return '<p>Sedang dipakai oleh <strong>' + esc(o.userNama) + '</strong> sejak <strong>' + esc(fmtTime(o.start)) + ' WIB</strong>' + (o.overdue ? ' (' + esc(fmtDay(o.start)) + ', belum ditutup)' : '') + ' &middot; ' + esc(fmtDur(o.start)) + '</p>';
     }).join('');
 
     var statusHtml, actionHtml;
     if (mine) {
-      statusHtml = '<div class="banner ok">' + ICON.check + '<div><p>Sedang <strong>Anda pakai</strong> sejak <strong>' + esc(fmtTime(mine.start)) + '</strong>' + (mine.overdue ? ' (' + esc(fmtDay(mine.start)) + ')' : '') + '</p><div class="elapsed" id="elapsed">' + esc(fmtDur(mine.start)) + '</div></div></div>'
+      statusHtml = '<div class="banner ok">' + ICON.check + '<div><p>Sedang <strong>Anda pakai</strong> sejak <strong>' + esc(fmtTime(mine.start)) + ' WIB</strong>' + (mine.overdue ? ' (' + esc(fmtDay(mine.start)) + ')' : '') + '</p><div class="elapsed" id="elapsed">' + esc(fmtDur(mine.start)) + '</div></div></div>'
         + (mine.overdue ? '<div class="banner warn" style="margin-top:10px;">' + ICON.warn + '<p>Sesi ini dari hari sebelumnya dan belum ditutup. Tutup sekarang kalau sudah selesai.</p></div>' : '')
         + (others.length ? '<div class="banner danger" style="margin-top:10px;">' + ICON.warn + '<div>' + otherHtml + '</div></div>' : '');
       actionHtml = '<button type="button" class="btn btn-danger btn-xl" id="btn-act" data-act="stop">SELESAI</button>';
@@ -545,12 +545,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var banner = overdue.length ? '<div class="section"><div class="banner warn">' + ICON.warn + '<div><p><strong>' + overdue.length + ' sesi belum ditutup</strong> dari hari sebelumnya (tercatat sebagai pelanggaran SOP).</p><p>Tekan Selesai di bawah kalau alatnya sudah tidak dipakai.</p></div></div></div>' : '';
     var list = open.length ? open.map(function(s){
       return '<div class="row"><div class="grow"><div class="nm">' + esc(s.toolNama) + '</div>'
-        + '<div class="meta"><span class="tag">' + esc(s.toolId) + '</span><span>Gedung ' + esc(s.gedung) + '</span><span>sejak ' + esc(fmtTime(s.start)) + (s.overdue ? ' ' + esc(fmtDay(s.start)) : '') + '</span>' + (s.status === 'overlap' ? statusPill('overlap') : '') + (s.overdue ? '<span class="pill pill-warn">Belum ditutup</span>' : '') + '</div>'
+        + '<div class="meta"><span class="tag">' + esc(s.toolId) + '</span><span>Gedung ' + esc(s.gedung) + '</span><span>sejak ' + esc(fmtTime(s.start)) + ' WIB' + (s.overdue ? ' ' + esc(fmtDay(s.start)) : '') + '</span>' + (s.status === 'overlap' ? statusPill('overlap') : '') + (s.overdue ? '<span class="pill pill-warn">Belum ditutup</span>' : '') + '</div>'
         + '<div class="mono" style="color:var(--accent); font-weight:600; margin-top:4px;">' + esc(fmtDur(s.start)) + '</div></div>'
         + '<button type="button" class="btn btn-danger btn-sm" data-stop="' + esc(s.toolId) + '">Selesai</button></div>';
     }).join('') : '<div class="card empty">Tidak ada alat yang sedang Anda pakai.<br>Scan QR di alat untuk mulai.</div>';
     var hist = home.hist.length ? home.hist.map(function(s){
-      return '<div class="hrow"><div><div style="font-weight:600;">' + esc(s.toolNama) + '</div><div class="faint">' + esc(fmtDay(s.start)) + ' &middot; ' + esc(fmtTime(s.start)) + '–' + esc(fmtTime(s.end)) + (s.status === 'overlap' ? ' &middot; overlap' : '') + '</div></div><div class="r">' + esc(fmtDur(s.start, s.end)) + '</div></div>';
+      return '<div class="hrow"><div><div style="font-weight:600;">' + esc(s.toolNama) + '</div><div class="faint">' + esc(fmtDay(s.start)) + ' &middot; ' + esc(fmtTime(s.start)) + '–' + esc(fmtTime(s.end)) + ' WIB' + (s.status === 'overlap' ? ' &middot; overlap' : '') + '</div></div><div class="r">' + esc(fmtDur(s.start, s.end)) + '</div></div>';
     }).join('') : '<div class="empty">Belum ada riwayat.</div>';
     return banner
       + '<div class="section"><div class="section-head"><h2>Sedang Saya Pakai</h2><span class="faint">' + open.length + ' alat</span></div>' + list + '</div>'
@@ -627,7 +627,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var gchips = ['Semua','S25','S29'].map(function(g){ return '<button type="button" class="chip' + (ui.adminGedung === g ? ' active' : '') + '" data-admin-gedung="' + g + '">' + g + '</button>'; }).join('');
     var inG = function(g){ return ui.adminGedung === 'Semua' || g === ui.adminGedung; };
     var status = a.status.filter(function(t){ return inG(t.gedung); }).map(function(t){
-      var who = t.opens.map(function(o){ return '<div class="faint" style="margin-top:2px;">' + esc(o.userNama) + ' &middot; sejak ' + esc(fmtTime(o.start)) + ' ' + esc(fmtDay(o.start)) + ' &middot; ' + esc(fmtDur(o.start)) + (o.overdue ? ' &middot; <strong>belum ditutup</strong>' : '') + '</div>'; }).join('');
+      var who = t.opens.map(function(o){ return '<div class="faint" style="margin-top:2px;">' + esc(o.userNama) + ' &middot; sejak ' + esc(fmtTime(o.start)) + ' WIB ' + esc(fmtDay(o.start)) + ' &middot; ' + esc(fmtDur(o.start)) + (o.overdue ? ' &middot; <strong>belum ditutup</strong>' : '') + '</div>'; }).join('');
       return '<div class="row" style="align-items:flex-start;"><div class="grow"><div class="nm">' + esc(t.nama) + '</div><div class="meta">' + statusPill(t.status) + (t.opens.some(function(o){ return o.overdue; }) ? '<span class="pill pill-warn">Belum ditutup</span>' : '') + '<span class="tag">' + esc(t.id) + '</span></div>' + who + '</div></div>';
     }).join('') || '<div class="empty">Tidak ada alat.</div>';
 
@@ -635,7 +635,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var sess = a.sessions.filter(function(s){ return inG(s.gedung) && (ui.histFilter !== 'bermasalah' || s.status === 'overlap' || s.overdue); });
     var hist = sess.length ? sess.map(function(s){
       var badge = s.status === 'overlap' ? statusPill('overlap') : (s.overdue ? '<span class="pill pill-warn">Belum ditutup</span>' : (s.end ? '<span class="pill pill-neutral">Selesai</span>' : '<span class="pill pill-ok">Berjalan</span>'));
-      var waktu = s.end ? esc(fmtTime(s.start)) + '–' + esc(fmtTime(s.end)) : 'sejak ' + esc(fmtTime(s.start));
+      var waktu = s.end ? esc(fmtTime(s.start)) + '–' + esc(fmtTime(s.end)) + ' WIB' : 'sejak ' + esc(fmtTime(s.start)) + ' WIB';
       return '<div class="hrow"><div><div style="font-weight:600;">' + esc(s.toolNama) + '</div><div class="faint" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">' + esc(s.userNama) + ' &middot; ' + esc(s.gedung) + ' &middot; ' + esc(fmtDay(s.start)) + ' ' + waktu + ' ' + badge + '</div></div><div class="r">' + esc(fmtDur(s.start, s.end)) + '</div></div>';
     }).join('') : '<div class="empty">Tidak ada sesi untuk filter ini.</div>';
 
