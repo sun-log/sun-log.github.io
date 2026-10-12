@@ -50,6 +50,7 @@
 
   .btn{appearance:none; border:1px solid transparent; border-radius:var(--radius-sm); padding:10px 16px; min-height:44px; font-weight:600; font-size:.95rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; touch-action:manipulation; transition:transform .06s ease, opacity .15s;}
   .btn:active{transform:scale(.98);}
+  a.btn{text-decoration:none;}
   .btn:disabled{opacity:.55; cursor:default;}
   .btn-primary{background:var(--accent); color:var(--accent-ink);}
   .btn-ok{background:var(--ok); color:#fff;}
@@ -102,6 +103,25 @@
   .form-error{background:var(--danger-soft); color:var(--danger-ink); border-radius:var(--radius-sm); padding:9px 12px; font-size:.86rem; margin-bottom:14px;}
   .scan-hint{background:var(--accent-soft); color:var(--accent-soft-ink); border-radius:var(--radius-sm); padding:10px 12px; font-size:.88rem; margin-bottom:16px;}
   .form-row{display:flex; gap:10px; flex-wrap:wrap;}
+  /* login cepat: ketuk nama + PIN */
+  .step-title{font-family:var(--font-display); font-size:1.05rem; text-align:center; margin:0 0 12px;}
+  .team-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .team-btn{appearance:none; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); border-radius:var(--radius); padding:12px 10px; min-height:64px; font-weight:600; font-size:.92rem; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; touch-action:manipulation;}
+  .team-btn:active{transform:scale(.97);}
+  .team-btn .av{width:34px; height:34px; border-radius:50%; background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:.95rem;}
+  .team-btn.last{border-color:var(--accent); background:var(--accent-soft);}
+  .pin-dots{display:flex; justify-content:center; gap:14px; margin:6px 0 16px;}
+  .pin-dots i{width:16px; height:16px; border-radius:50%; border:2px solid var(--accent); display:block;}
+  .pin-dots i.on{background:var(--accent);}
+  .pin-dots.shake{animation:shake .35s;}
+  @keyframes shake{20%,60%{transform:translateX(-8px);}40%,80%{transform:translateX(8px);}}
+  .keypad{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  .key{appearance:none; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); border-radius:var(--radius); min-height:58px; font-family:var(--font-mono); font-size:1.5rem; font-weight:600; cursor:pointer; touch-action:manipulation; -webkit-user-select:none; user-select:none;}
+  .key:active{background:var(--accent-soft);}
+  .key.fn{font-family:var(--font-body); font-size:.85rem; font-weight:600; color:var(--ink-dim);}
+  .who-line{display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:6px;}
+  .login-qr{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px;}
+  .login-qr .qr-card .cta{color:#B23A3A;}
   .form-row .field{flex:1; min-width:140px;}
 
   /* tool landing page */
@@ -182,10 +202,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   'use strict';
   // Server data (Google Apps Script). Dipanggil tanpa cookie, jadi login Google di HP tidak berpengaruh.
   var API_URL = 'https://script.google.com/macros/s/AKfycbznnP6WeTM8mu9hQcm611oVcMji1b-TmFvWqBIbttfEvAMlhKoqga8pgP7hkkp4pZJKWA/exec';
-  var PARAM_T = (new URLSearchParams(location.search).get('t') || '').trim().toUpperCase();
+  var QS = new URLSearchParams(location.search);
+  var PARAM_T = (QS.get('t') || '').trim().toUpperCase();
+  var PARAM_LOGIN = (QS.get('login') || '').trim();
   // baseUrl = alamat halaman ini sendiri, jadi QR selalu menunjuk ke halaman ini.
   var BOOT = { toolId: PARAM_T, tool: null, baseUrl: location.origin + location.pathname };
-  var AUTH_KEY = 'logalat.auth.v1';
+  var AUTH_KEY = 'logalat.auth.v1', LAST_KEY = 'logalat.last.v1';
 
   /* ---------- state ---------- */
   var auth = loadAuth();
@@ -194,11 +216,26 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   var toolState = { toolId: BOOT.toolId, tool: BOOT.tool, opens: [], loaded: false, note: null };
   var home = null, admin = null;
   var busy = false, cooldownUntil = 0, mutSeq = 0;
-  var ui = { gedung: 'Semua', query: '', adminGedung: 'Semua', histFilter: 'semua', qrGedung: 'Semua', loginError: '', toolErr: '', userErr: '' };
+  var lg = { team: null, teamFailed: false, pick: null, pin: '', checking: false, manual: false, linking: !!PARAM_LOGIN };
+  var ui = { gedung: 'Semua', query: '', adminGedung: 'Semua', histFilter: 'semua', qrGedung: 'Semua', qrMode: 'alat', loginError: '', toolErr: '', userErr: '' };
 
-  function loadAuth(){ try { var a = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); return (a && a.token && a.user) ? a : null; } catch(e){ return null; } }
-  function saveAuth(a){ auth = a; try { localStorage.setItem(AUTH_KEY, JSON.stringify(a)); } catch(e){} }
-  function clearAuth(){ auth = null; home = null; admin = null; try { localStorage.removeItem(AUTH_KEY); } catch(e){} }
+  // Login disimpan di 2 tempat (localStorage + cookie 1 tahun) supaya HP tidak "lupa".
+  function readCookie(){ try { var m = document.cookie.match(/(?:^|; )logalat_auth=([^;]*)/); return m ? decodeURIComponent(m[1]) : null; } catch(e){ return null; } }
+  function writeCookie(v){ try { document.cookie = 'logalat_auth=' + (v ? encodeURIComponent(v) : '') + '; path=/; max-age=' + (v ? 31536000 : 0) + '; SameSite=Lax; Secure'; } catch(e){} }
+  function parseAuth(txt){ try { var a = JSON.parse(txt || 'null'); return (a && a.token && a.user) ? a : null; } catch(e){ return null; } }
+  function loadAuth(){
+    var ls = null; try { ls = localStorage.getItem(AUTH_KEY); } catch(e){}
+    var a = parseAuth(ls) || parseAuth(readCookie());
+    if (a && !ls) { try { localStorage.setItem(AUTH_KEY, JSON.stringify(a)); localStorage.setItem(LAST_KEY, a.user.username); } catch(e){} }
+    return a;
+  }
+  function saveAuth(a){
+    auth = a; var txt = JSON.stringify(a);
+    try { localStorage.setItem(AUTH_KEY, txt); localStorage.setItem(LAST_KEY, a.user.username); } catch(e){}
+    writeCookie(txt);
+  }
+  function clearAuth(){ auth = null; home = null; admin = null; try { localStorage.removeItem(AUTH_KEY); } catch(e){} writeCookie(''); }
+  function lastUser(){ try { return localStorage.getItem(LAST_KEY) || ''; } catch(e){ return ''; } }
   function isAdmin(){ return !!(auth && auth.user && auth.user.role === 'admin'); }
 
   /* ---------- server calls ---------- */
@@ -216,7 +253,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   /** Returns res if ok; otherwise handles auth/errors and returns null. */
   function handle(res){
     if (res && res.ok) return res;
-    if (res && res.code === 'AUTH') { clearAuth(); ui.loginError = res.message; render(); return null; }
+    if (res && res.code === 'AUTH') { clearAuth(); ui.loginError = res.message; render(); if (!lg.team) loadTeam(); return null; }
     toast((res && res.message) || 'Terjadi kesalahan.');
     return null;
   }
@@ -264,39 +301,113 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (view === 'tool') bindTool(); else bindHome();
   }
 
-  /* ---------- login ---------- */
+  /* ---------- login (cepat: ketuk nama -> 4 digit PIN, otomatis masuk) ---------- */
+  function initials(n){ var w = String(n || '?').trim().split(/\s+/); return ((w[0] || '?').charAt(0) + (w[1] ? w[1].charAt(0) : '')).toUpperCase(); }
+  function scanHintHtml(){
+    if (!BOOT.toolId) return '';
+    return '<div class="scan-hint" id="scan-hint">' + (BOOT.tool ? 'Alat: <strong>' + esc(BOOT.tool.nama) + '</strong> &middot; Gedung ' + esc(BOOT.tool.gedung) : 'Alat: <strong>' + esc(BOOT.toolId) + '</strong>') + '</div>';
+  }
   function renderLogin(){
-    var hint = '';
-    if (BOOT.toolId) {
-      hint = '<div class="scan-hint" id="scan-hint">Login dulu untuk memakai: <strong>' + esc(BOOT.tool ? BOOT.tool.nama : BOOT.toolId) + '</strong>' + (BOOT.tool ? ' &middot; Gedung ' + esc(BOOT.tool.gedung) : '') + '</div>';
+    var head = '<div class="login-mark" style="margin-bottom:14px;">' + ICON.mark + '<h1>Log Alat Suneeday</h1></div>';
+    var body;
+    if (lg.linking) {
+      body = loadingHtml('Menyambungkan akun ke HP ini…');
+    } else if (lg.manual || lg.teamFailed) {
+      body = '<form id="login-form" autocomplete="on">'
+        + '<div class="field"><label for="f-username">Username</label><input id="f-username" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required value="' + esc(lastUser()) + '"></div>'
+        + '<div class="field"><label for="f-pin">PIN (4 digit)</label><input id="f-pin" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="current-password" required></div>'
+        + '<button type="submit" class="btn btn-primary btn-block" id="btn-login">Masuk</button></form>'
+        + (lg.team ? '<p style="text-align:center; margin:12px 0 0;"><button type="button" class="linkbtn" id="btn-to-team">Pilih nama saja</button></p>' : '');
+    } else if (!lg.team) {
+      body = loadingHtml('Memuat daftar tim…');
+    } else if (!lg.pick) {
+      var last = lastUser();
+      var team = lg.team.slice().sort(function(a, b){ return (b.username === last) - (a.username === last); });
+      body = '<p class="step-title">Siapa kamu?</p><div class="team-grid">'
+        + team.map(function(m){
+            return '<button type="button" class="team-btn' + (m.username === last ? ' last' : '') + '" data-pick="' + esc(m.username) + '"><span class="av">' + esc(initials(m.nama)) + '</span>' + esc(m.nama) + '</button>';
+          }).join('')
+        + '</div>';
+    } else {
+      var dots = '';
+      for (var i = 0; i < 4; i++) dots += '<i class="' + (i < lg.pin.length ? 'on' : '') + '"></i>';
+      var keys = ['1','2','3','4','5','6','7','8','9','back','0','del'].map(function(k){
+        if (k === 'back') return '<button type="button" class="key fn" data-key="back">Ganti<br>nama</button>';
+        if (k === 'del') return '<button type="button" class="key fn" data-key="del" aria-label="Hapus">&#9003;</button>';
+        return '<button type="button" class="key" data-key="' + k + '">' + k + '</button>';
+      }).join('');
+      body = '<div class="who-line"><span class="team-btn" style="min-height:0; padding:0; border:none; background:none; flex-direction:row;"><span class="av">' + esc(initials(lg.pick.nama)) + '</span><strong>' + esc(lg.pick.nama) + '</strong></span></div>'
+        + '<p class="step-title" style="margin-bottom:6px;">' + (lg.checking ? 'Memeriksa…' : 'Masukkan PIN') + '</p>'
+        + '<div class="pin-dots" id="pin-dots">' + dots + '</div>'
+        + '<div class="keypad">' + keys + '</div>';
     }
-    return '<div class="screen-center"><div class="login-card">'
-      + '<div class="login-mark">' + ICON.mark + '<h1>Log Alat Suneeday</h1><span>Pencatatan Pemakaian Alat</span></div>'
-      + hint
-      + (ui.loginError ? '<div class="form-error">' + esc(ui.loginError) + '</div>' : '')
-      + '<form id="login-form" autocomplete="on">'
-      + '<div class="field"><label for="f-username">Username</label><input id="f-username" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required></div>'
-      + '<div class="field"><label for="f-pin">PIN (4 digit)</label><input id="f-pin" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="current-password" required></div>'
-      + '<button type="submit" class="btn btn-primary btn-block" id="btn-login">Masuk</button>'
-      + '</form>'
-      + '<p class="faint" style="text-align:center; margin:14px 0 0;">Cukup login sekali — HP ini akan tetap masuk sampai Anda keluar.</p>'
+    return '<div class="screen-center"><div class="login-card">' + head + scanHintHtml()
+      + (ui.loginError ? '<div class="form-error" id="login-error">' + esc(ui.loginError) + '</div>' : '')
+      + body
+      + '<p class="faint" style="text-align:center; margin:16px 0 0;">Cukup <strong>sekali</strong> di HP ini. Setelah itu scan QR alat langsung ke tombol Start / Selesai.</p>'
+      + (!lg.manual && !lg.teamFailed && !lg.linking ? '<p style="text-align:center; margin:4px 0 0;"><button type="button" class="linkbtn" id="btn-to-manual">Login pakai username</button></p>' : '')
       + '</div></div>';
   }
+  function updatePinDots(){
+    var d = document.getElementById('pin-dots'); if (!d) return;
+    Array.prototype.forEach.call(d.children, function(el, i){ el.className = i < lg.pin.length ? 'on' : ''; });
+  }
+  function pressKey(k){
+    if (!lg.pick || lg.checking) return;
+    if (k === 'back') { lg.pick = null; lg.pin = ''; ui.loginError = ''; render(); return; }
+    if (k === 'del') { lg.pin = lg.pin.slice(0, -1); updatePinDots(); return; }
+    if (!/^[0-9]$/.test(k) || lg.pin.length >= 4) return;
+    lg.pin += k; updatePinDots();
+    if (lg.pin.length === 4) doLogin(lg.pick.username, lg.pin);
+  }
+  function afterLogin(){
+    ui.loginError = ''; lg.pick = null; lg.pin = ''; lg.checking = false; lg.manual = false;
+    if (view === 'tool') { render(); refreshTool(); }
+    else { tab = isAdmin() ? 'admin' : 'saya'; render(); loadTab(); }
+  }
+  function doLogin(username, pin){
+    if (busy) return;
+    busy = true; lg.checking = true;
+    if (lg.pick) render();
+    call('apiLogin', username, pin).then(function(res){
+      busy = false; lg.checking = false;
+      if (!res.ok) {
+        ui.loginError = res.message || 'Login gagal.'; lg.pin = ''; render();
+        var d = document.getElementById('pin-dots'); if (d) d.classList.add('shake');
+        return;
+      }
+      saveAuth({ token: res.token, user: res.user });
+      afterLogin();
+    });
+  }
   function bindLogin(){
-    var f = document.getElementById('login-form');
-    f.addEventListener('submit', function(ev){
-      ev.preventDefault();
-      if (busy) return;
-      var btn = document.getElementById('btn-login');
-      busy = true; btn.disabled = true; btn.textContent = 'Memeriksa…';
-      call('apiLogin', document.getElementById('f-username').value, document.getElementById('f-pin').value).then(function(res){
-        busy = false;
-        if (!res.ok) { ui.loginError = res.message || 'Login gagal.'; render(); return; }
-        saveAuth({ token: res.token, user: res.user });
-        ui.loginError = '';
-        if (view === 'tool') { render(); refreshTool(); }
-        else { tab = isAdmin() ? 'admin' : 'saya'; render(); loadTab(); }
+    document.querySelectorAll('[data-pick]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var u = b.getAttribute('data-pick');
+        lg.pick = lg.team.filter(function(m){ return m.username === u; })[0] || null; lg.pin = ''; ui.loginError = ''; render();
       });
+    });
+    document.querySelectorAll('[data-key]').forEach(function(b){
+      b.addEventListener('click', function(){ pressKey(b.getAttribute('data-key')); });
+    });
+    var tm = document.getElementById('btn-to-manual'); if (tm) tm.addEventListener('click', function(){ lg.manual = true; ui.loginError = ''; render(); });
+    var tt = document.getElementById('btn-to-team'); if (tt) tt.addEventListener('click', function(){ lg.manual = false; lg.teamFailed = false; ui.loginError = ''; render(); });
+    var f = document.getElementById('login-form');
+    if (f) f.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var btn = document.getElementById('btn-login'); btn.disabled = true; btn.textContent = 'Memeriksa…';
+      doLogin(document.getElementById('f-username').value, document.getElementById('f-pin').value);
+    });
+  }
+  document.addEventListener('keydown', function(ev){
+    if (auth || !lg.pick || lg.manual) return;
+    if (/^[0-9]$/.test(ev.key)) { pressKey(ev.key); ev.preventDefault(); }
+    else if (ev.key === 'Backspace') { pressKey('del'); ev.preventDefault(); }
+  });
+  function loadTeam(){
+    call('apiTeam').then(function(res){
+      if (res.ok && res.team && res.team.length) lg.team = res.team; else lg.teamFailed = true;
+      if (!auth) render();
     });
   }
 
@@ -320,7 +431,14 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function tabBtn(k, label){ return '<button type="button" class="tabbtn' + (tab === k ? ' active' : '') + '" data-tab="' + k + '">' + esc(label) + '</button>'; }
   function bindTopbar(){
     var lo = document.getElementById('btn-logout');
-    if (lo) lo.addEventListener('click', function(){ clearAuth(); view = BOOT.toolId ? 'tool' : 'home'; render(); });
+    if (lo) lo.addEventListener('click', function(){
+      if (!lo.getAttribute('data-armed')) {
+        lo.setAttribute('data-armed', '1'); lo.textContent = 'Yakin keluar?';
+        setTimeout(function(){ if (lo.isConnected) { lo.removeAttribute('data-armed'); lo.textContent = 'Keluar'; } }, 3000);
+        return;
+      }
+      clearAuth(); view = BOOT.toolId ? 'tool' : 'home'; lg.pick = null; lg.pin = ''; render(); if (!lg.team) loadTeam();
+    });
     var hb = document.getElementById('btn-home');
     if (hb) hb.addEventListener('click', function(){ view = 'home'; tab = 'saya'; render(); loadTab(); });
     document.querySelectorAll('[data-tab]').forEach(function(b){
@@ -585,7 +703,27 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function restore(prefix, data){ Object.keys(data).forEach(function(k){ var el = document.getElementById(prefix + k); if (el) el.value = data[k]; }); }
 
   /* ---------- cetak QR ---------- */
+  function loginUrl(u){ return (BOOT.baseUrl || '') + '?login=' + encodeURIComponent(u.token); }
   function renderQr(){
+    var modes = '<div class="chiprow no-print">' + [['alat','QR Alat'],['login','QR Login Tim']].map(function(m){ return '<button type="button" class="chip' + (ui.qrMode === m[0] ? ' active' : '') + '" data-qr-mode="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div>';
+    return modes + (ui.qrMode === 'login' ? renderLoginQr() : renderToolQr());
+  }
+  function renderLoginQr(){
+    var users = admin.users.filter(function(u){ return u.token; }).slice().sort(function(x, y){ return x.nama.localeCompare(y.nama); });
+    var cards = users.map(function(u){
+      return '<div class="qr-card"><div class="qbox" id="lq-' + esc(u.id) + '"></div><div class="nm">' + esc(u.nama) + '</div><div class="id">' + esc(u.username) + (u.role === 'admin' ? ' &middot; admin' : '') + '</div><div class="cta">Login sekali &middot; pribadi</div>'
+        + '<div class="no-print" style="display:flex; gap:6px; justify-content:center; margin-top:8px; flex-wrap:wrap;">'
+        + '<button type="button" class="btn btn-ghost btn-sm" data-copy-login="' + esc(u.id) + '">Salin link</button>'
+        + '<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent('Link login Log Alat Suneeday untuk ' + u.nama + ' (buka sekali di HP kamu, jangan dibagikan): ' + loginUrl(u)) + '">WhatsApp</a></div></div>';
+    }).join('');
+    return '<div class="no-print section">'
+      + '<div class="section-head"><h2>QR Login Tim</h2></div>'
+      + '<p class="sub" style="margin:0 0 10px;">Biar tim <strong>tidak perlu mengetik apa pun</strong>: minta tiap VG scan QR namanya di layar ini <strong>pakai kamera HP yang sama</strong> dengan yang dipakai untuk scan alat (atau kirim link-nya lewat WhatsApp). Sekali saja — setelah itu setiap scan QR alat langsung ke tombol Start / Selesai.</p>'
+      + '<div class="banner warn" style="margin-bottom:12px;">' + ICON.warn + '<p>QR / link ini = kunci akun. <strong>Jangan ditempel di alat</strong> atau dikirim ke grup. Kalau bocor, ganti PIN orang itu di Sheet — link lamanya otomatis mati.</p></div>'
+      + '</div>'
+      + '<div class="qr-grid login-qr">' + (cards || '<div class="empty">Server belum mendukung QR login. Perbarui Apps Script.</div>') + '</div>';
+  }
+  function renderToolQr(){
     var base = BOOT.baseUrl || '';
     var looksOk = /^https:\/\//.test(base);
     var chips = ['Semua','S25','S29'].map(function(g){ return '<button type="button" class="chip' + (ui.qrGedung === g ? ' active' : '') + '" data-qr-gedung="' + g + '">' + g + '</button>'; }).join('');
@@ -603,7 +741,24 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '</div>'
       + '<div class="qr-grid">' + (cards || '<div class="empty">Belum ada alat.</div>') + '</div>';
   }
+  function drawQr(el, text, alt){
+    el.setAttribute('data-qr', text);
+    try { var qr = qrcode(0, 'M'); qr.addData(text); qr.make(); el.innerHTML = qr.createImgTag(qr.getModuleCount() > 41 ? 4 : 6, 12, alt); }
+    catch(e){ el.innerHTML = '<div class="faint">QR gagal dibuat</div>'; }
+  }
+  function copyText(t){
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t).then(function(){ toast('Link disalin.'); }, function(){ toast(t); });
+    toast(t);
+  }
   function bindQr(){
+    document.querySelectorAll('[data-qr-mode]').forEach(function(c){ c.addEventListener('click', function(){ ui.qrMode = c.getAttribute('data-qr-mode'); render(); }); });
+    if (ui.qrMode === 'login') {
+      admin.users.forEach(function(u){ var el = document.getElementById('lq-' + u.id); if (el && u.token) drawQr(el, loginUrl(u), 'QR login ' + u.nama); });
+      document.querySelectorAll('[data-copy-login]').forEach(function(b){
+        b.addEventListener('click', function(){ var u = admin.users.filter(function(x){ return x.id === b.getAttribute('data-copy-login'); })[0]; if (u) copyText(loginUrl(u)); });
+      });
+      return;
+    }
     document.querySelectorAll('[data-qr-gedung]').forEach(function(c){ c.addEventListener('click', function(){ ui.qrGedung = c.getAttribute('data-qr-gedung'); render(); }); });
     var p = document.getElementById('btn-print');
     if (p) p.addEventListener('click', function(){ try { window.print(); } catch(e){ toast('Pakai menu browser → Print.'); } });
@@ -620,14 +775,33 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   /* ---------- boot ---------- */
-  render();
-  if (auth) { if (view === 'tool') refreshTool(); else { if (isAdmin()) tab = 'admin'; render(); loadTab(); } }
-  else if (BOOT.toolId) {
+  function startLoggedIn(){ if (view === 'tool') refreshTool(); else { if (isAdmin()) tab = 'admin'; render(); loadTab(); } }
+  if (PARAM_LOGIN) {
+    // Link / QR login pribadi: sekali buka, HP langsung tersambung ke akun itu.
+    try { QS.delete('login'); history.replaceState(null, '', location.pathname + (QS.toString() ? '?' + QS.toString() : '') + location.hash); } catch(e){}
+    var prevAuth = auth; auth = null; render();
+    call('apiHome', PARAM_LOGIN).then(function(res){
+      lg.linking = false;
+      if (res.ok && res.user) {
+        saveAuth({ token: PARAM_LOGIN, user: res.user });
+        render(); toast('HP ini sekarang masuk sebagai ' + res.user.nama + '.'); startLoggedIn();
+      } else if (prevAuth) {
+        auth = prevAuth; toast('Link login tidak berlaku. Tetap masuk sebagai ' + prevAuth.user.nama + '.'); render(); startLoggedIn();
+      } else {
+        ui.loginError = res.code === 'NET' ? res.message : 'Link login sudah tidak berlaku (PIN mungkin diganti). Login dengan nama & PIN.';
+        render(); loadTeam();
+      }
+    });
+  } else {
+    render();
+    if (auth) startLoggedIn(); else loadTeam();
+  }
+  if (BOOT.toolId && !auth) {
     call('apiToolInfo', BOOT.toolId).then(function(res){
       if (!res.ok || !res.tool) return;
       BOOT.tool = res.tool;
       var h = document.getElementById('scan-hint');
-      if (h) h.innerHTML = 'Login dulu untuk memakai: <strong>' + esc(res.tool.nama) + '</strong> &middot; Gedung ' + esc(res.tool.gedung);
+      if (h) h.innerHTML = 'Alat: <strong>' + esc(res.tool.nama) + '</strong> &middot; Gedung ' + esc(res.tool.gedung);
     });
   }
 
