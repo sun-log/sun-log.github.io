@@ -271,6 +271,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (st === 'overlap') return '<span class="pill pill-danger">Overlap</span>';
     return '<span class="pill pill-neutral">' + esc(st) + '</span>';
   }
+  /** Daftar gedung diambil dari data alat (tidak lagi tetap S25/S29). */
+  function gedungChips(tools){
+    var seen = {}, out = [];
+    (tools || []).forEach(function(t){ var g = String(t.gedung || '').trim(); if (g && !seen[g]) { seen[g] = 1; out.push(g); } });
+    return ['Semua'].concat(out.sort());
+  }
   function toolUrl(id){ var b = BOOT.baseUrl || ''; return b + (b.indexOf('?') >= 0 ? '&' : '?') + 't=' + encodeURIComponent(id); }
 
   var ICON = {
@@ -572,7 +578,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   function renderSemua(){
-    var chips = ['Semua','S25','S29'].map(function(g){ return '<button type="button" class="chip' + (ui.gedung === g ? ' active' : '') + '" data-gedung="' + g + '">' + g + '</button>'; }).join('');
+    var chips = gedungChips(home.tools).map(function(g){ return '<button type="button" class="chip' + (ui.gedung === g ? ' active' : '') + '" data-gedung="' + g + '">' + g + '</button>'; }).join('');
     return '<div class="section-head"><h2>Semua Alat</h2></div>'
       + '<p class="sub" style="margin:-4px 0 12px;">Tanpa QR? Ketuk alat untuk membuka halamannya.</p>'
       + '<div class="searchbar"><input id="f-search" type="search" placeholder="Cari nama atau kode alat…" value="' + esc(ui.query) + '"></div>'
@@ -624,7 +630,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<div class="stat danger"><div class="num">' + k.overlap + '</div><div class="lbl">Overlap Aktif</div></div>'
       + '<div class="stat warn"><div class="num">' + k.belumDitutup + '</div><div class="lbl">Belum Ditutup</div></div></div>';
 
-    var gchips = ['Semua','S25','S29'].map(function(g){ return '<button type="button" class="chip' + (ui.adminGedung === g ? ' active' : '') + '" data-admin-gedung="' + g + '">' + g + '</button>'; }).join('');
+    var gchips = gedungChips(a.tools).map(function(g){ return '<button type="button" class="chip' + (ui.adminGedung === g ? ' active' : '') + '" data-admin-gedung="' + g + '">' + g + '</button>'; }).join('');
     var inG = function(g){ return ui.adminGedung === 'Semua' || g === ui.adminGedung; };
     var status = a.status.filter(function(t){ return inG(t.gedung); }).map(function(t){
       var who = t.opens.map(function(o){ return '<div class="faint" style="margin-top:2px;">' + esc(o.userNama) + ' &middot; sejak ' + esc(fmtTime(o.start)) + ' WIB ' + esc(fmtDay(o.start)) + ' &middot; ' + esc(fmtDur(o.start)) + (o.overdue ? ' &middot; <strong>belum ditutup</strong>' : '') + '</div>'; }).join('');
@@ -655,8 +661,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<div class="section"><div class="section-head"><h2>Ringkasan 30 Hari per Alat</h2></div><p class="sub" style="margin:-4px 0 10px;">Alat yang sering overlap = tanda stoknya kurang.</p><div class="card" style="padding:4px 6px;">' + rkHtml + '</div></div>'
       + '<div class="section"><div class="section-head"><h2>Tambah Alat</h2></div><div class="card"><form id="form-tool">'
       + (ui.toolErr ? '<div class="form-error">' + esc(ui.toolErr) + '</div>' : '')
-      + '<div class="form-row"><div class="field"><label for="ft-id">Kode Alat</label><input id="ft-id" type="text" placeholder="cth. S25-CAM-03" autocapitalize="characters" required></div>'
-      + '<div class="field"><label for="ft-gedung">Gedung</label><select id="ft-gedung"><option>S25</option><option>S29</option></select></div></div>'
+      + '<div class="form-row"><div class="field"><label for="ft-id">Kode Alat (opsional)</label><input id="ft-id" type="text" placeholder="Kosongkan = dibuat otomatis" autocapitalize="characters"></div>'
+      + '<div class="field"><label for="ft-gedung">Gedung</label><input id="ft-gedung" type="text" list="dl-gedung" placeholder="cth. JKT" autocapitalize="characters" required value="' + esc(gedungChips(a.tools)[1] || '') + '"><datalist id="dl-gedung">' + gedungChips(a.tools).slice(1).map(function(g){ return '<option value="' + esc(g) + '">'; }).join('') + '</datalist></div></div>'
       + '<div class="form-row"><div class="field"><label for="ft-nama">Nama Alat</label><input id="ft-nama" type="text" placeholder="cth. Kamera Sony A7 IV" required></div>'
       + '<div class="field"><label for="ft-jenis">Jenis</label><select id="ft-jenis">' + jenisOpts + '</select></div></div>'
       + '<button type="submit" class="btn btn-primary">Tambah Alat</button></form></div></div>'
@@ -726,7 +732,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function renderToolQr(){
     var base = BOOT.baseUrl || '';
     var looksOk = /^https:\/\//.test(base);
-    var chips = ['Semua','S25','S29'].map(function(g){ return '<button type="button" class="chip' + (ui.qrGedung === g ? ' active' : '') + '" data-qr-gedung="' + g + '">' + g + '</button>'; }).join('');
+    var chips = gedungChips(admin.tools).map(function(g){ return '<button type="button" class="chip' + (ui.qrGedung === g ? ' active' : '') + '" data-qr-gedung="' + g + '">' + g + '</button>'; }).join('');
     var list = admin.tools.filter(function(t){ return ui.qrGedung === 'Semua' || t.gedung === ui.qrGedung; });
     var cards = list.map(function(t){
       return '<div class="qr-card"><div class="qbox" id="qr-' + esc(t.id) + '"></div><div class="nm">' + esc(t.nama) + '</div><div class="id">' + esc(t.id) + ' &middot; ' + esc(t.gedung) + '</div><div class="cta">Scan untuk Start / Selesai</div></div>';
