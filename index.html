@@ -132,6 +132,12 @@
   .status-box{margin:18px 0 16px;}
   .elapsed{font-family:var(--font-mono); font-size:2rem; font-weight:600; color:var(--accent); line-height:1.1; margin-top:6px;}
   .result-note{margin-top:14px;}
+  .glist{display:flex; flex-direction:column; gap:6px;}
+  .gitem{display:flex; align-items:center; gap:12px; margin:0; border-width:2px;}
+  .gitem.on{border-color:var(--accent); background:var(--accent-soft);}
+  .gitem.scanned .nm{color:var(--accent-soft-ink);}
+  .gtick{flex:none; width:26px; height:26px; border-radius:7px; border:2px solid var(--line); background:var(--surface); display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff;}
+  .gitem.on .gtick{background:var(--accent); border-color:var(--accent);}
 
   /* lists */
   .row{display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); margin-bottom:8px;}
@@ -264,7 +270,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   var auth = loadAuth();
   var view = BOOT.toolId ? 'tool' : 'home';
   var tab = 'saya';
-  var toolState = { toolId: BOOT.toolId, tool: BOOT.tool, opens: [], loaded: false, note: null };
+  var toolState = { toolId: BOOT.toolId, tool: BOOT.tool, opens: [], group: null, sel: {}, selInit: false, loaded: false, note: null };
   var home = null, admin = null;
   var busy = false, cooldownUntil = 0, mutSeq = 0;
   var lg = { team: null, teamFailed: false, pick: null, pin: '', checking: false, manual: false, linking: !!PARAM_LOGIN };
@@ -503,10 +509,109 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     });
   }
 
+  /* ---------- halaman paket (mis. battery 5 unit + charger / QR master) ---------- */
+  function setGroup(g){
+    toolState.group = g || null;
+    if (!g || toolState.selInit) return;
+    var me = auth && auth.user.id, sel = {};
+    var mine = g.items.filter(function(it){ return it.opens.some(function(o){ return o.userId === me; }); });
+    var free = g.items.filter(function(it){ return !it.opens.length; });
+    if (toolState.toolId === g.masterId) (mine.length ? mine : free).forEach(function(it){ sel[it.tool.id] = 1; });
+    else sel[toolState.toolId] = 1;
+    toolState.sel = sel; toolState.selInit = true;
+  }
+  function unitLabel(it, g){
+    if (it.tool.id === g.masterId) return 'Charger / paket';
+    var m = it.tool.id.match(/-([A-Z]+\d+)$/); return 'Unit ' + (m ? m[1] : it.tool.id);
+  }
+  function groupCounts(){
+    var g = toolState.group, me = auth.user.id, st = 0, sp = 0, ov = 0;
+    g.items.forEach(function(it){
+      if (!toolState.sel[it.tool.id]) return;
+      var mine = it.opens.some(function(o){ return o.userId === me; });
+      if (mine) sp++; else { st++; if (it.opens.length) ov++; }
+    });
+    return { start: st, stop: sp, overlap: ov };
+  }
+  function renderGroup(){
+    var g = toolState.group, me = auth.user.id;
+    var master = g.items.filter(function(it){ return it.tool.id === g.masterId; })[0].tool;
+    var units = g.items.length - 1;
+    var rows = g.items.map(function(it){
+      var id = it.tool.id, on = !!toolState.sel[id];
+      var mine = it.opens.filter(function(o){ return o.userId === me; })[0];
+      var others = it.opens.filter(function(o){ return o.userId !== me; });
+      var st;
+      if (mine) st = '<span class="pill pill-info">Kamu pakai sejak ' + esc(fmtTime(mine.start)) + ' WIB · ' + esc(fmtDur(mine.start)) + '</span>';
+      else if (others.length) st = '<span class="pill pill-danger">Dipakai ' + esc(others.map(function(o){ return o.userNama; }).join(', ')) + ' sejak ' + esc(fmtTime(others[0].start)) + ' WIB</span>';
+      else st = '<span class="pill pill-ok">Tersedia</span>';
+      if (mine && others.length) st += ' <span class="pill pill-danger">overlap</span>';
+      return '<button type="button" class="row gitem' + (on ? ' on' : '') + (id === toolState.toolId ? ' scanned' : '') + '" data-gsel="' + esc(id) + '" role="checkbox" aria-checked="' + on + '">'
+        + '<span class="gtick">' + (on ? '&#10003;' : '') + '</span>'
+        + '<div class="grow"><div class="nm">' + esc(unitLabel(it, g)) + (id === toolState.toolId ? ' <span class="tag">di-scan</span>' : '') + '</div>'
+        + '<div class="meta"><span class="tag">' + esc(id) + '</span>' + st + '</div></div></button>';
+    }).join('');
+    var c = groupCounts();
+    var acts = '';
+    if (c.start) acts += '<button type="button" class="btn ' + (c.overlap ? 'btn-warn' : 'btn-ok') + ' btn-xl" id="btn-gstart">START ' + c.start + ' alat' + (c.overlap ? ' (' + c.overlap + ' overlap)' : '') + '</button>';
+    if (c.stop) acts += '<button type="button" class="btn btn-danger btn-xl" id="btn-gstop" style="margin-top:10px;">SELESAI ' + c.stop + ' alat</button>';
+    if (!acts) acts = '<div class="banner info">' + ICON.info + '<p>Centang unit yang mau dipakai / diselesaikan.</p></div>';
+    var note = toolState.note ? '<div class="result-note banner ' + toolState.note.kind + '">' + (toolState.note.kind === 'ok' ? ICON.check : ICON.info) + '<p>' + esc(toolState.note.text) + '</p></div>' : '';
+    return '<div class="card tool-hero">'
+      + '<div class="meta"><span class="pill pill-neutral">' + esc(master.jenis) + '</span><span class="pill pill-neutral">Gedung ' + esc(master.gedung) + '</span><span class="pill pill-info">Paket · ' + units + ' unit + charger</span></div>'
+      + '<h1>' + esc(master.nama) + '</h1><div class="idline">QR master: ' + esc(master.id) + '</div>'
+      + '<div class="chiprow" style="margin:14px 0 8px;"><button type="button" class="chip" data-gquick="all">Pilih semua (+ charger)</button>'
+      + '<button type="button" class="chip" data-gquick="units">Unit saja</button>'
+      + '<button type="button" class="chip" data-gquick="mine">Yang saya pakai</button>'
+      + '<button type="button" class="chip" data-gquick="none">Kosongkan</button></div>'
+      + '<div class="glist">' + rows + '</div>'
+      + '<div style="margin-top:14px;">' + acts + '</div>'
+      + note
+      + '</div>'
+      + '<p class="faint" style="text-align:center; margin-top:14px;">Masuk sebagai ' + esc(auth.user.nama) + '. Scan QR unit mana pun atau QR master di charger untuk membuka halaman ini.</p>';
+  }
+  function bindGroup(){
+    var g = toolState.group, me = auth.user.id;
+    document.querySelectorAll('[data-gsel]').forEach(function(b){ b.addEventListener('click', function(){
+      var id = b.getAttribute('data-gsel'); if (toolState.sel[id]) delete toolState.sel[id]; else toolState.sel[id] = 1; toolState.note = null; render();
+    }); });
+    document.querySelectorAll('[data-gquick]').forEach(function(b){ b.addEventListener('click', function(){
+      var q = b.getAttribute('data-gquick'), sel = {};
+      g.items.forEach(function(it){
+        var id = it.tool.id, mine = it.opens.some(function(o){ return o.userId === me; });
+        if (q === 'all' || (q === 'units' && id !== g.masterId) || (q === 'mine' && mine)) sel[id] = 1;
+      });
+      toolState.sel = sel; toolState.note = null; render();
+    }); });
+    var act = function(kind){
+      if (busy || Date.now() < cooldownUntil) return;
+      var ids = g.items.filter(function(it){
+        if (!toolState.sel[it.tool.id]) return false;
+        var mine = it.opens.some(function(o){ return o.userId === me; });
+        return kind === 'stop' ? mine : !mine;
+      }).map(function(it){ return it.tool.id; });
+      if (!ids.length) return;
+      busy = true; mutSeq++;
+      var btn = document.getElementById(kind === 'stop' ? 'btn-gstop' : 'btn-gstart'); if (btn) { btn.disabled = true; btn.textContent = 'Memproses…'; }
+      call(kind === 'stop' ? 'apiStopMany' : 'apiStartMany', auth.token, ids, toolState.toolId).then(function(res){
+        busy = false; cooldownUntil = Date.now() + 1500;
+        var ok = handle(res);
+        if (!ok) { if (auth) render(); return; }
+        toolState.tool = ok.tool; toolState.opens = ok.opens || []; setGroup(ok.group);
+        toolState.note = { kind: ok.already ? 'info' : 'ok', text: ok.message };
+        home = null; admin = null;
+        render(); toast(ok.message);
+      });
+    };
+    var bs = document.getElementById('btn-gstart'); if (bs) bs.addEventListener('click', function(){ act('start'); });
+    var bp = document.getElementById('btn-gstop'); if (bp) bp.addEventListener('click', function(){ act('stop'); });
+  }
+
   /* ---------- tool landing page (hasil scan) ---------- */
   function renderTool(){
     var t = toolState.tool;
     if (!toolState.loaded) return loadingHtml('Memuat data alat…');
+    if (t && toolState.group) return renderGroup();
     if (!t) {
       return '<div class="card tool-hero"><div class="banner danger">' + ICON.warn + '<div><p><strong>Alat tidak ditemukan.</strong></p><p>Kode <span class="mono">' + esc(toolState.toolId || '-') + '</span> tidak terdaftar. Hubungi admin.</p></div></div></div>';
     }
@@ -542,6 +647,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<p class="faint" style="text-align:center; margin-top:14px;">Masuk sebagai ' + esc(auth.user.nama) + '. Halaman ini boleh tetap dibuka — tombol Selesai bisa ditekan nanti tanpa scan ulang.</p>';
   }
   function bindTool(){
+    if (toolState.group) { bindGroup(); return; }
     var b = document.getElementById('btn-act');
     if (!b) return;
     b.addEventListener('click', function(){
@@ -552,7 +658,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         busy = false; cooldownUntil = Date.now() + 1500;
         var ok = handle(res);
         if (!ok) { if (auth) render(); return; }
-        toolState.tool = ok.tool; toolState.opens = ok.opens || [];
+        toolState.tool = ok.tool; toolState.opens = ok.opens || []; setGroup(ok.group);
         toolState.note = { kind: ok.already ? 'info' : 'ok', text: ok.message };
         home = null; admin = null;
         render();
@@ -568,7 +674,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       if (seq !== mutSeq || forId !== toolState.toolId) return;
       var ok = handle(res);
       if (!ok) return;
-      toolState.tool = ok.tool; toolState.opens = ok.opens || []; toolState.loaded = true;
+      toolState.tool = ok.tool; toolState.opens = ok.opens || []; toolState.loaded = true; setGroup(ok.group);
       if (view === 'tool' && !busy) render();
     });
   }
@@ -666,7 +772,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
   function openTool(id){
     view = 'tool';
-    toolState = { toolId: id, tool: null, opens: [], loaded: false, note: null };
+    toolState = { toolId: id, tool: null, opens: [], group: null, sel: {}, selInit: false, loaded: false, note: null };
     render();
     refreshTool();
     window.scrollTo(0, 0);
@@ -701,7 +807,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + rk.map(function(r){ return '<tr><td>' + esc(r.nama) + '<div class="faint mono">' + esc(r.id) + '</div></td><td class="num">' + r.sesi + '</td><td class="num">' + esc(fmtMin(r.menit)) + '</td><td class="num">' + (r.overlap ? '<strong style="color:var(--danger)">' + r.overlap + '</strong>' : '0') + '</td></tr>'; }).join('')
       + '</tbody></table></div>';
 
-    var jenisOpts = ['Kamera','Lighting','Mic','Tripod','Lensa','Lainnya'].map(function(j){ return '<option>' + j + '</option>'; }).join('');
+    var jl = jenisChips(a.tools).slice(1); ['Kamera','Lensa','Lighting','Battery','Microphone','Memory','Tripod','Gimbal'].forEach(function(j){ if (!jl.some(function(x){ return x.toLowerCase() === j.toLowerCase(); })) jl.push(j); });
+    var jenisOpts = jl.map(function(j){ return '<option>' + esc(j) + '</option>'; }).join('');
     var userList = a.users.slice().sort(function(x, y){ return x.nama.localeCompare(y.nama); }).map(function(u){
       return '<div class="hrow"><div><div style="font-weight:600;">' + esc(u.nama) + (u.role === 'admin' ? ' <span class="tag">Admin</span>' : '') + '</div><div class="faint">' + esc(u.username) + '</div></div><div class="r">PIN ' + esc(u.pin) + '</div></div>';
     }).join('');
@@ -716,6 +823,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<div class="field"><label for="ft-gedung">Gedung</label><input id="ft-gedung" type="text" list="dl-gedung" placeholder="cth. JKT" autocapitalize="characters" required value="' + esc(gedungChips(a.tools)[1] || '') + '"><datalist id="dl-gedung">' + gedungChips(a.tools).slice(1).map(function(g){ return '<option value="' + esc(g) + '">'; }).join('') + '</datalist></div></div>'
       + '<div class="form-row"><div class="field"><label for="ft-nama">Nama Alat</label><input id="ft-nama" type="text" placeholder="cth. Kamera Sony A7 IV" required></div>'
       + '<div class="field"><label for="ft-jenis">Jenis</label><select id="ft-jenis">' + jenisOpts + '</select></div></div>'
+      + '<div class="form-row"><div class="field"><label for="ft-unit">Jumlah unit (khusus paket)</label><input id="ft-unit" type="number" inputmode="numeric" min="0" max="30" placeholder="Kosongkan kalau bukan paket"></div></div>'
+      + '<p class="faint" style="margin:-6px 0 12px;">Isi jumlah unit untuk alat berpaket (mis. battery 5 unit). QR alat ini jadi QR master (tempel di charger) dan QR tiap unit dibuat otomatis.</p>'
       + '<button type="submit" class="btn btn-primary">Tambah Alat</button></form></div></div>'
       + '<div class="section"><div class="section-head"><h2>Tambah Akun / Personel</h2></div><div class="card"><form id="form-user">'
       + (ui.userErr ? '<div class="form-error">' + esc(ui.userErr) + '</div>' : '')
@@ -736,7 +845,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var ft = document.getElementById('form-tool');
     if (ft) ft.addEventListener('submit', function(ev){
       ev.preventDefault(); if (busy) return; busy = true;
-      var data = { id: val('ft-id'), nama: val('ft-nama'), jenis: val('ft-jenis'), gedung: val('ft-gedung') };
+      var data = { id: val('ft-id'), nama: val('ft-nama'), jenis: val('ft-jenis'), gedung: val('ft-gedung'), unit: val('ft-unit') };
       call('apiAddTool', auth.token, data).then(function(res){
         busy = false;
         if (res.ok) { ui.toolErr = ''; toast(res.message); loadTab(); }
@@ -1127,6 +1236,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   // live-ish: perbarui timer tiap 30 detik, dan ambil data terbaru saat tab HP dibuka lagi
   setInterval(function(){
     if (!auth || busy) return;
+    if (view === 'tool' && toolState.group) { render(); return; }
     if (view === 'tool') { var e = document.getElementById('elapsed'); var me = auth.user.id; var m = toolState.opens.filter(function(o){ return o.userId === me; })[0]; if (e && m) e.textContent = fmtDur(m.start); }
     else if (tab === 'saya' && home) render();
   }, 30000);
