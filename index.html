@@ -177,12 +177,50 @@
   .spinner{width:18px; height:18px; border-radius:50%; border:2.5px solid var(--line); border-top-color:var(--accent); animation:spin .7s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  .qr-actions{display:flex; gap:6px; justify-content:center; margin-top:8px; flex-wrap:wrap;}
-  .qr-tools{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;}
+  /* ---- cetak QR: pilih + atur lembar ---- */
+  .steps{display:flex; gap:6px; margin-bottom:12px;}
+  .steps button{flex:1; appearance:none; border:1px solid var(--line); background:var(--surface); color:var(--ink-dim); border-radius:var(--radius-sm); padding:10px 8px; min-height:44px; font-weight:600; font-size:.88rem; cursor:pointer;}
+  .steps button.active{background:var(--accent); color:var(--accent-ink); border-color:var(--accent);}
+  .qr-tools{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:8px;}
   .qr-tools .searchbar{flex:1; min-width:180px;}
   .qr-tools .searchbar input{margin-bottom:0;}
-  .qr-tools label{display:block; font-size:.72rem; font-weight:600; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;}
-  .qr-tools select{padding:10px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--surface); color:var(--ink); min-height:44px;}
+  .qr-tools label, .opt label.lbl{display:block; font-size:.72rem; font-weight:600; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;}
+  .qr-tools select, .opt select{padding:10px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--surface); color:var(--ink); min-height:44px; font-size:16px;}
+  .filter-label{font-size:.72rem; font-weight:600; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; margin:6px 0 4px;}
+  .bulk{display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 12px;}
+  .pick-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; padding-bottom:80px;}
+  .pick{position:relative; border:2px solid var(--line); border-radius:var(--radius); background:#fff; color:#111; padding:10px 8px 8px; text-align:center; cursor:pointer; user-select:none; -webkit-user-select:none;}
+  .pick.on{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  .pick .tick{position:absolute; top:6px; left:6px; width:24px; height:24px; border-radius:6px; border:2px solid #B9B3A8; background:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:15px;}
+  .pick.on .tick{background:var(--accent); border-color:var(--accent);}
+  .pick img{width:96px; height:96px; image-rendering:pixelated; display:block; margin:0 auto 6px;}
+  .pick .nm{font-weight:700; font-size:.8rem; line-height:1.2;}
+  .pick .id{font-family:var(--font-mono); font-size:.7rem; color:#555; margin-top:2px;}
+  .pick .png{appearance:none; border:none; background:none; color:#1F5A73; text-decoration:underline; font-size:.72rem; margin-top:4px; cursor:pointer; padding:4px;}
+  .pickbar{position:fixed; left:0; right:0; bottom:0; z-index:30; background:var(--surface); border-top:1px solid var(--line); box-shadow:0 -4px 14px rgba(0,0,0,.08);}
+  .pickbar .inner{max-width:720px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px;}
+  .pickbar .cnt{flex:1; font-weight:600; font-size:.92rem;}
+  .opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:10px;}
+  .opt .chk{display:flex; align-items:center; gap:8px; min-height:44px; font-size:.9rem;}
+  .opt .chk input{width:20px; height:20px;}
+  .sheet-info{margin:4px 0 12px;}
+  .sheet-preview{background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius); padding:10px; display:flex; flex-direction:column; align-items:center; gap:10px; overflow:hidden;}
+  .page-wrap{position:relative; box-shadow:0 1px 4px rgba(0,0,0,.25); background:#fff; flex:none;}
+  .page-wrap .page-no{position:absolute; top:-1px; right:-1px; background:var(--ink); color:var(--bg); font-size:.7rem; padding:2px 6px; border-radius:0 0 0 6px; z-index:2;}
+  .sheet-page{position:relative; background:#fff; color:#111; overflow:hidden; transform-origin:0 0;}
+  .stk{position:absolute; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; text-align:center; font-family:Helvetica, Arial, sans-serif; overflow:hidden;}
+  .stk.cut{outline:0.3mm solid #8a8a8a; outline-offset:-0.15mm;}
+  .stk img{display:block; image-rendering:pixelated; flex:none;}
+  .stk .s-nm{font-weight:700; line-height:1.15; margin-top:0.6mm; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word;}
+  .stk .s-id{font-family:Menlo, Consolas, monospace; color:#333; line-height:1.25;}
+  .stk .s-cta{font-weight:700; color:#1F5A73; letter-spacing:.04em; line-height:1.3;}
+  .sel-list .row{padding:8px 10px; gap:8px;}
+  .size-ctl{display:flex; align-items:center; gap:4px; flex:none;}
+  .size-ctl button{appearance:none; width:36px; height:36px; border-radius:8px; border:1px solid var(--line); background:var(--surface-2); color:var(--ink); font-size:1.1rem; font-weight:700; cursor:pointer;}
+  .size-ctl input{width:58px; text-align:center; padding:6px 4px; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:16px; min-height:36px;}
+  .size-ctl .u{font-size:.75rem; color:var(--ink-faint);}
+  .rm{appearance:none; border:none; background:none; color:var(--danger); font-size:1.2rem; width:32px; height:36px; cursor:pointer; flex:none;}
+  #print-area{display:none;}
 
   @media print{
     .no-print{display:none !important;}
@@ -191,12 +229,11 @@
     main{padding:0;}
     .qr-grid{grid-template-columns:repeat(3,1fr); gap:8px;}
     .qr-card{break-inside:avoid; border:1px dashed #999; box-shadow:none;}
-    /* cetak satu alat saja, ukuran sesuai pilihan */
-    body.print-one .qr-grid{display:block;}
-    body.print-one .qr-card{display:none;}
-    body.print-one .qr-card.print-target{display:inline-block; width:auto; padding:4mm; border:1px dashed #999;}
-    body.print-one .qr-card.print-target .qbox, body.print-one .qr-card.print-target .qbox img{width:var(--qr-size,50mm) !important; height:var(--qr-size,50mm) !important;}
-    body.print-one .qr-card.print-target .nm, body.print-one .qr-card.print-target .id, body.print-one .qr-card.print-target .cta{max-width:var(--qr-size,50mm); margin-left:auto; margin-right:auto;}
+    /* lembar cetak QR: hanya halaman yang disusun admin yang tercetak, ukuran asli (mm) */
+    body.print-sheet #root{display:none !important;}
+    body.print-sheet #print-area{display:block !important;}
+    body.print-sheet .sheet-page{transform:none !important; page-break-after:always; break-after:page; -webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    body.print-sheet .sheet-page:last-child{page-break-after:auto; break-after:auto;}
   }
   @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
 </style>
@@ -231,7 +268,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   var home = null, admin = null;
   var busy = false, cooldownUntil = 0, mutSeq = 0;
   var lg = { team: null, teamFailed: false, pick: null, pin: '', checking: false, manual: false, linking: !!PARAM_LOGIN };
-  var ui = { gedung: 'Semua', query: '', adminGedung: 'Semua', histFilter: 'semua', qrGedung: 'Semua', qrMode: 'alat', qrQuery: '', qrSize: '50', loginError: '', toolErr: '', userErr: '' };
+  var ui = { gedung: 'Semua', query: '', adminGedung: 'Semua', histFilter: 'semua', qrGedung: 'Semua', qrMode: 'alat', qrQuery: '', qrStep: 'pilih', qrJenis: 'Semua', loginError: '', toolErr: '', userErr: '' };
 
   // Login disimpan di 2 tempat (localStorage + cookie 1 tahun) supaya HP tidak "lupa".
   function readCookie(){ try { var m = document.cookie.match(/(?:^|; )logalat_auth=([^;]*)/); return m ? decodeURIComponent(m[1]) : null; } catch(e){ return null; } }
@@ -743,49 +780,270 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '</div>'
       + '<div class="qr-grid login-qr">' + (cards || '<div class="empty">Server belum mendukung QR login. Perbarui Apps Script.</div>') + '</div>';
   }
-  function renderToolQr(){
-    var base = BOOT.baseUrl || '';
-    var looksOk = /^https:\/\//.test(base);
-    var chips = gedungChips(admin.tools).map(function(g){ return '<button type="button" class="chip' + (ui.qrGedung === g ? ' active' : '') + '" data-qr-gedung="' + g + '">' + g + '</button>'; }).join('');
-    var q0 = ui.qrQuery; ui.qrQuery = '';
-    var all = qrList(); ui.qrQuery = q0;
-    var shown = {}; qrList().forEach(function(t){ shown[t.id] = 1; });
-    var cards = all.map(function(t){
-      return '<div class="qr-card" data-card="' + esc(t.id) + '"' + (shown[t.id] ? '' : ' style="display:none"') + '><div class="qbox" id="qr-' + esc(t.id) + '"></div><div class="nm">' + esc(t.nama) + '</div><div class="id">' + esc(t.id) + ' &middot; ' + esc(t.gedung) + '</div><div class="cta">Scan untuk Start / Selesai</div>'
-        + '<div class="qr-actions no-print"><button type="button" class="btn btn-ghost btn-sm" data-print-one="' + esc(t.id) + '">' + ICON.print + ' Cetak</button><button type="button" class="btn btn-ghost btn-sm" data-png="' + esc(t.id) + '">Unduh PNG</button></div></div>';
-    }).join('');
-    var sizes = ['30','40','50','60','80','100'].map(function(v){ return '<option value="' + v + '"' + (ui.qrSize === v ? ' selected' : '') + '>' + (Number(v) / 10) + ' cm</option>'; }).join('');
-    return '<div class="no-print section">'
-      + '<div class="section-head"><h2>Cetak QR Alat</h2><button type="button" class="btn btn-primary btn-sm" id="btn-print">' + ICON.print + ' Cetak semua</button></div>'
-      + '<p style="margin:-6px 0 8px;"><button type="button" class="linkbtn" id="btn-qr-refresh">Muat ulang daftar alat</button></p>'
-      + '<p class="sub" style="margin:0 0 10px;">Daftar ini otomatis mengikuti tab <strong>Alat</strong> di Google Sheet — alat baru langsung muncul di sini. Tiap alat bisa dicetak sendiri (tombol <strong>Cetak</strong> di kartunya) atau diunduh sebagai gambar PNG supaya ukurannya bisa diatur bebas saat mencetak.</p>'
-      + '<div class="qr-tools"><div class="searchbar"><label for="f-qr-search">Cari alat</label><input id="f-qr-search" type="search" placeholder="Nama atau kode alat…" value="' + esc(ui.qrQuery) + '"></div>'
-      + '<div><label for="f-qr-size">Ukuran QR (cetak satuan)</label><select id="f-qr-size">' + sizes + '</select></div></div>'
-      + (looksOk ? '' : '<div class="banner warn" style="margin-bottom:10px;">' + ICON.warn + '<p>Link di QR belum terlihat seperti link web app final (berakhiran <span class="mono">/exec</span>). Isi kolom BASE_URL di tab <strong>Config</strong> pada Google Sheet dengan link web app Anda, lalu muat ulang halaman ini.</p></div>')
-      + '<p class="faint" style="margin:0 0 10px; word-break:break-all;">Link di QR: <span class="mono">' + esc(base) + '?t=…</span></p>'
-      + '<div class="chiprow">' + chips + '</div>'
-      + '<p class="faint" style="margin:0 0 12px;">Kalau tombol Cetak tidak merespons, pakai menu browser → Print (atau Ctrl+P). PNG berukuran besar (tajam), jadi aman diperbesar/diperkecil di Word, Canva, atau aplikasi printer.</p>'
-      + '</div>'
-      + '<div class="qr-grid" id="qr-grid">' + (cards || '<div class="empty">Tidak ada alat yang cocok.</div>') + '</div>';
+  /* ================= CETAK QR: pilih QR -> atur lembar -> cetak ================= */
+  var PAPERS = { A4: [210, 297], F4: [215, 330], A5: [148, 210], Letter: [216, 279], A3: [297, 420] };
+  var PAGE_MARGIN = 8; // mm, area aman printer
+  var PICK_KEY = 'logalat.qrpick.v1', CFG_KEY = 'logalat.qrcfg.v1';
+  var qrPick = loadJson(PICK_KEY, []);               // [{id, size(mm)}], urut sesuai dipilih
+  var qrCfg = Object.assign({ paper: 'A4', size: 50, gap: 2, cut: true, sort: true }, loadJson(CFG_KEY, {}));
+  var qrImgCache = {};
+  function loadJson(k, d){ try { var v = JSON.parse(localStorage.getItem(k) || 'null'); return v == null ? d : v; } catch(e){ return d; } }
+  function saveQrState(){ try { localStorage.setItem(PICK_KEY, JSON.stringify(qrPick)); localStorage.setItem(CFG_KEY, JSON.stringify(qrCfg)); } catch(e){} }
+  function isPicked(id){ return qrPick.some(function(p){ return p.id === id; }); }
+  function syncPick(){ // buang alat yang sudah tidak ada di Sheet
+    var ok = {}; admin.tools.forEach(function(t){ ok[t.id] = 1; });
+    qrPick = qrPick.filter(function(p){ return ok[p.id]; });
+  }
+  function qrImg(id){
+    if (!qrImgCache[id]) {
+      var qr = qrcode(0, 'M'); qr.addData(toolUrl(id)); qr.make();
+      qrImgCache[id] = qr.createDataURL(8, 32); // 4 modul ruang kosong di tiap sisi (wajib supaya mudah di-scan)
+    }
+    return qrImgCache[id];
+  }
+  function jenisChips(tools){
+    var seen = {}, out = [];
+    (tools || []).forEach(function(t){ var j = String(t.jenis || '').trim(); var k = j.toLowerCase(); if (j && !seen[k]) { seen[k] = 1; out.push(j); } });
+    return ['Semua'].concat(out.sort(function(a, b){ return a.localeCompare(b); }));
   }
   function qrList(){
     var q = ui.qrQuery.trim().toLowerCase();
     return admin.tools.filter(function(t){
       if (ui.qrGedung !== 'Semua' && t.gedung !== ui.qrGedung) return false;
+      if (ui.qrJenis !== 'Semua' && String(t.jenis).trim().toLowerCase() !== ui.qrJenis.toLowerCase()) return false;
       return !q || (t.nama + ' ' + t.id + ' ' + t.jenis).toLowerCase().indexOf(q) >= 0;
     });
   }
   function findAdminTool(id){ return admin.tools.filter(function(t){ return t.id === id; })[0]; }
-  /** Cetak satu kartu QR saja, dengan ukuran QR sesuai pilihan. */
-  function printOne(id){
-    var card = document.querySelector('[data-card="' + id + '"]');
-    if (!card) return;
-    document.body.style.setProperty('--qr-size', ui.qrSize + 'mm');
-    document.body.classList.add('print-one'); card.classList.add('print-target');
-    var done = function(){ document.body.classList.remove('print-one'); card.classList.remove('print-target'); window.removeEventListener('afterprint', done); };
+
+  /* ---- ukuran stiker (mm) ---- */
+  function stickerDims(s){
+    var pad = Math.max(2, s * 0.05);
+    var nameFs = Math.min(5, Math.max(2.3, s * 0.07)), idFs = nameFs * 0.8, ctaFs = nameFs * 0.62;
+    var cta = s >= 40;
+    var labelH = nameFs * 1.15 * 2 + 0.6 + idFs * 1.25 + (cta ? ctaFs * 1.3 + 0.4 : 0);
+    return { s: s, pad: pad, w: s + 2 * pad, h: pad + s + labelH + pad, nameFs: nameFs, idFs: idFs, ctaFs: ctaFs, cta: cta };
+  }
+  function paperSize(){ return PAPERS[qrCfg.paper] || PAPERS.A4; }
+  function maxSize(){ // QR terbesar yang masih muat di 1 halaman
+    var P = paperSize(), aw = P[0] - 2 * PAGE_MARGIN, ah = P[1] - 2 * PAGE_MARGIN, s = Math.floor(Math.min(aw, ah));
+    while (s > 15) { var d = stickerDims(s); if (d.w <= aw && d.h <= ah) return s; s--; }
+    return 15;
+  }
+  function clampSize(mm){ mm = Math.round(Number(mm) || qrCfg.size); return Math.max(15, Math.min(maxSize(), mm)); }
+
+  /* ---- susun stiker ke halaman (baris demi baris) ---- */
+  function layoutSheets(items){
+    var P = paperSize(), W = P[0], H = P[1], m = PAGE_MARGIN, g = Number(qrCfg.gap) || 0;
+    var list = items.map(function(it, i){ return { it: it, i: i, d: stickerDims(clampSize(it.size)) }; });
+    if (qrCfg.sort && !layoutSheets._inner) {
+      // coba beberapa urutan, ambil yang paling sedikit halamannya
+      var best = null;
+      [function(a, b){ return (b.d.h - a.d.h) || (a.i - b.i); }, function(a, b){ return (b.d.w * b.d.h - a.d.w * a.d.h) || (a.i - b.i); }, null].forEach(function(cmp){
+        var l2 = list.slice(); if (cmp) l2.sort(cmp);
+        layoutSheets._inner = true; var saved = qrCfg.sort; qrCfg.sort = false;
+        var r = layoutSheets(l2.map(function(e){ return e.it; }));
+        qrCfg.sort = saved; layoutSheets._inner = false;
+        if (!best || r.pages.length < best.pages.length) best = r;
+      });
+      return best;
+    }
+    var pages = [], page = [], x = m, y = m, rowH = 0;
+    list.forEach(function(e){
+      if (x > m && x + e.d.w > W - m + 0.01) { x = m; y += rowH + g; rowH = 0; }
+      if (y + e.d.h > H - m + 0.01) { pages.push(page); page = []; x = m; y = m; rowH = 0; }
+      page.push({ id: e.it.id, d: e.d, x: x, y: y });
+      x += e.d.w + g; rowH = Math.max(rowH, e.d.h);
+    });
+    if (page.length) pages.push(page);
+    return { pages: pages, W: W, H: H, cursor: { x: x, y: y, rowH: rowH } };
+  }
+  /** Berapa stiker (ukuran default) yang masih muat di halaman terakhir tanpa menambah halaman. */
+  function spareSlots(){
+    if (!qrPick.length) return 0;
+    var base = layoutSheets(qrPick).pages.length, n = 0, extra = qrPick.slice();
+    var saveSort = qrCfg.sort; qrCfg.sort = false; // stiker tambahan diletakkan setelah yang ada
+    var ordered = saveSort ? layoutSheets(qrPick).pages.reduce(function(a, p){ return a.concat(p.map(function(e){ return { id: e.id, size: e.d.s }; })); }, []) : extra;
+    while (n < 200) { ordered.push({ id: '_', size: qrCfg.size }); if (layoutSheets(ordered).pages.length > base) break; n++; }
+    qrCfg.sort = saveSort;
+    return n;
+  }
+  function stickerHtml(e){
+    var t = findAdminTool(e.id) || { nama: e.id, id: e.id, gedung: '' }, d = e.d;
+    return '<div class="stk' + (qrCfg.cut ? ' cut' : '') + '" style="left:' + e.x.toFixed(2) + 'mm;top:' + e.y.toFixed(2) + 'mm;width:' + d.w.toFixed(2) + 'mm;height:' + d.h.toFixed(2) + 'mm;padding:' + d.pad.toFixed(2) + 'mm;">'
+      + '<img src="' + qrImg(e.id) + '" alt="" style="width:' + d.s + 'mm;height:' + d.s + 'mm;">'
+      + '<div class="s-nm" style="font-size:' + d.nameFs.toFixed(2) + 'mm;max-width:' + d.s + 'mm;">' + esc(t.nama) + '</div>'
+      + '<div class="s-id" style="font-size:' + d.idFs.toFixed(2) + 'mm;">' + esc(t.id) + (t.gedung ? ' &middot; ' + esc(t.gedung) : '') + '</div>'
+      + (d.cta ? '<div class="s-cta" style="font-size:' + d.ctaFs.toFixed(2) + 'mm;">SCAN UNTUK START / SELESAI</div>' : '')
+      + '</div>';
+  }
+  function pageHtml(page, L, scale){
+    return '<div class="sheet-page" style="width:' + L.W + 'mm;height:' + L.H + 'mm;' + (scale ? 'transform:scale(' + scale + ');' : '') + '">' + page.map(stickerHtml).join('') + '</div>';
+  }
+
+  /* ---- tampilan ---- */
+  function renderToolQr(){
+    syncPick();
+    var steps = '<div class="steps no-print"><button type="button" data-qr-step="pilih" class="' + (ui.qrStep === 'pilih' ? 'active' : '') + '">1. Pilih QR</button>'
+      + '<button type="button" data-qr-step="atur" class="' + (ui.qrStep === 'atur' ? 'active' : '') + '">2. Atur &amp; Cetak (' + qrPick.length + ')</button></div>';
+    return '<div class="no-print">' + steps + (ui.qrStep === 'atur' ? renderQrAtur() : renderQrPilih()) + '</div>';
+  }
+  function renderQrPilih(){
+    var gch = gedungChips(admin.tools).map(function(g){ return '<button type="button" class="chip' + (ui.qrGedung === g ? ' active' : '') + '" data-qr-gedung="' + esc(g) + '">' + esc(g) + '</button>'; }).join('');
+    var jch = jenisChips(admin.tools).map(function(j){ return '<button type="button" class="chip' + (ui.qrJenis === j ? ' active' : '') + '" data-qr-jenis="' + esc(j) + '">' + esc(j) + '</button>'; }).join('');
+    var list = qrList();
+    var cards = list.map(function(t){
+      var on = isPicked(t.id);
+      return '<div class="pick' + (on ? ' on' : '') + '" data-pick-tool="' + esc(t.id) + '" role="checkbox" aria-checked="' + on + '" tabindex="0"><span class="tick">' + (on ? '&#10003;' : '') + '</span>'
+        + '<img src="' + qrImg(t.id) + '" alt=""><div class="nm">' + esc(t.nama) + '</div><div class="id">' + esc(t.id) + ' &middot; ' + esc(t.gedung) + '</div>'
+        + '<button type="button" class="png" data-png="' + esc(t.id) + '">Unduh PNG</button></div>';
+    }).join('');
+    var shownOn = list.filter(function(t){ return isPicked(t.id); }).length;
+    return '<div class="section-head"><h2>Pilih QR yang mau dicetak</h2><button type="button" class="linkbtn" id="btn-qr-refresh">Muat ulang</button></div>'
+      + '<p class="sub" style="margin:-4px 0 10px;">Daftar mengikuti tab <strong>Alat</strong> di Google Sheet. Ketuk kartu untuk memilih, atau pakai filter lalu <strong>Pilih semua</strong>.</p>'
+      + '<div class="qr-tools"><div class="searchbar"><label for="f-qr-search">Cari alat</label><input id="f-qr-search" type="search" placeholder="Nama atau kode alat…" value="' + esc(ui.qrQuery) + '"></div></div>'
+      + '<div class="filter-label">Gedung</div><div class="chiprow" style="margin-bottom:4px;">' + gch + '</div>'
+      + '<div class="filter-label">Kategori</div><div class="chiprow" style="margin-bottom:4px;">' + jch + '</div>'
+      + '<div class="bulk"><button type="button" class="btn btn-ghost btn-sm" id="btn-pick-all">Pilih semua yang tampil (' + list.length + ')</button>'
+      + (shownOn ? '<button type="button" class="btn btn-ghost btn-sm" id="btn-unpick-shown">Batal pilih yang tampil</button>' : '')
+      + (qrPick.length ? '<button type="button" class="btn btn-ghost btn-sm" id="btn-pick-clear">Kosongkan semua pilihan</button>' : '') + '</div>'
+      + '<div class="pick-grid" id="pick-grid">' + (cards || '<div class="empty">Tidak ada alat yang cocok.</div>') + '</div>'
+      + '<div class="pickbar"><div class="inner"><span class="cnt" id="pick-count">' + qrPick.length + ' QR dipilih</span>'
+      + '<button type="button" class="btn btn-primary" id="btn-to-atur"' + (qrPick.length ? '' : ' disabled') + '>Atur &amp; Cetak &rsaquo;</button></div></div>';
+  }
+  function renderQrAtur(){
+    if (!qrPick.length) {
+      return '<div class="card empty">Belum ada QR yang dipilih.<br><button type="button" class="btn btn-primary btn-sm" data-qr-step="pilih" style="margin-top:10px;">Pilih QR</button></div>';
+    }
+    var mx = maxSize();
+    var papers = Object.keys(PAPERS).map(function(k){ return '<option value="' + k + '"' + (qrCfg.paper === k ? ' selected' : '') + '>' + k + ' (' + PAPERS[k][0] / 10 + ' × ' + PAPERS[k][1] / 10 + ' cm)</option>'; }).join('');
+    var sizes = [20, 25, 30, 35, 40, 50, 60, 70, 80, 100, 120, 150].filter(function(v){ return v <= mx; }).map(function(v){ return '<option value="' + v + '"' + (Number(qrCfg.size) === v ? ' selected' : '') + '>' + v / 10 + ' cm</option>'; }).join('');
+    var gaps = [[0, '0 mm (garis menempel)'], [2, '2 mm'], [4, '4 mm'], [6, '6 mm']].map(function(g){ return '<option value="' + g[0] + '"' + (Number(qrCfg.gap) === g[0] ? ' selected' : '') + '>' + g[1] + '</option>'; }).join('');
+    var rows = qrPick.map(function(p){
+      var t = findAdminTool(p.id) || { nama: p.id, id: p.id, gedung: '' }, cm = (clampSize(p.size) / 10).toFixed(1).replace(/\.0$/, '');
+      return '<div class="row"><div class="grow"><div class="nm" style="font-size:.88rem;">' + esc(t.nama) + '</div><div class="meta"><span class="tag">' + esc(t.id) + '</span></div></div>'
+        + '<div class="size-ctl"><button type="button" data-size-step="-5" data-id="' + esc(p.id) + '" aria-label="Perkecil">&minus;</button>'
+        + '<input type="number" inputmode="decimal" step="0.5" min="1.5" max="' + mx / 10 + '" value="' + cm + '" data-size-input="' + esc(p.id) + '" aria-label="Ukuran QR (cm)">'
+        + '<button type="button" data-size-step="5" data-id="' + esc(p.id) + '" aria-label="Perbesar">+</button><span class="u">cm</span></div>'
+        + '<button type="button" class="rm" data-unpick="' + esc(p.id) + '" aria-label="Hapus dari lembar">&times;</button></div>';
+    }).join('');
+    return '<div class="section-head"><h2>Atur lembar cetak</h2></div>'
+      + '<div class="opts">'
+      + '<div class="opt"><label class="lbl" for="f-paper">Kertas</label><select id="f-paper">' + papers + '</select></div>'
+      + '<div class="opt"><label class="lbl" for="f-defsize">Ukuran QR</label><select id="f-defsize">' + sizes + '</select></div>'
+      + '<div class="opt"><label class="lbl" for="f-gap">Jarak antar stiker</label><select id="f-gap">' + gaps + '</select></div>'
+      + '<div class="opt"><span class="lbl" style="display:block; font-size:.72rem; font-weight:600; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;">Pilihan</span>'
+      + '<label class="chk"><input type="checkbox" id="f-cut"' + (qrCfg.cut ? ' checked' : '') + '> Garis potong (frame)</label>'
+      + '<label class="chk"><input type="checkbox" id="f-sort"' + (qrCfg.sort ? ' checked' : '') + '> Susun hemat kertas</label></div>'
+      + '</div>'
+      + '<div class="bulk" style="margin-top:0;"><button type="button" class="btn btn-ghost btn-sm" id="btn-size-all">Samakan semua jadi ' + Number(qrCfg.size) / 10 + ' cm</button>'
+      + '<button type="button" class="btn btn-ghost btn-sm" data-qr-step="pilih">+ Tambah QR lain</button></div>'
+      + '<div id="sheet-info" class="sheet-info"></div>'
+      + '<div class="sheet-preview" id="sheet-preview"></div>'
+      + '<div class="section" style="margin-top:16px;"><div class="section-head"><h2>QR di lembar ini (' + qrPick.length + ')</h2><button type="button" class="linkbtn" id="btn-pick-clear">Kosongkan</button></div>'
+      + '<p class="sub" style="margin:-4px 0 8px;">Ubah ukuran tiap QR sendiri-sendiri (dalam cm). Pratinjau di atas langsung menyesuaikan.</p>'
+      + '<div class="sel-list">' + rows + '</div></div>'
+      + '<p class="faint" style="margin:0 0 90px;">Saat jendela cetak muncul: pilih ukuran kertas yang sama, <strong>Skala 100% / Ukuran sebenarnya</strong> (jangan "Fit to page"), dan margin <strong>None / Tidak ada</strong> supaya ukuran QR pas.</p>'
+      + '<div class="pickbar"><div class="inner"><span class="cnt" id="print-count"></span><button type="button" class="btn btn-primary" id="btn-print-sheet">' + ICON.print + ' Cetak sekarang</button></div></div>';
+  }
+  /** Gambar ulang pratinjau + info tanpa merender ulang seluruh halaman (supaya input tidak kehilangan fokus). */
+  function renderSheetPreview(){
+    var box = document.getElementById('sheet-preview'); if (!box) return;
+    var L = layoutSheets(qrPick);
+    var avail = Math.max(200, Math.min(box.clientWidth - 20, 520));
+    var pxPerMm = 96 / 25.4, scale = Math.min(1, avail / (L.W * pxPerMm));
+    box.innerHTML = L.pages.map(function(p, i){
+      return '<div class="page-wrap" style="width:' + (L.W * pxPerMm * scale).toFixed(1) + 'px;height:' + (L.H * pxPerMm * scale).toFixed(1) + 'px;"><span class="page-no">Hal. ' + (i + 1) + '/' + L.pages.length + '</span>' + pageHtml(p, L, scale) + '</div>';
+    }).join('');
+    var spare = spareSlots();
+    var info = document.getElementById('sheet-info');
+    if (info) info.innerHTML = '<div class="banner ' + (spare ? 'info' : 'ok') + '">' + ICON.info + '<p><strong>' + qrPick.length + ' QR · ' + L.pages.length + ' halaman ' + esc(qrCfg.paper) + '.</strong> '
+      + (spare ? 'Halaman terakhir masih muat <strong>±' + spare + ' QR lagi</strong> ukuran ' + Number(qrCfg.size) / 10 + ' cm — tambah QR lain atau perbesar ukurannya.' : 'Halaman terakhir sudah penuh untuk ukuran ' + Number(qrCfg.size) / 10 + ' cm.') + '</p></div>';
+    var pc = document.getElementById('print-count'); if (pc) pc.textContent = qrPick.length + ' QR · ' + L.pages.length + ' hal.';
+  }
+  function printSheet(){
+    if (!qrPick.length) return;
+    var L = layoutSheets(qrPick);
+    var area = document.getElementById('print-area');
+    if (!area) { area = document.createElement('div'); area.id = 'print-area'; document.body.appendChild(area); }
+    area.innerHTML = L.pages.map(function(p){ return pageHtml(p, L, 0); }).join('');
+    var st = document.getElementById('print-page-style');
+    if (!st) { st = document.createElement('style'); st.id = 'print-page-style'; document.head.appendChild(st); }
+    st.textContent = '@page{size:' + L.W + 'mm ' + L.H + 'mm;margin:0;}';
+    document.body.classList.add('print-sheet');
+    var done = function(){ document.body.classList.remove('print-sheet'); window.removeEventListener('afterprint', done); };
     window.addEventListener('afterprint', done);
-    try { window.print(); } catch(e){ toast('Pakai menu browser → Print.'); }
-    setTimeout(function(){ if (!window.matchMedia || !window.matchMedia('print').matches) done(); }, 1500);
+    var imgs = Array.prototype.slice.call(area.querySelectorAll('img'));
+    var ready = Promise.all(imgs.map(function(im){ return im.complete ? 0 : new Promise(function(r){ im.onload = im.onerror = r; }); }));
+    Promise.race([ready, new Promise(function(r){ setTimeout(r, 1500); })]).then(function(){
+      try { window.print(); } catch(e){ toast('Pakai menu browser → Print.'); }
+      setTimeout(function(){ if (!window.matchMedia || !window.matchMedia('print').matches) done(); }, 2000);
+    });
+  }
+  function togglePick(id){
+    if (isPicked(id)) qrPick = qrPick.filter(function(p){ return p.id !== id; });
+    else qrPick.push({ id: id, size: Number(qrCfg.size) || 50 });
+    saveQrState();
+  }
+  function updatePickUi(){
+    document.querySelectorAll('[data-pick-tool]').forEach(function(c){
+      var on = isPicked(c.getAttribute('data-pick-tool'));
+      c.classList.toggle('on', on); c.setAttribute('aria-checked', on); c.querySelector('.tick').innerHTML = on ? '&#10003;' : '';
+    });
+    var pc = document.getElementById('pick-count'); if (pc) pc.textContent = qrPick.length + ' QR dipilih';
+    var b = document.getElementById('btn-to-atur'); if (b) b.disabled = !qrPick.length;
+    var st = document.querySelector('[data-qr-step="atur"]'); if (st) st.innerHTML = '2. Atur &amp; Cetak (' + qrPick.length + ')';
+  }
+  function setPickSize(id, mm){
+    qrPick.forEach(function(p){ if (p.id === id) p.size = clampSize(mm); });
+    saveQrState();
+    var inp = document.querySelector('[data-size-input="' + id + '"]');
+    var p = qrPick.filter(function(x){ return x.id === id; })[0];
+    if (inp && p) inp.value = (p.size / 10).toFixed(1).replace(/\.0$/, '');
+    renderSheetPreview();
+  }
+  function bindToolQr(){
+    document.querySelectorAll('[data-qr-step]').forEach(function(b){ b.addEventListener('click', function(){ ui.qrStep = b.getAttribute('data-qr-step'); render(); window.scrollTo(0, 0); }); });
+    var r0 = document.getElementById('btn-qr-refresh'); if (r0) r0.addEventListener('click', function(){ loadTab(); toast('Memuat ulang…'); });
+    document.querySelectorAll('[data-png]').forEach(function(b){ b.addEventListener('click', function(ev){ ev.stopPropagation(); downloadPng(b.getAttribute('data-png')); }); });
+    var clr = document.getElementById('btn-pick-clear'); if (clr) clr.addEventListener('click', function(){ qrPick = []; saveQrState(); render(); });
+    if (ui.qrStep !== 'atur') {
+      document.querySelectorAll('[data-qr-gedung]').forEach(function(c){ c.addEventListener('click', function(){ ui.qrGedung = c.getAttribute('data-qr-gedung'); render(); }); });
+      document.querySelectorAll('[data-qr-jenis]').forEach(function(c){ c.addEventListener('click', function(){ ui.qrJenis = c.getAttribute('data-qr-jenis'); render(); }); });
+      var qs = document.getElementById('f-qr-search');
+      if (qs) qs.addEventListener('input', function(){
+        ui.qrQuery = qs.value;
+        var ok = {}; qrList().forEach(function(t){ ok[t.id] = 1; });
+        document.querySelectorAll('[data-pick-tool]').forEach(function(c){ c.style.display = ok[c.getAttribute('data-pick-tool')] ? '' : 'none'; });
+      });
+      document.querySelectorAll('[data-pick-tool]').forEach(function(c){
+        var go = function(){ togglePick(c.getAttribute('data-pick-tool')); updatePickUi(); };
+        c.addEventListener('click', go);
+        c.addEventListener('keydown', function(ev){ if (ev.key === ' ' || ev.key === 'Enter') { ev.preventDefault(); go(); } });
+      });
+      var all = document.getElementById('btn-pick-all'); if (all) all.addEventListener('click', function(){ qrList().forEach(function(t){ if (!isPicked(t.id)) qrPick.push({ id: t.id, size: Number(qrCfg.size) || 50 }); }); saveQrState(); render(); });
+      var un = document.getElementById('btn-unpick-shown'); if (un) un.addEventListener('click', function(){ var sh = {}; qrList().forEach(function(t){ sh[t.id] = 1; }); qrPick = qrPick.filter(function(p){ return !sh[p.id]; }); saveQrState(); render(); });
+      var go = document.getElementById('btn-to-atur'); if (go) go.addEventListener('click', function(){ ui.qrStep = 'atur'; render(); window.scrollTo(0, 0); });
+      return;
+    }
+    var on = function(id, ev, fn){ var el = document.getElementById(id); if (el) el.addEventListener(ev, fn); };
+    on('f-paper', 'change', function(e){ qrCfg.paper = e.target.value; qrCfg.size = clampSize(qrCfg.size); saveQrState(); render(); });
+    on('f-defsize', 'change', function(e){ qrCfg.size = Number(e.target.value); saveQrState(); render(); });
+    on('f-gap', 'change', function(e){ qrCfg.gap = Number(e.target.value); saveQrState(); renderSheetPreview(); });
+    on('f-cut', 'change', function(e){ qrCfg.cut = e.target.checked; saveQrState(); renderSheetPreview(); });
+    on('f-sort', 'change', function(e){ qrCfg.sort = e.target.checked; saveQrState(); renderSheetPreview(); });
+    on('btn-size-all', 'click', function(){ qrPick.forEach(function(p){ p.size = clampSize(qrCfg.size); }); saveQrState(); render(); });
+    on('btn-print-sheet', 'click', printSheet);
+    document.querySelectorAll('[data-size-step]').forEach(function(b){ b.addEventListener('click', function(){
+      var id = b.getAttribute('data-id'), p = qrPick.filter(function(x){ return x.id === id; })[0];
+      if (p) setPickSize(id, clampSize(p.size) + Number(b.getAttribute('data-size-step')));
+    }); });
+    document.querySelectorAll('[data-size-input]').forEach(function(inp){ inp.addEventListener('change', function(){
+      var v = parseFloat(String(inp.value).replace(',', '.'));
+      if (isFinite(v)) setPickSize(inp.getAttribute('data-size-input'), v * 10);
+    }); });
+    document.querySelectorAll('[data-unpick]').forEach(function(b){ b.addEventListener('click', function(){ togglePick(b.getAttribute('data-unpick')); render(); }); });
+    renderSheetPreview();
   }
   /** Gambar PNG resolusi tinggi: QR + nama + kode + gedung, siap diatur ukurannya saat dicetak. */
   function qrPng(t){
@@ -832,29 +1090,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       });
       return;
     }
-    document.querySelectorAll('[data-qr-gedung]').forEach(function(c){ c.addEventListener('click', function(){ ui.qrGedung = c.getAttribute('data-qr-gedung'); render(); }); });
-    var p = document.getElementById('btn-print');
-    if (p) p.addEventListener('click', function(){ try { window.print(); } catch(e){ toast('Pakai menu browser → Print.'); } });
-    var qs = document.getElementById('f-qr-search');
-    if (qs) qs.addEventListener('input', function(){
-      ui.qrQuery = qs.value;
-      var ok = {}; qrList().forEach(function(t){ ok[t.id] = 1; });
-      document.querySelectorAll('[data-card]').forEach(function(c){ c.style.display = ok[c.getAttribute('data-card')] ? '' : 'none'; });
-    });
-    var qr0 = document.getElementById('btn-qr-refresh'); if (qr0) qr0.addEventListener('click', function(){ loadTab(); toast('Memuat ulang…'); });
-    var sz = document.getElementById('f-qr-size'); if (sz) sz.addEventListener('change', function(){ ui.qrSize = sz.value; });
-    document.querySelectorAll('[data-print-one]').forEach(function(b){ b.addEventListener('click', function(){ printOne(b.getAttribute('data-print-one')); }); });
-    document.querySelectorAll('[data-png]').forEach(function(b){ b.addEventListener('click', function(){ downloadPng(b.getAttribute('data-png')); }); });
-    admin.tools.forEach(function(t){
-      var el = document.getElementById('qr-' + t.id);
-      if (!el) return;
-      var text = toolUrl(t.id);
-      el.setAttribute('data-qr', text);
-      try {
-        var qr = qrcode(0, 'M'); qr.addData(text); qr.make();
-        el.innerHTML = qr.createImgTag(6, 12, 'QR ' + t.id);
-      } catch(e){ el.innerHTML = '<div class="faint">QR gagal dibuat</div>'; }
-    });
+    bindToolQr();
   }
 
   /* ---------- boot ---------- */
