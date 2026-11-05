@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0F11">
-<title>Dashboard Videographer &amp; Editor</title>
+<title>DASHBOARD VIDEOGRAPHER &amp; EDITOR</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
   /* Tema "Onyx Glass": gelap, minimalis, panel kaca (blur) di atas cahaya ambient lembut. */
@@ -263,15 +263,6 @@
   .evkonf-item{padding:10px 0; border-top:1px solid var(--line);} .evkonf-item:first-of-type{border-top:none;}
   .evkonf-ctl{display:grid; grid-template-columns:1fr; gap:6px;} @media (min-width:560px){ .evkonf-ctl{grid-template-columns:2fr 1fr 2fr;} }
   .evkonf-ctl select{padding:9px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:16px; min-height:42px;}
-  .pdf-hold{position:fixed; left:0; top:0; width:0; height:0; overflow:hidden; z-index:-1;}
-  .pdf-sheet{width:190mm; background:#fff; color:#1C2126; font-family:var(--font-body);
-    --bg:#fff; --surface:#fff; --surface-2:#F2F2F0; --line:#E2E0DA; --ink:#1C2126; --ink-dim:#4D555C; --ink-faint:#7A8188;
-    --accent:#7A6644; --accent-ink:#fff; --accent-soft:#F3EEE5; --accent-soft-ink:#5A4A2F; --ok:#3F7D4E; --ok-soft:#E5F1E7; --ok-ink:#24502F; --warn:#C98A12; --warn-soft:#F7EBCF; --warn-ink:#6E4A05;
-    --danger:#B23A3A; --danger-soft:#F6DEDB; --danger-ink:#7E2222; --info:#5B4B9A; --info-soft:#E6E1F5; --info-ink:#3F3373; --shadow:none;}
-  .pdf-sheet .card{box-shadow:none;} .pdf-sheet .chiprow{display:none;}
-  .pdf-head{display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #1C2126; padding-bottom:8px; margin-bottom:14px;}
-  .pdf-head h1{font-size:22px;} .pdf-kicker{font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#7A8188;} .pdf-meta{font-size:11px; color:#4D555C; text-align:right;}
-  .pdf-break{page-break-before:always; break-before:page; height:0;}
   #print-area{display:none;}
   /* ---- evaluasi ---- */
   .evcard{margin-bottom:16px;}
@@ -298,6 +289,110 @@
   .evvideo{position:relative; width:100%; max-width:360px; margin:0 auto; aspect-ratio:9/16; background:#000; border-radius:var(--radius-sm); overflow:hidden;}
   .evvideo iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
 
+
+  /* ===== layout: navigasi ikon ===== */
+  .brand{gap:10px;}
+  .brand-t{display:flex; flex-direction:column; line-height:1.05; min-width:0;}
+  .brand-t small{font-size:.62rem; letter-spacing:.22em; color:var(--ink-faint); font-weight:600;}
+  .brand-t b{font-size:.9rem !important; letter-spacing:.06em !important;}
+  .brand-full{display:none;}
+  @media (max-width: 479px){ .brand > svg{display:none;} .brand-t b{font-size:.78rem !important; letter-spacing:.02em !important;} .topbar-inner{gap:8px; padding:10px 12px;} }
+  .userchip{display:inline-flex; align-items:center; gap:8px; max-width:none;}
+  .userchip .av, .evperson .av{width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2); display:inline-flex; align-items:center; justify-content:center; font-size:.74rem; font-weight:700; color:var(--ink); flex:none;}
+  .nav{position:fixed; z-index:40; display:flex; -webkit-backdrop-filter:var(--glass); backdrop-filter:var(--glass);
+    background:linear-gradient(160deg, rgba(255,255,255,.14), rgba(14,16,21,.55) 45%, rgba(14,16,21,.5)); border:1px solid rgba(255,255,255,.16); box-shadow:var(--lg-shadow);}
+  .nav-it{appearance:none; border:0; background:transparent; color:var(--ink-dim); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; position:relative; flex:none;
+    border-radius:16px; transition:color .18s ease, background .18s ease, transform .18s ease;}
+  .nav-it:hover{color:var(--ink); background:rgba(255,255,255,.07);}
+  .nav-it:active{transform:scale(.92);}
+  .nav-it.on{color:var(--accent-ink); background:linear-gradient(180deg, rgba(232,218,192,.96), rgba(214,196,163,.86)); box-shadow:inset 0 1px 0 rgba(255,255,255,.6), 0 6px 18px rgba(214,196,163,.25);}
+  .nav-it:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .nav-it.on *{text-shadow:none;}
+  .nav-lbl{font-size:.62rem; font-weight:600; letter-spacing:.01em; white-space:nowrap; text-shadow:none;}
+  /* HP (vertikal): dock bawah, ikon saja */
+  @media (max-width: 899px){
+    .nav{left:10px; right:10px; bottom:calc(env(safe-area-inset-bottom) + 10px); border-radius:24px; padding:6px; gap:2px; overflow-x:auto; scrollbar-width:none; justify-content:space-between;}
+    .nav::-webkit-scrollbar{display:none;}
+    .nav-it{width:40px; height:44px; min-width:40px;}
+    .nav-lbl{display:none;}
+    main.has-nav{padding-bottom:110px;}
+    #toast-host{bottom:calc(env(safe-area-inset-bottom) + 86px);}
+    .hide-xs{display:none;}
+  }
+  @media (max-width: 419px){ .nav{padding:5px; left:8px; right:8px;} .nav-it{width:35px; min-width:35px;} .seg button{padding:8px 10px;} }
+  @media (max-width: 899px) and (min-width: 480px){ .nav{left:50%; right:auto; transform:translateX(-50%); width:max-content; max-width:calc(100vw - 20px);} .nav-it{width:48px;} .hide-xs{display:inline;} }
+  /* komputer (landscape): sidebar kiri, ikon + label, konten lebih lebar */
+  @media (min-width: 900px){
+    .nav{left:16px; top:84px; bottom:16px; width:86px; flex-direction:column; align-items:center; border-radius:28px; padding:10px 6px; gap:4px; overflow-y:auto; scrollbar-width:none;}
+    .nav::-webkit-scrollbar{display:none;}
+    .nav-it{width:72px; min-height:58px; padding:6px 2px;}
+    .nav-lbl{max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:normal; text-align:center; line-height:1.1; font-size:.6rem;}
+    main.has-nav{padding-left:118px; padding-right:24px;}
+    .topbar-inner{max-width:none; padding:12px 24px;}
+    .wrap.wide{max-width:1180px;}
+    .brand-t{display:none;} .brand-full{display:block; font-size:1rem !important; letter-spacing:.1em !important;}
+    .evgrid{grid-template-columns:1fr 1fr;}
+    .grid-auto{display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:12px;}
+    .grid-auto > .card{margin-bottom:0 !important;}
+    .evpeople{display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start;}
+    .evpeople .evperson.open{grid-column:1 / -1;}
+    #content[data-page="saya"] .btn-xl{max-width:520px; margin:0 auto; display:flex;}
+  }
+  #content{animation:pagein .28s ease both;}
+  @keyframes pagein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .pagehead{display:flex; align-items:center; gap:14px; margin:4px 0 16px;}
+  .pagehead h1{font-size:1.45rem; line-height:1.15;}
+  .pagehead .sub{margin:2px 0 0;}
+  .pagehead .grow{flex:1; min-width:0;}
+  .pagehead-ic{width:46px; height:46px; flex:none; border-radius:15px; display:flex; align-items:center; justify-content:center; color:var(--accent);
+    background:linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.04)); border:1px solid rgba(255,255,255,.16); box-shadow:inset 0 1px 1px rgba(255,255,255,.25);}
+  .seg{display:inline-flex; gap:2px; padding:3px; border-radius:14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); margin-bottom:12px; max-width:100%; overflow-x:auto;}
+  .seg button{appearance:none; border:0; background:transparent; color:var(--ink-dim); padding:8px 14px; min-height:38px; border-radius:11px; font-weight:600; font-size:.86rem; cursor:pointer; white-space:nowrap; transition:background .15s, color .15s;}
+  .seg button:hover{color:var(--ink);}
+  .seg button.on{background:rgba(255,255,255,.9); color:#111214; text-shadow:none;}
+  .subtabs{margin-top:-4px;}
+  .sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);}
+  textarea{width:100%; padding:10px; border-radius:var(--radius-sm); border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--ink); font:inherit; font-size:16px;}
+  /* rapor */
+  .evsel{margin-bottom:12px;}
+  .evsel .seg{margin-bottom:10px;}
+  .evsel-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .evsel-row select{flex:1; min-width:200px; padding:10px; border-radius:var(--radius-sm); border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--ink); min-height:42px; font-size:16px;}
+  .evperson{padding:12px 14px; margin-bottom:8px;}
+  .evperson-h{display:flex; align-items:center; gap:10px;}
+  .evperson-h .grow{flex:1; min-width:0;} .evperson-h .nm{font-weight:600;}
+  .evperson-h .meta{display:flex; gap:6px; flex-wrap:wrap; margin-top:3px;}
+  .evperson .av{width:36px; height:36px; font-size:.8rem;}
+  .ring{--p:0; --c:var(--accent); width:84px; height:84px; flex:none; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(closest-side, rgba(14,16,21,.92) 78%, transparent 80% 100%), conic-gradient(var(--c) calc(var(--p) * 1%), rgba(255,255,255,.1) 0);}
+  .ring span{font-size:1.45rem; font-weight:600;}
+  .evscore .grow{flex:1; min-width:0;}
+  .evvids{margin-top:14px;} .evvids .tbl td:first-child{min-width:180px;}
+  .tbl tr.me{background:var(--accent-soft);}
+  .medal{display:inline-flex; width:22px; height:22px; border-radius:50%; align-items:center; justify-content:center; font-size:.72rem; font-weight:700; color:#17140F; text-shadow:none;}
+  .medal.m1{background:linear-gradient(160deg,#F3E2A9,#C9A54B);} .medal.m2{background:linear-gradient(160deg,#ECEEF2,#A9AEB8);} .medal.m3{background:linear-gradient(160deg,#E9C3A1,#A86E45);}
+  /* mading */
+  .mboard{columns:1; column-gap:14px;}
+  @media (min-width: 640px){ .mboard{columns:2;} }
+  @media (min-width: 1100px){ .mboard{columns:3;} }
+  .mcard{break-inside:avoid; position:relative; margin:0 0 16px; padding:20px 16px 14px; border-radius:var(--radius); transform:rotate(var(--tilt)); transition:transform .2s ease, box-shadow .2s ease;
+    -webkit-backdrop-filter:var(--glass); backdrop-filter:var(--glass); background:var(--lg-fill); border:1px solid rgba(255,255,255,.14); box-shadow:var(--lg-shadow);}
+  .mcard:hover{transform:rotate(0) translateY(-3px); box-shadow:var(--lg-shadow), 0 16px 40px rgba(0,0,0,.35);}
+  .mcard.pinned{border-color:rgba(214,196,163,.55);}
+  .mcard.archived{opacity:.55;}
+  .mcard .mpin{position:absolute; top:-7px; left:50%; width:16px; height:16px; margin-left:-8px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #F7E7C6, #C49A55 60%, #7A5A26); box-shadow:0 3px 6px rgba(0,0,0,.45);}
+  .mcard .meta{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;}
+  .mcard h3{font-size:1.1rem; margin-bottom:6px;}
+  .mcard img{width:100%; border-radius:var(--radius-sm); margin:6px 0 8px; display:block; background:rgba(255,255,255,.05);}
+  .mcard .misi{white-space:pre-line; margin:0 0 10px; font-size:.94rem;}
+  .mfoot{margin-top:8px;}
+  /* fitur yang sedang dibuat */
+  .soon{text-align:center; padding:34px 20px; max-width:620px; margin:0 auto;}
+  .soon-ic{width:84px; height:84px; margin:0 auto 14px; border-radius:26px; display:flex; align-items:center; justify-content:center; color:var(--accent);
+    background:linear-gradient(160deg, rgba(255,255,255,.18), rgba(255,255,255,.04)); border:1px solid rgba(255,255,255,.18); box-shadow:inset 0 1px 1px rgba(255,255,255,.3); animation:float 4s ease-in-out infinite;}
+  @keyframes float{50%{transform:translateY(-6px);}}
+  .soon h2{font-size:1.25rem; margin-bottom:6px;}
+  .soon .evlist{display:inline-block; text-align:left; margin:8px 0 16px;}
   @media print{
     .no-print{display:none !important;}
     #toast-host{display:none !important;}
@@ -339,7 +434,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   /* ---------- state ---------- */
   var auth = loadAuth();
   var view = BOOT.toolId ? 'tool' : 'home';
-  var tab = 'saya';
+  var tab = 'wlb';
   var toolState = { toolId: BOOT.toolId, tool: BOOT.tool, opens: [], group: null, sel: {}, selInit: false, loaded: false, note: null };
   var home = null, admin = null;
   var busy = false, cooldownUntil = 0, mutSeq = 0;
@@ -361,7 +456,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     try { localStorage.setItem(AUTH_KEY, txt); localStorage.setItem(LAST_KEY, a.user.username); } catch(e){}
     writeCookie(txt);
   }
-  function clearAuth(){ auth = null; home = null; admin = null; evMe = null; evTim = null; evAdm = null; try { localStorage.removeItem(AUTH_KEY); } catch(e){} writeCookie(''); }
+  function clearAuth(){ auth = null; home = null; admin = null; evMe = null; evTim = null; evAdm = null; mading = null; tab = 'wlb'; try { localStorage.removeItem(AUTH_KEY); } catch(e){} writeCookie(''); }
   function lastUser(){ try { return localStorage.getItem(LAST_KEY) || ''; } catch(e){ return ''; } }
   function isAdmin(){ return !!(auth && auth.user && auth.user.role === 'admin'); }
 
@@ -416,6 +511,22 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     print:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>'
   };
 
+  var ICON_PATH = {
+    cup: '<path d="M4 9h12v4.5A5.5 5.5 0 0 1 10.5 19h-1A5.5 5.5 0 0 1 4 13.5z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H15.6"/><path d="M8 3.5c-.6.9.6 1.6 0 2.5M11.5 3.5c-.6.9.6 1.6 0 2.5"/><path d="M3 21.5h14"/>',
+    pin: '<path d="M9 3.5h6"/><path d="M10 3.5l-.6 5.2L6.5 12h11l-2.9-3.3L14 3.5"/><path d="M12 12v8.5"/>',
+    chat: '<path d="M4.5 4.5h10a2 2 0 0 1 2 2V12a2 2 0 0 1-2 2H9l-3.5 3v-3h-1a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/><path d="M16.5 8.5h3a2 2 0 0 1 2 2V16a2 2 0 0 1-2 2h-1v2.5l-3-2.5h-3.5a2 2 0 0 1-1.8-1.1"/>',
+    camera: '<rect x="2.5" y="6.5" width="19" height="13" rx="2.5"/><circle cx="12" cy="13" r="3.6"/><path d="M8 6.5l1.6-2.5h4.8L16 6.5"/>',
+    report: '<path d="M6 2.8h8.2L18.5 7v14.2H6z"/><path d="M14 2.8V7h4.5"/><path d="M12.2 10.2l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.3-2.4 1.3.5-2.6-1.9-1.8 2.6-.4z"/>',
+    trophy: '<path d="M7.5 3.5h9V9a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 5.5H4.5a3 3 0 0 0 3.3 4.4M16.5 5.5h3a3 3 0 0 1-3.3 4.4"/><path d="M12 13.5v3.5"/><path d="M8.5 20.5h7l-.8-3.5H9.3z"/>',
+    target: '<circle cx="12" cy="12" r="8.8"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/><path d="M12 1.5v3M12 19.5v3"/>',
+    calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M7.5 13.5h2M11 13.5h2M14.5 13.5h2M7.5 17h2M11 17h2"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    doc: '<path d="M6 2.8h8.2L18.5 7v14.2H6z"/><path d="M14 2.8V7h4.5M9 12.5h6M9 16h6"/>',
+    sync: '<path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20v-4h-4"/>'
+  };
+  ICON.doc = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON_PATH.doc + '</svg>';
+  ICON.sync = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON_PATH.sync + '</svg>';
+
   var toastTimer = null;
   function toast(msg){
     var host = document.getElementById('toast-host');
@@ -430,7 +541,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function render(){
     var root = document.getElementById('root');
     if (!auth) { root.innerHTML = renderLogin(); bindLogin(); return; }
-    root.innerHTML = renderTopbar() + '<main><div class="wrap" id="content">' + (view === 'tool' ? renderTool() : renderHome()) + '</div></main>';
+    var nav = view === 'home';
+    root.innerHTML = renderTopbar() + (nav ? renderNav() : '') + '<main class="' + (nav ? 'has-nav' : '') + '"><div class="wrap' + (nav ? ' wide' : '') + '" id="content" data-page="' + esc(view === 'tool' ? 'tool' : tab) + '">' + (view === 'tool' ? renderTool() : renderHome()) + '</div></main>';
     bindTopbar();
     if (view === 'tool') bindTool(); else bindHome();
   }
@@ -442,7 +554,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     return '<div class="scan-hint" id="scan-hint">' + (BOOT.tool ? 'Alat: <strong>' + esc(BOOT.tool.nama) + '</strong> &middot; Gedung ' + esc(BOOT.tool.gedung) : 'Alat: <strong>' + esc(BOOT.toolId) + '</strong>') + '</div>';
   }
   function renderLogin(){
-    var head = '<div class="login-mark" style="margin-bottom:14px;">' + ICON.mark + '<h1>Dashboard Videographer &amp; Editor</h1></div>';
+    var head = '<div class="login-mark" style="margin-bottom:14px;">' + ICON.mark + '<h1>DASHBOARD VIDEOGRAPHER &amp; EDITOR</h1></div>';
     var body;
     if (lg.linking) {
       body = loadingHtml('Menyambungkan akun ke HP ini…');
@@ -545,26 +657,39 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     });
   }
 
-  /* ---------- topbar ---------- */
+  /* ---------- navigasi ikon: dock bawah (HP, vertikal) / sidebar kiri (komputer, landscape) ---------- */
+  var NAV_IC = { wlb: 'cup', mading: 'pin', ws: 'chat', alat: 'camera', rapor: 'report', tim: 'trophy', kpi: 'target', kal: 'calendar', adm: 'gear' };
+  function navItems(){
+    var l = [['wlb', 'Worklife Balance'], ['mading', 'Mading VGE'], ['ws', 'Working Space'], ['alat', 'Alat'], ['rapor', isAdmin() ? 'Admin Rapor' : 'Rapor Ku'],
+      ['tim', 'Rapor Tim'], ['kpi', 'Tracking KPI'], ['kal', 'Kalender Konten']];
+    if (isAdmin()) l.push(['adm', 'Admin']);
+    return l;
+  }
+  function navKey(t){ return (t === 'saya' || t === 'semua') ? 'alat' : ((t === 'admin' || t === 'qr') ? 'adm' : t); }
+  function navTarget(k){ return k === 'alat' ? 'saya' : (k === 'adm' ? 'admin' : k); }
+  function ic(name, size){ var s = size || 22; return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON_PATH[name] || '') + '</svg>'; }
+  function pageHead(k, title, sub, right){
+    var key = NAV_IC[k] ? k : navKey(k);
+    return '<div class="pagehead"><div class="pagehead-ic">' + ic(NAV_IC[key] || 'pin', 22) + '</div><div class="grow"><h1>' + esc(title) + '</h1>' + (sub ? '<p class="sub">' + sub + '</p>' : '') + '</div>' + (right || '') + '</div>';
+  }
+  function subTabs(list){ return '<div class="seg subtabs">' + list.map(function(x){ return '<button type="button" class="' + (tab === x[0] ? 'on' : '') + '" data-tab="' + x[0] + '">' + esc(x[1]) + '</button>'; }).join('') + '</div>'; }
+  function renderNav(){
+    var cur = navKey(tab);
+    return '<nav class="nav no-print" aria-label="Menu">' + navItems().map(function(x){
+      return '<button type="button" class="nav-it' + (cur === x[0] ? ' on' : '') + '" data-nav="' + x[0] + '" aria-label="' + esc(x[1]) + '" title="' + esc(x[1]) + '"' + (cur === x[0] ? ' aria-current="page"' : '') + '>'
+        + ic(NAV_IC[x[0]], 22) + '<span class="nav-lbl">' + esc(x[1]) + '</span></button>';
+    }).join('') + '</nav>';
+  }
   function renderTopbar(){
-    var tabs = '';
-    if (view === 'home') {
-      tabs = '<div class="tabbar">'
-        + tabBtn('saya', 'Alat Saya') + tabBtn('semua', 'Semua Alat')
-        + (isAdmin() ? '' : tabBtn('evme', 'Evaluasiku')) + tabBtn('evtim', 'Evaluasi Tim')
-        + (isAdmin() ? tabBtn('evadm', 'Admin Evaluasi') + tabBtn('admin', 'Admin') + tabBtn('qr', 'Cetak QR') : '')
-        + '</div>';
-    }
     return '<div class="topbar no-print"><div class="topbar-inner">'
       + (view === 'tool'
           ? '<button type="button" class="btn btn-ghost btn-sm" id="btn-home">' + ICON.back + ' Dashboard</button><div class="brand"></div>'
-          : '<div class="brand">' + ICON.mark + '<b title="Dashboard Videographer &amp; Editor">VG &amp; Editor</b></div>')
-      + '<button type="button" class="btn btn-primary btn-sm" id="btn-scan-top" aria-label="Scan QR alat">' + ICON.scan + ' Scan</button>'
-      + '<span class="userchip">' + esc(auth.user.nama) + '</span>'
+          : '<div class="brand">' + ICON.mark + '<div class="brand-t"><small>DASHBOARD</small><b title="DASHBOARD VIDEOGRAPHER &amp; EDITOR">VIDEOGRAPHER &amp; EDITOR</b></div><b class="brand-full">DASHBOARD VIDEOGRAPHER &amp; EDITOR</b></div>')
+      + '<button type="button" class="btn btn-primary btn-sm" id="btn-scan-top" aria-label="Scan QR alat">' + ICON.scan + '<span class="hide-xs"> Scan</span></button>'
+      + '<span class="userchip" title="' + esc(auth.user.nama) + '"><span class="av">' + esc(initials(auth.user.nama)) + '</span><span class="hide-xs">' + esc(auth.user.nama) + '</span></span>'
       + '<button type="button" class="linkbtn" id="btn-logout">Keluar</button>'
-      + '</div>' + tabs + '</div>';
+      + '</div></div>';
   }
-  function tabBtn(k, label){ return '<button type="button" class="tabbtn' + (tab === k ? ' active' : '') + '" data-tab="' + k + '">' + esc(label) + '</button>'; }
   function bindTopbar(){
     var sc = document.getElementById('btn-scan-top'); if (sc) sc.addEventListener('click', scanStart);
     var lo = document.getElementById('btn-logout');
@@ -578,6 +703,9 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     });
     var hb = document.getElementById('btn-home');
     if (hb) hb.addEventListener('click', function(){ view = 'home'; tab = 'saya'; render(); loadTab(); });
+    document.querySelectorAll('[data-nav]').forEach(function(b){
+      b.addEventListener('click', function(){ var t = navTarget(b.getAttribute('data-nav')); if (t === tab) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; } tab = t; render(); loadTab(); window.scrollTo(0, 0); });
+    });
     document.querySelectorAll('[data-tab]').forEach(function(b){
       b.addEventListener('click', function(){ tab = b.getAttribute('data-tab'); render(); loadTab(); });
     });
@@ -756,33 +884,41 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   /* ---------- home ---------- */
   function loadTab(){
     if (!auth || view !== 'home') return;
-    if (tab === 'evme') { call('apiEvalMine', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; evMe = ok; if (view === 'home' && tab === 'evme') render(); }); return; }
-    if (tab === 'evtim') { call('apiEvalTeam', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; evTim = ok; if (view === 'home' && tab === 'evtim') render(); }); return; }
-    if (tab === 'evadm') { if (!isAdmin()) { tab = 'saya'; render(); return; } loadEvAdm(); return; }
-    if (tab === 'admin' || tab === 'qr') {
-      if (!isAdmin()) { tab = 'saya'; render(); return; }
-      call('apiAdmin', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; admin = ok; if (view === 'home' && (tab === 'admin' || tab === 'qr')) render(); });
-    } else {
-      call('apiHome', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; home = ok; if (view === 'home' && (tab === 'saya' || tab === 'semua')) render(); });
+    if (SOON[tab]) return;
+    if (tab === 'mading') { loadMading(); return; }
+    if (tab === 'rapor') {
+      if (isAdmin()) { loadEvAdm(); return; }
+      call('apiRaporMine', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; evMe = ok; if (view === 'home' && tab === 'rapor') render(); }); return;
     }
+    if (tab === 'tim') { call('apiRaporTeam', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; evTim = ok; if (view === 'home' && tab === 'tim') render(); }); return; }
+    if (tab === 'admin' || tab === 'qr') {
+      if (!isAdmin()) { tab = 'wlb'; render(); return; }
+      call('apiAdmin', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; admin = ok; if (view === 'home' && (tab === 'admin' || tab === 'qr')) render(); });
+    } else if (tab === 'saya' || tab === 'semua') {
+      call('apiHome', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; home = ok; if (view === 'home' && (tab === 'saya' || tab === 'semua')) render(); });
+    } else { tab = 'wlb'; render(); }
   }
   function renderHome(){
-    if (tab === 'evme') return evMe ? renderEvMe() : loadingHtml('Memuat rapor…');
-    if (tab === 'evtim') return evTim ? renderEvTim() : loadingHtml('Memuat evaluasi tim…');
-    if (tab === 'evadm') return evAdm ? renderEvAdm() : loadingHtml('Memuat rapor…');
-    if (tab === 'admin') return admin ? renderAdmin() : loadingHtml();
-    if (tab === 'qr') return admin ? renderQr() : loadingHtml();
-    if (!home) return loadingHtml();
-    return tab === 'semua' ? renderSemua() : renderSaya();
+    if (SOON[tab]) return renderSoon(tab);
+    if (tab === 'mading') return mading ? renderMading() : pageHead('mading', 'Mading VGE', '') + loadingHtml('Memuat mading…');
+    if (tab === 'rapor') return isAdmin() ? (evAdm ? renderEvAdm() : pageHead('rapor', 'Admin Rapor', '') + loadingHtml('Menghitung rapor…')) : (evMe ? renderEvMe() : pageHead('rapor', 'Rapor Ku', '') + loadingHtml('Memuat rapor…'));
+    if (tab === 'tim') return evTim ? renderEvTim() : pageHead('tim', 'Rapor Tim', '') + loadingHtml('Memuat rapor tim…');
+    if (tab === 'admin' || tab === 'qr') {
+      var ah = pageHead('adm', 'Admin', 'Alat, akun, dan cetak QR') + subTabs([['admin', 'Alat & Akun'], ['qr', 'Cetak QR']]);
+      return ah + (admin ? (tab === 'qr' ? renderQr() : renderAdmin()) : loadingHtml());
+    }
+    var head = pageHead('alat', 'Alat', 'Scan QR untuk mulai / selesai memakai alat') + subTabs([['saya', 'Alat Saya'], ['semua', 'Semua Alat']]);
+    if (!home) return head + loadingHtml();
+    return head + (tab === 'semua' ? renderSemua() : renderSaya());
   }
   function bindHome(){
     if (tab === 'saya') bindSaya();
     else if (tab === 'semua') bindSemua();
-    else if (tab === 'admin') bindAdmin();
-    else if (tab === 'qr') bindQr();
-    else if (tab === 'evme') bindEvMe();
-    else if (tab === 'evtim') bindEvTim();
-    else if (tab === 'evadm') bindEvAdm();
+    else if (tab === 'admin') { if (admin) bindAdmin(); }
+    else if (tab === 'qr') { if (admin) bindQr(); }
+    else if (tab === 'mading') { if (mading) bindMading(); }
+    else if (tab === 'rapor') { if (isAdmin()) { if (evAdm) bindEvAdm(); } else if (evMe) bindEvMe(); }
+    else if (tab === 'tim') { if (evTim) bindEvTim(); }
   }
 
   function renderSaya(){
@@ -821,8 +957,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 
   function renderSemua(){
     var chips = gedungChips(home.tools).map(function(g){ return '<button type="button" class="chip' + (ui.gedung === g ? ' active' : '') + '" data-gedung="' + g + '">' + g + '</button>'; }).join('');
-    return '<div class="section-head"><h2>Semua Alat</h2></div>'
-      + '<p class="sub" style="margin:-4px 0 12px;">Tanpa QR? Ketuk alat untuk membuka halamannya.</p>'
+    return '<p class="sub" style="margin:0 0 12px;">Tanpa QR? Ketuk alat untuk membuka halamannya.</p>'
       + '<div class="searchbar"><input id="f-search" type="search" placeholder="Cari nama atau kode alat…" value="' + esc(ui.query) + '"></div>'
       + '<div class="chiprow">' + chips + '</div>'
       + '<div id="tool-list">' + renderToolList() + '</div>';
@@ -1370,12 +1505,13 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
   document.addEventListener('visibilitychange', function(){ if (document.visibilityState !== 'visible' && scan.on) scanStop(); });
 
-  /* ================= EVALUASI TIM =================
-   * Evaluasiku  : rapor pribadi (server hanya mengirim milik sendiri yang sudah dipublish).
-   * Evaluasi Tim: ranking + ringkasan tim + materi + video (yang sudah dipublish).
-   * Admin Eval. : review, catatan, publish, video, unduh PDF, jawab "perlu konfirmasi". */
+  /* ================= RAPOR =================
+   * Rapor Ku    : rapor pribadi (server hanya mengirim milik sendiri yang sudah dipublish).
+   * Rapor Tim   : ranking + ringkasan tim + materi + video (yang sudah dipublish).
+   * Admin Rapor : hitung rapor periode apa pun (minggu/bulan/kuartal/tahun) dari database, catatan, publish,
+   *               jawab "perlu konfirmasi", video, unduh PDF formal. */
   var evMe = null, evTim = null, evAdm = null, evBusy = false;
-  var ev = { meIdx: 0, timIdx: 0, week: '', open: '', peranMe: '' };
+  var ev = { meJenis: '', meIdx: 0, timJenis: '', timIdx: 0, jenis: 'minggu', kode: '', open: '', peranMe: '', showVid: {}, konfAll: {} };
   var EV_SARAN = {
     'audio/mixing': 'Sebelum export, dengarkan full pakai headphone sekali jalan tanpa melihat layar. Samakan level dialog/VO, musik di bawahnya, dan cek tiap VO sudah masuk.',
     'subtitle & typography': 'Cocokkan subtitle dengan skrip baris per baris. Satu orang bicara = satu baris; pisahkan kalau ganti pembicara. Jangan menutupi wajah.',
@@ -1389,17 +1525,18 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     'kecepatan revisi': 'Kerjakan semua poin revisi dalam satu putaran dan centang satu per satu sebelum kirim draft berikutnya.'
   };
   var EV_PERAN = { Editor: 'Editor', VG: 'Videografer' };
+  var EV_JENIS = { minggu: 'Mingguan', bulan: 'Bulanan', kuartal: 'Kuartal', tahun: 'Tahunan' };
+  var EV_KELAS = { Daily: 'Daily (bobot 1)', Endorse: 'Endorse & series (bobot 1,25)', Flagship: 'Flagship (bobot 2)', 'Non-Video': 'Non-video (bobot 0,5)' };
+  var EV_JORDER = ['minggu', 'bulan', 'kuartal', 'tahun'];
+  var LEAD_TITLE = 'Head of Videographer';
 
-  function evWeekLabel(w, a, b){
-    var f = function(s){ try { return new Date(s + 'T00:00:00+07:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', timeZone: 'Asia/Jakarta' }); } catch(e){ return s; } };
-    return 'Minggu ' + esc(String(w || '').replace(/^\d+-W/, '')) + (a ? ' &middot; ' + f(a) + '–' + f(b) : '');
-  }
   function evScoreColor(s){ return s >= 80 ? 'var(--ok)' : (s >= 60 ? 'var(--warn)' : 'var(--danger)'); }
-  function evDelta(now, lalu){
+  function evPeriodWord(j){ return j === 'minggu' ? 'minggu' : (j === 'bulan' ? 'bulan' : (j === 'kuartal' ? 'kuartal' : 'tahun')); }
+  function evDelta(now, lalu, j){
     if (lalu == null || now == null) return '<span class="faint">belum ada pembanding</span>';
-    var d = Math.round((now - lalu) * 10) / 10;
-    if (Math.abs(d) < 0.05) return '<span class="pill pill-neutral">sama dengan minggu lalu</span>';
-    return '<span class="pill ' + (d > 0 ? 'pill-ok' : 'pill-danger') + '">' + (d > 0 ? '▲ +' : '▼ ') + d + ' dari minggu lalu</span>';
+    var d = Math.round((now - lalu) * 10) / 10, w = evPeriodWord(j) + ' lalu';
+    if (Math.abs(d) < 0.05) return '<span class="pill pill-neutral">sama dengan ' + w + '</span>';
+    return '<span class="pill ' + (d > 0 ? 'pill-ok' : 'pill-danger') + '">' + (d > 0 ? '▲ +' : '▼ ') + d + ' dari ' + w + '</span>';
   }
   function evStatusPill(st){
     if (st === 'tercapai') return '<span class="pill pill-ok">Tercapai</span>';
@@ -1407,49 +1544,54 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if (st === 'belum') return '<span class="pill pill-danger">Belum</span>';
     return '<span class="pill pill-neutral">' + esc(st) + '</span>';
   }
-  /** Grafik garis skor (0–100) tren mingguan. tren = [[minggu, skor, poin/video, video], ...] */
+  /** Grafik garis skor (0–100). tren = [[label, skor, poin/video, video], ...] */
   function evTrendSvg(tren){
     if (!tren || !tren.length) return '<div class="empty">Belum ada data tren.</div>';
-    var W = 320, H = 120, pl = 28, pr = 10, pt = 10, pb = 24, n = tren.length;
+    var W = 320, H = 130, pl = 28, pr = 12, pt = 16, pb = 24, n = tren.length;
     var x = function(i){ return n === 1 ? (pl + (W - pl - pr) / 2) : pl + i * (W - pl - pr) / (n - 1); };
     var y = function(v){ return pt + (100 - v) * (H - pt - pb) / 100; };
-    var grid = [0, 50, 100].map(function(v){ return '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--line)" stroke-width="1"/><text x="' + (pl - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="10" fill="var(--ink-faint)">' + v + '</text>'; }).join('');
+    var grid = [0, 50, 100].map(function(v){ return '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="rgba(255,255,255,.12)" stroke-width="1"/><text x="' + (pl - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end" font-size="10" fill="var(--ink-faint)">' + v + '</text>'; }).join('');
     var pts = tren.map(function(t, i){ return x(i).toFixed(1) + ',' + y(t[1]).toFixed(1); }).join(' ');
+    var area = n > 1 ? '<polygon points="' + x(0).toFixed(1) + ',' + y(0) + ' ' + pts + ' ' + x(n - 1).toFixed(1) + ',' + y(0) + '" fill="url(#evg)" opacity=".35"/>' : '';
     var dots = tren.map(function(t, i){ return '<circle cx="' + x(i).toFixed(1) + '" cy="' + y(t[1]).toFixed(1) + '" r="4" fill="var(--accent)"><title>' + esc(t[0]) + ': skor ' + t[1] + ' (' + t[3] + ' video)</title></circle>'
-      + '<text x="' + x(i).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="10" fill="var(--ink-faint)">W' + esc(String(t[0]).slice(-2)) + '</text>'; }).join('');
+      + '<text x="' + x(i).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="10" fill="var(--ink-faint)">' + esc(t[0]) + '</text>'; }).join('');
     var last = tren[n - 1];
-    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Tren skor mingguan">' + grid
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Tren skor"><defs><linearGradient id="evg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D6C4A3"/><stop offset="1" stop-color="#D6C4A3" stop-opacity="0"/></linearGradient></defs>' + grid + area
       + (n > 1 ? '<polyline points="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>' : '')
-      + dots + '<text x="' + x(n - 1).toFixed(1) + '" y="' + (y(last[1]) - 8).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">' + last[1] + '</text></svg>';
+      + dots + '<text x="' + x(n - 1).toFixed(1) + '" y="' + Math.max(11, y(last[1]) - 8).toFixed(1) + '" text-anchor="middle" font-size="11" font-weight="700" fill="var(--ink)">' + last[1] + '</text></svg>';
   }
   /** Batang per kategori: [minor, sedang, major] */
   function evKatBars(kat){
     var keys = Object.keys(kat || {});
-    if (!keys.length) return '<div class="empty">Tidak ada catatan minggu ini.</div>';
+    if (!keys.length) return '<div class="empty">Tidak ada catatan di periode ini.</div>';
     keys.sort(function(a, b){ var s = function(k){ return kat[k][0] + kat[k][1] * 2 + kat[k][2] * 4; }; return s(b) - s(a); });
     var max = Math.max.apply(null, keys.map(function(k){ return kat[k][0] + kat[k][1] + kat[k][2]; }));
     return '<div class="evbars">' + keys.map(function(k){
       var v = kat[k], tot = v[0] + v[1] + v[2], w = function(n){ return (100 * n / max).toFixed(1) + '%'; };
-      return '<div class="evbar"><div class="lbl">' + esc(k) + '</div><div class="trk">'
+      return '<div class="evbar"><div class="lbl" title="' + esc(k) + '">' + esc(k) + '</div><div class="trk">'
         + (v[2] ? '<i class="maj" style="width:' + w(v[2]) + '" title="major ' + v[2] + '"></i>' : '')
         + (v[1] ? '<i class="sed" style="width:' + w(v[1]) + '" title="sedang ' + v[1] + '"></i>' : '')
         + (v[0] ? '<i class="min" style="width:' + w(v[0]) + '" title="minor ' + v[0] + '"></i>' : '')
         + '</div><div class="n mono">' + tot + '</div></div>';
     }).join('') + '<div class="evlegend"><span><i class="maj"></i>major</span><span><i class="sed"></i>sedang</span><span><i class="min"></i>minor</span></div></div>';
   }
+  function evKelasText(k){ return Object.keys(k || {}).map(function(x){ return k[x] + ' ' + x; }).join(' · '); }
+  function nmUser(id){ if (!id) return '—'; if (id === 'U-ADMIN') return 'Jun (admin, tidak dinilai)'; var x = (evAdm && evAdm.rapor || []).filter(function(r){ return r.userId === id; })[0]; return x ? x.nama : id; }
   /** Isi rapor satu peran (Editor / VG). forAdmin = tampilkan bagian "perlu konfirmasi". */
-  function evPeranHtml(p, peran, forAdmin){
-    var s = p.ringkas || {};
-    var head = '<div class="evscore"><div class="big mono" style="color:' + evScoreColor(s.skor) + '">' + esc(s.skor) + '</div>'
-      + '<div><div class="sub" style="margin-bottom:4px;">Skor ' + EV_PERAN[peran] + ' (0–100)</div>'
+  function evPeranHtml(p, peran, forAdmin, jenis, key){
+    var s = p.ringkas || {}, w = evPeriodWord(jenis);
+    var head = '<div class="evscore"><div class="ring" style="--p:' + (s.skor || 0) + '; --c:' + evScoreColor(s.skor) + ';"><span class="mono">' + esc(s.skor) + '</span></div>'
+      + '<div class="grow"><div class="sub" style="margin-bottom:4px;">Skor ' + EV_PERAN[peran] + ' (0–100) &middot; nilai <strong class="mono">' + esc(s.nilai) + '</strong> dari ' + esc(s.nilaiMaks) + '</div>'
       + (s.ikutRanking ? '<span class="pill pill-info">Peringkat ' + esc(s.peringkat) + ' dari ' + esc(s.dari) + '</span> ' : '<span class="pill pill-neutral">Belum masuk ranking (&lt; 3 video)</span> ')
-      + evDelta(s.skor, s.skorLalu) + '</div></div>';
+      + evDelta(s.skor, s.skorLalu, jenis) + '</div></div>';
     var stats = '<div class="stat-row evstats">'
       + '<div class="stat"><div class="num">' + esc(s.video) + '</div><div class="lbl">Video direview</div></div>'
+      + '<div class="stat"><div class="num">' + esc(s.videoSetara) + '</div><div class="lbl">Video setara (bobot)</div></div>'
       + '<div class="stat"><div class="num">' + esc(s.komentar) + '</div><div class="lbl">Catatan</div></div>'
-      + '<div class="stat"><div class="num">' + esc(s.poinPerVideo) + '</div><div class="lbl">Poin catatan / video</div></div>'
+      + '<div class="stat"><div class="num">' + esc(s.poinPerVideo) + '</div><div class="lbl">Poin catatan / video setara</div></div>'
       + '<div class="stat"><div class="num">' + esc(s.rataRonde) + '</div><div class="lbl">Rata-rata draft</div></div>'
-      + '<div class="stat ok"><div class="num">' + esc(s.acc1) + '</div><div class="lbl">ACC di draft 1</div></div></div>';
+      + '<div class="stat ok"><div class="num">' + esc(s.acc1) + '</div><div class="lbl">ACC di draft 1</div></div></div>'
+      + (s.kelas ? '<p class="faint" style="margin:-8px 0 12px;">Jenis konten: ' + esc(evKelasText(s.kelas)) + '</p>' : '');
     var utama = (p.poinUtama || []).map(function(u, i){
       var c = (u.contoh || [])[0];
       return '<div class="row" style="align-items:flex-start;"><span class="evnum">' + (i + 1) + '</span><div class="grow"><div class="nm">' + esc(u.kategori) + ' <span class="faint">(' + esc(u.jumlah) + ' catatan)</span></div>'
@@ -1457,60 +1599,91 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         + '<div class="evtip"><strong>Saran:</strong> ' + esc(EV_SARAN[u.kategori] || '') + '</div></div></div>';
     }).join('') || '<div class="card empty">Tidak ada catatan utama. Pertahankan!</div>';
     var kek = (p.kekuatan || []).map(function(k){ return '<li>' + esc(k) + '</li>'; }).join('');
-    var ber = (p.berulang || []).filter(function(b){ return b[1] >= 2 || b[2] >= 2; }).map(function(b){ return '<span class="pill pill-warn">' + esc(b[0]) + ' &middot; ' + b[1] + ' video, ' + b[2] + ' minggu</span>'; }).join(' ');
+    var ber = (p.berulang || []).map(function(b){ return '<span class="pill pill-warn">' + esc(b[0]) + ' &middot; ' + b[1] + ' video, ' + b[2] + ' minggu</span>'; }).join(' ');
     var lalu = (p.actionLalu || []).map(function(a){ return '<div class="hrow"><div>' + esc(a.teks) + '</div><div class="r">' + evStatusPill(a.status) + '</div></div>'; }).join('');
     var baru = (p.actionBaru || []).map(function(a){ return '<li>' + esc(a.teks) + '</li>'; }).join('');
+    var vid = '';
+    if ((p.videos || []).length) {
+      var vk = key + peran, open = !!ev.showVid[vk];
+      vid = '<details class="hist evvids"' + (open ? ' open' : '') + ' data-ev-vids="' + esc(vk) + '"><summary>Rincian nilai per video (' + p.videos.length + ')</summary><div class="scroll-x"><table class="tbl"><thead><tr><th>Judul</th><th>Kelas</th><th class="num">Draft</th><th class="num">Poin</th><th class="num">Nilai</th></tr></thead><tbody>'
+        + p.videos.map(function(v){ return '<tr><td>' + esc(v[0]) + '</td><td><span class="tag">' + esc(v[1]) + '</span></td><td class="num">' + esc(v[3]) + '</td><td class="num">' + esc(v[4]) + '</td><td class="num">' + esc(v[5]) + '<span class="faint">/' + esc(v[6]) + '</span></td></tr>'; }).join('')
+        + '</tbody></table></div></details>';
+    }
     var konf = '';
     if (forAdmin && (p.perluKonfirmasi || []).length) {
-      var nm = function(id){ if (!id) return '—'; if (id === 'U-ADMIN') return 'Jun (admin, tidak dinilai)'; var x = (evAdm && evAdm.rapor || []).filter(function(r){ return r.userId === id; })[0]; return x ? x.nama : id; };
       var katOpt = '<option value="">Pilih jenis kesalahan…</option>' + Object.keys(EV_SARAN).map(function(k){ return '<option value="' + esc(k) + '">' + esc(k) + '</option>'; }).join('');
       konf = '<div class="evkonf"><h3 class="evh" style="margin-top:4px;">Perlu kamu jawab (' + (p.jumlahKonfirmasi || p.perluKonfirmasi.length) + ') — belum dihitung</h3>'
-        + p.perluKonfirmasi.map(function(it){
+        + p.perluKonfirmasi.slice(0, ev.konfAll[key + peran] ? 40 : 6).map(function(it){
             return '<div class="evkonf-item" data-cf-wrap="1"><div class="evquote" style="margin-top:0;">"' + esc(it.poin) + '"<div class="faint">' + esc(it.judul || '') + (it.draft ? ' &middot; draft ' + esc(it.draft) : '') + ' &middot; ' + esc(it.log) + '</div></div>'
-              + '<div class="evkonf-ctl"><select data-cf="kat">' + katOpt + '</select>'
-              + '<select data-cf="sev"><option value="sedang">sedang</option><option value="minor">minor</option><option value="major">major</option></select>'
-              + '<select data-cf="untuk"><option value="">Kesalahan siapa?</option><option value="Editor">Editor: ' + esc(nm(it.ed)) + '</option><option value="VG">VG: ' + esc(nm(it.vg)) + '</option></select></div>'
+              + '<div class="evkonf-ctl"><select data-cf="kat" aria-label="Jenis kesalahan">' + katOpt + '</select>'
+              + '<select data-cf="sev" aria-label="Keparahan"><option value="sedang">sedang</option><option value="minor">minor</option><option value="major">major</option></select>'
+              + '<select data-cf="untuk" aria-label="Kesalahan siapa"><option value="">Kesalahan siapa?</option><option value="Editor">Editor: ' + esc(nmUser(it.ed)) + '</option><option value="VG">VG: ' + esc(nmUser(it.vg)) + '</option></select></div>'
               + '<div class="bulk" style="margin:8px 0 0;"><button type="button" class="btn btn-primary btn-sm" data-ev-cf="' + esc(it.k) + '">Masukkan ke rapor</button><button type="button" class="btn btn-ghost btn-sm" data-ev-cf="' + esc(it.k) + '" data-ev-skip="1">Bukan kesalahan</button></div></div>';
-          }).join('') + '</div>';
+          }).join('') + (!ev.konfAll[key + peran] && p.perluKonfirmasi.length > 6 ? '<button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;" data-ev-konfall="' + esc(key + peran) + '">Tampilkan ' + (p.perluKonfirmasi.length - 6) + ' lainnya</button>' : '')
+          + (p.jumlahKonfirmasi > p.perluKonfirmasi.length ? '<p class="faint" style="margin:8px 0 0;">Ditampilkan ' + p.perluKonfirmasi.length + ' dari ' + p.jumlahKonfirmasi + '. Sisanya muncul setelah yang ini dijawab.</p>' : '') + '</div>';
     }
     return '<div class="card evcard">' + head + stats
       + '<div class="evgrid"><div><h3 class="evh">Tren skor</h3>' + evTrendSvg(p.tren) + '</div><div><h3 class="evh">Catatan per kategori</h3>' + evKatBars(p.kategori) + '</div></div>'
-      + '<h3 class="evh">3 poin evaluasi utama</h3>' + utama
+      + '<div class="evgrid"><div><h3 class="evh">3 poin evaluasi utama</h3>' + utama + '</div><div>'
       + (ber ? '<h3 class="evh">Masalah berulang (prioritas)</h3><div class="chiprow">' + ber + '</div>' : '')
       + '<h3 class="evh">Yang sudah bagus</h3><ul class="evlist">' + kek + '</ul>'
-      + (lalu ? '<h3 class="evh">Action item minggu lalu</h3><div class="card" style="padding:0; overflow:hidden;">' + lalu + '</div>' : '')
-      + (baru ? '<h3 class="evh">Target minggu ini</h3><ul class="evlist">' + baru + '</ul>' : '')
-      + konf + '</div>';
+      + (lalu ? '<h3 class="evh">Target ' + w + ' lalu</h3><div class="card" style="padding:0; overflow:hidden;">' + lalu + '</div>' : '')
+      + (baru ? '<h3 class="evh">Target ' + w + ' berikutnya</h3><ul class="evlist">' + baru + '</ul>' : '') + '</div></div>'
+      + vid + konf + '</div>';
   }
-  function evRaporHtml(r, forAdmin, forPdf){
-    var d = r.data || {}, peran = Object.keys(d.peran || {});
-    var all = forAdmin || forPdf;
-    var pick = all ? null : (ev.peranMe && d.peran[ev.peranMe] ? ev.peranMe : peran[0]);
-    var tabs = !all && peran.length > 1 ? '<div class="chiprow">' + peran.map(function(k){ return '<button type="button" class="chip' + (k === pick ? ' active' : '') + '" data-ev-peran="' + k + '">' + EV_PERAN[k] + '</button>'; }).join('') + '</div>' : '';
-    var note = r.catatan ? '<div class="banner info" style="margin-bottom:12px;">' + ICON.info + '<div><p><strong>Catatan dari Head of Production</strong></p><p style="white-space:pre-line;">' + esc(r.catatan) + '</p></div></div>' : '';
-    var body = (all ? peran : [pick]).map(function(k){ return (all ? '<div class="gedung-heading">' + EV_PERAN[k] + '</div>' : '') + evPeranHtml(d.peran[k], k, forAdmin); }).join('');
+  function evRaporHtml(r, forAdmin){
+    var d = r.data || {}, peran = Object.keys(d.peran || {}).sort();
+    var pick = forAdmin ? null : (ev.peranMe && d.peran[ev.peranMe] ? ev.peranMe : peran[0]);
+    var tabs = !forAdmin && peran.length > 1 ? '<div class="chiprow">' + peran.map(function(k){ return '<button type="button" class="chip' + (k === pick ? ' active' : '') + '" data-ev-peran="' + k + '">' + EV_PERAN[k] + '</button>'; }).join('') + '</div>' : '';
+    var note = r.catatan ? '<div class="banner info" style="margin-bottom:12px;">' + ICON.info + '<div><p><strong>Catatan dari ' + LEAD_TITLE + '</strong></p><p style="white-space:pre-line;">' + esc(r.catatan) + '</p></div></div>' : '';
+    var body = (forAdmin ? peran : [pick]).map(function(k){ return (forAdmin ? '<div class="gedung-heading">' + EV_PERAN[k] + '</div>' : '') + evPeranHtml(d.peran[k], k, forAdmin, d.jenis, r.id || ''); }).join('');
     return note + tabs + body;
   }
+  function evMetodeHtml(){
+    return '<details class="hist" style="margin-top:14px;"><summary>Cara nilai dihitung</summary><div style="padding:0 14px 14px;" class="sub">'
+      + '<p>Setiap catatan reviewer diberi poin: minor 1, sedang 2, major 4. Setiap video punya <strong>bobot kesulitan</strong>: daily 1, endorse & series 1,25, flagship 2, non-video 0,5. Nilai sempurna per video = 100 × bobot (daily 100, flagship 200).</p>'
+      + '<p>Skor kualitas per video = 100 × (1 - (poin ÷ bobot) ÷ 10). Untuk editor, skor revisi = 100 × (1 - (draft - 1) ÷ (2 × bobot)), dan skor video = 70% kualitas + 30% revisi. Video flagship boleh lebih banyak catatan & draft sebelum nilainya turun.</p>'
+      + '<p>Skor akhir = total nilai ÷ total nilai maksimal × 100. Ranking hanya untuk yang punya minimal 3 video di periode itu.</p></div></details>';
+  }
+  /** Chip jenis periode + chip periode dari daftar rapor [{jenis,label}] */
+  function evPeriodChips(list, jKey, iKey, dataAttr){
+    var jenisAda = EV_JORDER.filter(function(j){ return list.some(function(x){ return x.jenis === j; }); });
+    if (jenisAda.indexOf(ev[jKey]) < 0) ev[jKey] = jenisAda[0] || 'minggu';
+    var sub = list.filter(function(x){ return x.jenis === ev[jKey]; });
+    ev[iKey] = Math.min(ev[iKey], Math.max(0, sub.length - 1));
+    var c1 = jenisAda.length > 1 ? '<div class="seg" role="tablist">' + jenisAda.map(function(j){ return '<button type="button" class="' + (j === ev[jKey] ? 'on' : '') + '" data-' + dataAttr + '-j="' + j + '">' + EV_JENIS[j] + '</button>'; }).join('') + '</div>' : '';
+    var c2 = '<div class="chiprow">' + sub.slice(0, 12).map(function(x, i){ return '<button type="button" class="chip' + (i === ev[iKey] ? ' active' : '') + '" data-' + dataAttr + '-i="' + i + '">' + esc(x.label) + '</button>'; }).join('') + '</div>';
+    return { html: c1 + c2, item: sub[ev[iKey]] };
+  }
 
-  /* ---------- Evaluasiku ---------- */
+  /* ---------- Rapor Ku ---------- */
   function renderEvMe(){
     var l = evMe.rapor || [];
-    var head = '<div class="section-head"><h2>Evaluasiku</h2><span class="faint">Hanya kamu &amp; admin yang bisa melihat ini</span></div>';
-    if (!l.length) return head + '<div class="card empty">Belum ada rapor yang dipublish untukmu.<br>Rapor mingguan muncul setelah admin menekan Publish.</div>';
-    ev.meIdx = Math.min(ev.meIdx, l.length - 1);
-    var r = l[ev.meIdx], d = r.data || {};
-    var chips = '<div class="chiprow">' + l.slice(0, 8).map(function(x, i){ return '<button type="button" class="chip' + (i === ev.meIdx ? ' active' : '') + '" data-ev-me="' + i + '">' + (i === 0 ? 'Terbaru' : 'W' + esc(x.minggu.slice(-2))) + '</button>'; }).join('') + '</div>';
-    return head + chips + '<p class="sub" style="margin:-4px 0 12px;">' + evWeekLabel(d.minggu, d.mulai, d.selesai) + ' &middot; dihitung dari semua catatan reviewer.</p>'
-      + '<div class="bulk" style="margin-top:0;"><button type="button" class="btn btn-ghost btn-sm" id="btn-ev-mepdf">Unduh PDF</button></div>' + evRaporHtml(r, false)
-      + '<p class="faint" style="margin-top:14px;">Skor: 100 = tanpa catatan. Catatan major berbobot 4, sedang 2, minor 1, dibagi jumlah video. Untuk editor, jumlah draft revisi ikut dihitung (30%).</p>';
+    var head = pageHead('rapor', 'Rapor Ku', 'Hanya kamu &amp; admin yang bisa melihat ini');
+    if (!l.length) return head + '<div class="card empty">Belum ada rapor yang dipublish untukmu.<br>Rapor muncul setelah ' + LEAD_TITLE + ' menekan Publish.</div>' + evMetodeHtml();
+    var pc = evPeriodChips(l, 'meJenis', 'meIdx', 'evme'), r = pc.item, d = r.data || {};
+    return head + pc.html + '<p class="sub" style="margin:-2px 0 12px;">' + esc(d.label || r.label) + ' &middot; dihitung dari semua catatan reviewer.</p>'
+      + '<div class="bulk" style="margin-top:0;"><button type="button" class="btn btn-ghost btn-sm" id="btn-ev-mepdf">' + ICON.doc + ' Unduh PDF</button></div>' + evRaporHtml(r, false) + evMetodeHtml();
+  }
+  function bindPeriodChips(attr, jKey, iKey){
+    document.querySelectorAll('[data-' + attr + '-j]').forEach(function(b){ b.addEventListener('click', function(){ ev[jKey] = b.getAttribute('data-' + attr + '-j'); ev[iKey] = 0; render(); }); });
+    document.querySelectorAll('[data-' + attr + '-i]').forEach(function(b){ b.addEventListener('click', function(){ ev[iKey] = Number(b.getAttribute('data-' + attr + '-i')); render(); }); });
+  }
+  function bindEvCommon(){
+    document.querySelectorAll('[data-ev-peran]').forEach(function(b){ b.addEventListener('click', function(){ ev.peranMe = b.getAttribute('data-ev-peran'); render(); }); });
+    document.querySelectorAll('[data-ev-vids]').forEach(function(d){ d.addEventListener('toggle', function(){ ev.showVid[d.getAttribute('data-ev-vids')] = d.open; }); });
+    document.querySelectorAll('[data-ev-konfall]').forEach(function(b){ b.addEventListener('click', function(){ ev.konfAll[b.getAttribute('data-ev-konfall')] = true; render(); }); });
   }
   function bindEvMe(){
-    var mp = document.getElementById('btn-ev-mepdf'); if (mp) mp.addEventListener('click', function(){ var r = evMe.rapor[ev.meIdx]; evPdf([evPdfPage(Object.assign({ nama: auth.user.nama }, r))], 'Rapor ' + r.minggu + ' - ' + auth.user.nama + '.pdf'); });
-    document.querySelectorAll('[data-ev-me]').forEach(function(b){ b.addEventListener('click', function(){ ev.meIdx = Number(b.getAttribute('data-ev-me')); render(); }); });
-    document.querySelectorAll('[data-ev-peran]').forEach(function(b){ b.addEventListener('click', function(){ ev.peranMe = b.getAttribute('data-ev-peran'); render(); }); });
+    bindPeriodChips('evme', 'meJenis', 'meIdx'); bindEvCommon();
+    var mp = document.getElementById('btn-ev-mepdf');
+    if (mp) mp.addEventListener('click', function(){
+      var l = (evMe.rapor || []).filter(function(x){ return x.jenis === ev.meJenis; }), r = l[ev.meIdx];
+      if (r) pdfRapor([Object.assign({ nama: auth.user.nama, status: 'published' }, r)], null, 'Rapor ' + (r.data.label || r.label) + ' - ' + auth.user.nama + '.pdf');
+    });
   }
 
-  /* ---------- Evaluasi Tim ---------- */
+  /* ---------- Rapor Tim ---------- */
   function evVideoHtml(v){
     return '<div class="card" style="padding:10px;"><div class="evvideo"><iframe src="https://drive.google.com/file/d/' + encodeURIComponent(v.fileId) + '/preview" allow="autoplay; fullscreen" allowfullscreen loading="lazy" title="' + esc(v.judul) + '"></iframe></div>'
       + '<div class="nm" style="margin-top:8px;">' + esc(v.judul) + '</div><div class="faint">' + esc(v.periode) + (v.dipublish ? ' &middot; ' + esc(v.dipublish) : '') + '</div></div>';
@@ -1518,11 +1691,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function evRankTable(list, me){
     if (!list || !list.length) return '<div class="empty">Belum ada ranking.</div>';
     return '<div class="card" style="padding:4px 6px;"><table class="tbl"><thead><tr><th>#</th><th>Nama</th><th class="num">Skor</th><th class="num">Video</th></tr></thead><tbody>'
-      + list.map(function(r){ var mine = me && r.userId === me; return '<tr' + (mine ? ' style="background:var(--accent-soft);"' : '') + '><td class="mono">' + (r.peringkat <= 3 ? ['','🥇','🥈','🥉'][r.peringkat] : r.peringkat) + '</td><td>' + esc(r.nama) + (mine ? ' <span class="tag">kamu</span>' : '') + '</td><td class="num" style="color:' + evScoreColor(r.skor) + '; font-weight:600;">' + esc(r.skor) + '</td><td class="num">' + esc(r.video) + '</td></tr>'; }).join('')
+      + list.map(function(r){ var mine = me && r.userId === me; return '<tr' + (mine ? ' class="me"' : '') + '><td class="mono">' + (r.peringkat <= 3 ? '<span class="medal m' + r.peringkat + '">' + r.peringkat + '</span>' : r.peringkat) + '</td><td>' + esc(r.nama) + (mine ? ' <span class="tag">kamu</span>' : '') + '</td><td class="num" style="color:' + evScoreColor(r.skor) + '; font-weight:600;">' + esc(r.skor) + '</td><td class="num">' + esc(r.video) + '</td></tr>'; }).join('')
       + '</tbody></table></div>';
   }
   function evTimHtml(t, forAdmin){
-    var d = t.data || {}, s = d.ringkas || {};
+    var d = t.data || {}, s = d.ringkas || {}, w = evPeriodWord(d.jenis);
     var stats = '<div class="stat-row">'
       + '<div class="stat"><div class="num">' + esc(s.video) + '</div><div class="lbl">Video direview</div></div>'
       + '<div class="stat"><div class="num">' + esc(s.catatan) + '</div><div class="lbl">Catatan reviewer</div></div>'
@@ -1538,68 +1711,74 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         + '<p class="sub" style="margin:0 0 8px;"><strong>Kenapa penting buat kita:</strong> ' + esc(m.relevansi) + '</p>'
         + '<div class="evtip"><strong>Tips praktis:</strong> ' + esc(m.tips) + '</div><p class="faint" style="margin:8px 0 0;">Rujukan: ' + esc(m.rujukan) + '</p></div>';
     }).join('');
-    return '<p class="sub" style="margin:-4px 0 12px;">' + evWeekLabel(d.minggu, d.mulai, d.selesai) + '</p>' + stats
-      + '<div class="section"><div class="section-head"><h2>Ranking Editor</h2></div>' + evRankTable((d.ranking || {}).Editor, auth.user.id) + '</div>'
-      + '<div class="section"><div class="section-head"><h2>Ranking Videografer</h2></div>' + evRankTable((d.ranking || {}).VG, auth.user.id) + '<p class="faint">Ranking hanya untuk yang punya ≥ 3 video direview minggu itu. Detail kekurangan tiap orang hanya ada di Evaluasiku masing-masing.</p></div>'
-      + '<div class="section"><div class="section-head"><h2>Masalah terbanyak tim</h2></div><div class="card"><div class="evbars">' + top + '</div></div>'
+    return '<p class="sub" style="margin:-2px 0 12px;">' + esc(d.label || t.label || '') + (s.kelas ? ' &middot; ' + esc(evKelasText(s.kelas)) : '') + '</p>' + stats
+      + '<div class="evgrid"><div class="section"><div class="section-head"><h2>Ranking Editor</h2></div>' + evRankTable((d.ranking || {}).Editor, auth.user.id) + '</div>'
+      + '<div class="section"><div class="section-head"><h2>Ranking Videografer</h2></div>' + evRankTable((d.ranking || {}).VG, auth.user.id) + '</div></div>'
+      + '<p class="faint" style="margin-top:-14px;">Ranking hanya untuk yang punya minimal 3 video direview di periode itu. Nilai sudah memakai bobot kesulitan konten. Detail kekurangan tiap orang hanya ada di Rapor Ku masing-masing.</p>'
+      + '<div class="evgrid"><div class="section"><div class="section-head"><h2>Masalah terbanyak tim</h2></div><div class="card"><div class="evbars">' + (top || '<div class="empty">Tidak ada catatan.</div>') + '</div></div>'
       + ((d.pola || []).length ? '<ul class="evlist" style="margin-top:10px;">' + d.pola.map(function(p){ return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' : '') + '</div>'
-      + ((d.bagus || []).length ? '<div class="section"><div class="banner ok">' + ICON.check + '<div>' + d.bagus.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div></div></div>' : '')
-      + '<div class="section"><div class="section-head"><h2>Materi minggu ini</h2></div>' + (materi || '<div class="empty">Belum ada materi.</div>') + '</div>'
-      + ((d.actionTim || []).length ? '<div class="section"><div class="section-head"><h2>Target tim minggu ini</h2></div><ul class="evlist">' + d.actionTim.map(function(p){ return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>' : '');
+      + '<div class="section">' + ((d.bagus || []).length ? '<div class="banner ok" style="margin-bottom:12px;">' + ICON.check + '<div>' + d.bagus.map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div></div>' : '')
+      + ((d.actionTim || []).length ? '<div class="section-head"><h2>Target tim ' + w + ' berikutnya</h2></div><ul class="evlist">' + d.actionTim.map(function(p){ return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>' : '') + '</div></div>'
+      + '<div class="section"><div class="section-head"><h2>Materi belajar</h2></div><div class="grid-auto">' + (materi || '<div class="empty">Belum ada materi.</div>') + '</div></div>';
   }
   function renderEvTim(){
     var l = evTim.tim || [], vids = evTim.videos || [];
-    var out = '<div class="section-head"><h2>Evaluasi Tim</h2></div>';
+    var out = pageHead('tim', 'Rapor Tim', 'Ranking, masalah terbanyak, dan materi belajar tim');
     if (vids.length) out += '<div class="section"><div class="section-head"><h2>Video evaluasi terbaru</h2></div>' + evVideoHtml(vids[0])
       + (vids.length > 1 ? '<details class="hist" style="margin-top:10px;"><summary>Arsip video (' + (vids.length - 1) + ')</summary><div class="stack" style="padding:10px;">' + vids.slice(1).map(evVideoHtml).join('') + '</div></details>' : '') + '</div>';
-    if (!l.length) return out + '<div class="card empty">Belum ada evaluasi tim yang dipublish.</div>';
-    ev.timIdx = Math.min(ev.timIdx, l.length - 1);
-    out += '<div class="chiprow">' + l.slice(0, 8).map(function(x, i){ return '<button type="button" class="chip' + (i === ev.timIdx ? ' active' : '') + '" data-ev-tim="' + i + '">' + (i === 0 ? 'Terbaru' : 'W' + esc(x.minggu.slice(-2))) + '</button>'; }).join('') + '</div>';
-    return out + evTimHtml(l[ev.timIdx], false);
+    if (!l.length) return out + '<div class="card empty">Belum ada rapor tim yang dipublish.</div>';
+    var pc = evPeriodChips(l, 'timJenis', 'timIdx', 'evtim');
+    return out + pc.html + evTimHtml(pc.item, false);
   }
-  function bindEvTim(){
-    document.querySelectorAll('[data-ev-tim]').forEach(function(b){ b.addEventListener('click', function(){ ev.timIdx = Number(b.getAttribute('data-ev-tim')); render(); }); });
-  }
+  function bindEvTim(){ bindPeriodChips('evtim', 'timJenis', 'timIdx'); }
 
-  /* ---------- Admin Evaluasi ---------- */
+  /* ---------- Admin Rapor ---------- */
   function renderEvAdm(){
-    var a = evAdm, weeks = a.weeks || [];
-    var head = '<div class="section-head"><h2>Admin Evaluasi</h2><button type="button" class="linkbtn" id="btn-ev-refresh">Muat ulang</button></div>';
-    if (!weeks.length) return head + '<div class="card empty">Belum ada rapor. Rapor dibuat otomatis tiap Senin pagi.</div>';
-    var wk = weeks.filter(function(w){ return w.minggu === a.minggu; })[0] || weeks[0];
-    var chips = '<div class="chiprow">' + weeks.slice(0, 10).map(function(w){ return '<button type="button" class="chip' + (w.minggu === a.minggu ? ' active' : '') + '" data-ev-week="' + esc(w.minggu) + '">' + esc(w.minggu) + (w.published < w.total ? ' •' : '') + '</button>'; }).join('') + '</div>';
-    var tim = (a.tim || []).filter(function(t){ return t.minggu === a.minggu; })[0];
-    var pipe = '<div class="banner ' + (wk.published === wk.total ? 'ok' : 'warn') + '" style="margin-bottom:12px;">' + ICON.info + '<div><p><strong>Status pipeline ' + esc(a.minggu) + ':</strong> data terambil &amp; dianalisis' + (a.rapor[0] && a.rapor[0].dibuat ? ' (' + esc(a.rapor[0].dibuat) + ' WIB)' : '') + ' &rarr; ' + wk.published + ' dari ' + wk.total + ' rapor dipublish &rarr; ringkasan tim ' + (tim && tim.status === 'published' ? 'dipublish' : 'masih draft') + '.</p></div></div>';
-    var acts = '<div class="bulk"><button type="button" class="btn btn-primary btn-sm" id="btn-ev-pubweek"' + (wk.published === wk.total && (!tim || tim.status === 'published') ? ' disabled' : '') + '>Publish semua ' + esc(a.minggu) + '</button>'
-      + '<button type="button" class="btn btn-ghost btn-sm" id="btn-ev-pdfall">Unduh PDF semua</button></div>';
-    var rows = a.rapor.slice().sort(function(x, y){ return (Number(y.data && y.data.peran && y.data.peran.Editor ? y.data.peran.Editor.ringkas.skor : -1)) - (Number(x.data && x.data.peran && x.data.peran.Editor ? x.data.peran.Editor.ringkas.skor : -1)); }).map(function(r){
-      var p = (r.data || {}).peran || {}, e = p.Editor && p.Editor.ringkas, v = p.VG && p.VG.ringkas, open = ev.open === r.id;
+    var a = evAdm, P = a.periode || {}, si = a.sync || {};
+    var head = pageHead('rapor', 'Admin Rapor', 'Hitung, periksa, dan publish rapor tim');
+    var sel = '<div class="card evsel"><div class="seg" role="tablist">' + EV_JORDER.map(function(j){ return '<button type="button" class="' + (j === a.jenis ? 'on' : '') + '" data-ev-jenis="' + j + '">' + EV_JENIS[j] + '</button>'; }).join('') + '</div>'
+      + '<div class="evsel-row"><label class="sr" for="ev-kode">Periode</label><select id="ev-kode">' + (a.daftar || []).map(function(p){ return '<option value="' + esc(p.kode) + '"' + (p.kode === a.kode ? ' selected' : '') + '>' + esc(p.label) + '</option>'; }).join('') + '</select>'
+      + '<button type="button" class="btn btn-ghost btn-sm" id="btn-ev-sync">' + ICON.sync + ' Sinkron data review</button></div>'
+      + '<p class="faint" style="margin:8px 0 0;">Data review terakhir disinkron: ' + esc(si.waktu || '-') + ' WIB &middot; ' + esc(si.review || 0) + ' review, ' + esc(si.catatan || 0) + ' catatan. Sinkron otomatis tiap hari jam 05.00.'
+      + ((si.namaTakCocok || []).length ? ' <span class="pill pill-warn">Nama belum dikenali: ' + esc(si.namaTakCocok.join(', ')) + '</span>' : '')
+      + ((si.jenisBaru || []).length ? ' <span class="pill pill-warn">Jenis konten baru (bobot 1): ' + esc(si.jenisBaru.join(', ')) + '</span>' : '') + '</p></div>';
+    var pub = a.rapor.filter(function(r){ return r.status === 'published'; }).length, nk = 0;
+    a.rapor.forEach(function(r){ Object.keys(r.data.peran || {}).forEach(function(k){ nk += r.data.peran[k].jumlahKonfirmasi || 0; }); });
+    var stat = '<div class="banner ' + (pub === a.rapor.length && a.tim.status === 'published' ? 'ok' : 'warn') + '" style="margin-bottom:12px;">' + ICON.info + '<div><p><strong>' + esc(P.label) + ':</strong> ' + a.rapor.length + ' orang dinilai &rarr; ' + pub + ' rapor dipublish &rarr; ringkasan tim ' + (a.tim.status === 'published' ? 'dipublish' : 'masih draft') + '.'
+      + (nk ? ' Ada <strong>' + nk + '</strong> catatan yang perlu kamu jawab (buka tiap orang).' : '') + '</p></div></div>';
+    var acts = '<div class="bulk"><button type="button" class="btn btn-primary btn-sm" id="btn-ev-pubweek">Publish semua (' + esc(P.label) + ')</button>'
+      + '<button type="button" class="btn btn-ghost btn-sm" id="btn-ev-pdfall">' + ICON.doc + ' Unduh PDF semua</button></div>';
+    var rows = a.rapor.slice().sort(function(x, y){ var s = function(r){ var p = r.data.peran; return p.Editor ? p.Editor.ringkas.skor : (p.VG ? p.VG.ringkas.skor : 0); }; return s(y) - s(x); }).map(function(r){
+      var p = r.data.peran || {}, e = p.Editor && p.Editor.ringkas, v = p.VG && p.VG.ringkas, open = ev.open === r.id;
       var k = (p.Editor && p.Editor.jumlahKonfirmasi || 0) + (p.VG && p.VG.jumlahKonfirmasi || 0);
-      return '<div class="card" style="margin-bottom:8px; padding:12px 14px;"><div style="display:flex; align-items:center; gap:10px;"><div class="grow" style="flex:1; min-width:0;"><div class="nm" style="font-weight:600;">' + esc(r.nama) + '</div>'
-        + '<div class="meta" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:3px;">' + (r.status === 'published' ? '<span class="pill pill-ok">Published</span>' : '<span class="pill pill-neutral">Draft</span>')
+      return '<div class="card evperson' + (open ? ' open' : '') + '"><div class="evperson-h"><div class="av">' + esc(initials(r.nama)) + '</div><div class="grow"><div class="nm">' + esc(r.nama) + '</div>'
+        + '<div class="meta">' + (r.status === 'published' ? '<span class="pill pill-ok">Published</span>' + (r.snapshotBeda ? '<span class="pill pill-warn">Ada perubahan, publish ulang</span>' : '') : '<span class="pill pill-neutral">Draft</span>')
         + (e ? '<span class="pill pill-info">Editor ' + esc(e.skor) + (e.peringkat ? ' · #' + e.peringkat : '') + '</span>' : '') + (v ? '<span class="pill pill-info">VG ' + esc(v.skor) + (v.peringkat ? ' · #' + v.peringkat : '') + '</span>' : '')
-        + (k ? '<span class="pill pill-warn">' + k + ' perlu konfirmasi</span>' : '') + (r.catatan ? '<span class="pill pill-neutral">ada catatan</span>' : '') + '</div></div>'
+        + (k ? '<span class="pill pill-warn">' + k + ' perlu dijawab</span>' : '') + (r.catatan ? '<span class="pill pill-neutral">ada catatan</span>' : '') + '</div></div>'
         + '<button type="button" class="btn btn-ghost btn-sm" data-ev-open="' + esc(r.id) + '">' + (open ? 'Tutup' : 'Lihat') + '</button></div>'
         + (open ? '<div style="margin-top:12px;">' + evRaporHtml(r, true)
-          + '<div class="field" style="margin-top:12px;"><label for="ev-note">Catatan untuk ' + esc(r.nama) + ' (terlihat olehnya setelah publish)</label><textarea id="ev-note" rows="3" style="width:100%; padding:10px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--surface); color:var(--ink); font:inherit;">' + esc(r.catatan) + '</textarea></div>'
-          + '<div class="bulk"><button type="button" class="btn btn-ghost btn-sm" data-ev-note="' + esc(r.id) + '">Simpan catatan</button><button type="button" class="btn btn-ghost btn-sm" data-ev-pdf="' + esc(r.id) + '">Unduh PDF</button>'
-          + '<button type="button" class="btn ' + (r.status === 'published' ? 'btn-outline' : 'btn-primary') + ' btn-sm" data-ev-pub="' + esc(r.id) + '" data-ev-to="' + (r.status === 'published' ? '0' : '1') + '">' + (r.status === 'published' ? 'Tarik ke draft' : 'Publish rapor ini') + '</button></div></div>' : '')
+          + '<div class="field" style="margin-top:12px;"><label for="ev-note">Catatan untuk ' + esc(r.nama) + ' (terlihat olehnya setelah publish)</label><textarea id="ev-note" rows="3">' + esc(r.catatan) + '</textarea></div>'
+          + '<div class="bulk"><button type="button" class="btn btn-ghost btn-sm" data-ev-note="' + esc(r.userId) + '">Simpan catatan</button><button type="button" class="btn btn-ghost btn-sm" data-ev-pdf="' + esc(r.id) + '">' + ICON.doc + ' Unduh PDF</button>'
+          + '<button type="button" class="btn ' + (r.status === 'published' && !r.snapshotBeda ? 'btn-outline' : 'btn-primary') + ' btn-sm" data-ev-pub="' + esc(r.userId) + '" data-ev-to="' + (r.status === 'published' && !r.snapshotBeda ? '0' : '1') + '">'
+          + (r.status === 'published' ? (r.snapshotBeda ? 'Publish ulang (perbarui)' : 'Tarik ke draft') : 'Publish rapor ini') + '</button></div></div>' : '')
         + '</div>';
-    }).join('');
-    var timSec = tim ? '<div class="section"><div class="section-head"><h2>Ringkasan tim ' + esc(tim.minggu) + '</h2>' + (tim.status === 'published' ? '<span class="pill pill-ok">Published</span>' : '<span class="pill pill-neutral">Draft</span>') + '</div>'
+    }).join('') || '<div class="card empty">Belum ada data review di periode ini.</div>';
+    var tim = a.tim;
+    var timSec = '<div class="section"><div class="section-head"><h2>Ringkasan tim</h2>' + (tim.status === 'published' ? '<span class="pill pill-ok">Published</span>' : '<span class="pill pill-neutral">Draft</span>') + '</div>'
       + '<details class="hist"><summary>Lihat ringkasan tim (seperti yang dilihat anggota)</summary><div style="padding:12px;">' + evTimHtml(tim, true) + '</div></details>'
-      + '<div class="bulk"><button type="button" class="btn ' + (tim.status === 'published' ? 'btn-outline' : 'btn-primary') + ' btn-sm" data-ev-timpub="' + esc(tim.minggu) + '" data-ev-to="' + (tim.status === 'published' ? '0' : '1') + '">' + (tim.status === 'published' ? 'Tarik ringkasan tim' : 'Publish ringkasan tim') + '</button></div></div>' : '';
+      + '<div class="bulk"><button type="button" class="btn ' + (tim.status === 'published' ? 'btn-outline' : 'btn-primary') + ' btn-sm" data-ev-timpub="1" data-ev-to="' + (tim.status === 'published' ? '0' : '1') + '">' + (tim.status === 'published' ? 'Tarik ringkasan tim' : 'Publish ringkasan tim') + '</button>'
+      + '<button type="button" class="btn btn-ghost btn-sm" id="btn-ev-pdftim">' + ICON.doc + ' PDF ringkasan tim</button></div></div>';
     var vids = (a.videos || []).map(function(v){
       return '<div class="hrow"><div><div style="font-weight:600;">' + esc(v.judul) + '</div><div class="faint">' + esc(v.periode) + ' &middot; ' + esc(v.dibuat) + ' &middot; <a href="' + esc(v.link) + '" target="_blank" rel="noopener">buka</a></div></div><div class="r">'
         + '<button type="button" class="btn ' + (v.status === 'published' ? 'btn-outline' : 'btn-primary') + ' btn-sm" data-ev-vidpub="' + esc(v.id) + '" data-ev-to="' + (v.status === 'published' ? '0' : '1') + '">' + (v.status === 'published' ? 'Tarik' : 'Publish') + '</button></div></div>';
     }).join('') || '<div class="empty">Belum ada video.</div>';
     var vidSec = '<div class="section"><div class="section-head"><h2>Video evaluasi tim</h2></div><div class="card"><form id="form-ev-video">'
-      + '<div class="form-row"><div class="field"><label for="ev-v-periode">Periode</label><input id="ev-v-periode" type="text" value="' + esc(a.minggu) + '"></div>'
-      + '<div class="field"><label for="ev-v-judul">Judul</label><input id="ev-v-judul" type="text" placeholder="cth. Evaluasi Tim W44–W45" required></div></div>'
+      + '<div class="form-row"><div class="field"><label for="ev-v-periode">Periode</label><input id="ev-v-periode" type="text" value="' + esc(P.label || '') + '"></div>'
+      + '<div class="field"><label for="ev-v-judul">Judul</label><input id="ev-v-judul" type="text" placeholder="cth. Evaluasi Tim Oktober" required></div></div>'
       + '<div class="field"><label for="ev-v-link">Link Google Drive (akses: siapa saja yang punya link)</label><input id="ev-v-link" type="url" placeholder="https://drive.google.com/file/d/…" required></div>'
       + '<button type="submit" class="btn btn-primary btn-sm">Simpan sebagai draft</button></form></div>'
       + '<div class="card" style="padding:0; overflow:hidden; margin-top:10px;">' + vids + '</div></div>';
-    return head + chips + pipe + acts + '<div class="section"><div class="section-head"><h2>Rapor per orang</h2><span class="faint">' + a.rapor.length + ' orang</span></div>' + rows + '</div>' + timSec + vidSec;
+    return head + sel + stat + acts + '<div class="section"><div class="section-head"><h2>Rapor per orang</h2><span class="faint">' + a.rapor.length + ' orang</span></div><div class="evpeople">' + rows + '</div></div>' + timSec + vidSec + evMetodeHtml();
   }
   function evAdmAct(fn, args, after){
     if (evBusy) return; evBusy = true;
@@ -1608,67 +1787,282 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       toast(ok.message); if (after) after(); loadEvAdm();
     });
   }
-  function loadEvAdm(){ call('apiEvalAdmin', auth.token, ev.week || '').then(function(res){ var ok = handle(res); if (!ok) return; evAdm = ok; ev.week = ok.minggu; if (view === 'home' && tab === 'evadm') render(); }); }
+  function loadEvAdm(){
+    call('apiRaporAdmin', auth.token, ev.jenis, ev.kode || '').then(function(res){ var ok = handle(res); if (!ok) return; evAdm = ok; ev.jenis = ok.jenis; ev.kode = ok.kode; if (view === 'home' && tab === 'rapor') render(); });
+  }
   function bindEvAdm(){
-    var rf = document.getElementById('btn-ev-refresh'); if (rf) rf.addEventListener('click', function(){ loadEvAdm(); toast('Memuat ulang…'); });
-    document.querySelectorAll('[data-ev-week]').forEach(function(b){ b.addEventListener('click', function(){ ev.week = b.getAttribute('data-ev-week'); ev.open = ''; evAdm = null; render(); loadEvAdm(); }); });
+    bindEvCommon();
+    document.querySelectorAll('[data-ev-jenis]').forEach(function(b){ b.addEventListener('click', function(){ ev.jenis = b.getAttribute('data-ev-jenis'); ev.kode = ''; ev.open = ''; evAdm = null; render(); loadEvAdm(); }); });
+    var ks = document.getElementById('ev-kode'); if (ks) ks.addEventListener('change', function(){ ev.kode = ks.value; ev.open = ''; evAdm = null; render(); loadEvAdm(); });
+    var sy = document.getElementById('btn-ev-sync'); if (sy) sy.addEventListener('click', function(){ sy.disabled = true; sy.textContent = 'Menyinkron…'; evAdmAct('apiRaporSync', []); });
     document.querySelectorAll('[data-ev-open]').forEach(function(b){ b.addEventListener('click', function(){ var id = b.getAttribute('data-ev-open'); ev.open = ev.open === id ? '' : id; render(); }); });
-    document.querySelectorAll('[data-ev-note]').forEach(function(b){ b.addEventListener('click', function(){ evAdmAct('apiEvalSaveNote', [b.getAttribute('data-ev-note'), document.getElementById('ev-note').value]); }); });
-    document.querySelectorAll('[data-ev-pub]').forEach(function(b){ b.addEventListener('click', function(){ evAdmAct('apiEvalPublish', ['rapor', b.getAttribute('data-ev-pub'), b.getAttribute('data-ev-to') === '1']); }); });
-    document.querySelectorAll('[data-ev-timpub]').forEach(function(b){ b.addEventListener('click', function(){ evAdmAct('apiEvalPublish', ['tim', b.getAttribute('data-ev-timpub'), b.getAttribute('data-ev-to') === '1']); }); });
-    document.querySelectorAll('[data-ev-vidpub]').forEach(function(b){ b.addEventListener('click', function(){ evAdmAct('apiEvalPublish', ['video', b.getAttribute('data-ev-vidpub'), b.getAttribute('data-ev-to') === '1']); }); });
+    document.querySelectorAll('[data-ev-note]').forEach(function(b){ b.addEventListener('click', function(){ evAdmAct('apiRaporNote', [evAdm.jenis, evAdm.kode, b.getAttribute('data-ev-note'), document.getElementById('ev-note').value]); }); });
+    document.querySelectorAll('[data-ev-pub]').forEach(function(b){ b.addEventListener('click', function(){ evAdmAct('apiRaporPublish', [evAdm.jenis, evAdm.kode, b.getAttribute('data-ev-pub'), b.getAttribute('data-ev-to') === '1']); }); });
+    document.querySelectorAll('[data-ev-timpub]').forEach(function(b){ b.addEventListener('click', function(){ evAdmAct('apiRaporPublish', [evAdm.jenis, evAdm.kode, 'tim', b.getAttribute('data-ev-to') === '1']); }); });
+    document.querySelectorAll('[data-ev-vidpub]').forEach(function(b){ b.addEventListener('click', function(){ evAdmAct('apiVideoPublish', [b.getAttribute('data-ev-vidpub'), b.getAttribute('data-ev-to') === '1']); }); });
     var pw = document.getElementById('btn-ev-pubweek');
     if (pw) pw.addEventListener('click', function(){
-      if (!pw.getAttribute('data-armed')) { pw.setAttribute('data-armed', '1'); pw.textContent = 'Yakin? Tekan sekali lagi'; setTimeout(function(){ if (pw.isConnected) { pw.removeAttribute('data-armed'); pw.textContent = 'Publish semua ' + evAdm.minggu; } }, 3500); return; }
-      evAdmAct('apiEvalPublishWeek', [evAdm.minggu]);
+      if (!pw.getAttribute('data-armed')) { pw.setAttribute('data-armed', '1'); pw.textContent = 'Yakin? Tekan sekali lagi'; setTimeout(function(){ if (pw.isConnected) { pw.removeAttribute('data-armed'); pw.textContent = 'Publish semua (' + evAdm.periode.label + ')'; } }, 3500); return; }
+      evAdmAct('apiRaporPublish', [evAdm.jenis, evAdm.kode, '*', true]);
     });
     var fv = document.getElementById('form-ev-video');
-    if (fv) fv.addEventListener('submit', function(e){ e.preventDefault(); evAdmAct('apiEvalVideoAdd', [{ periode: val('ev-v-periode'), judul: val('ev-v-judul'), link: val('ev-v-link') }]); });
+    if (fv) fv.addEventListener('submit', function(e){ e.preventDefault(); evAdmAct('apiVideoAdd', [{ periode: val('ev-v-periode'), judul: val('ev-v-judul'), link: val('ev-v-link') }]); });
     var pa = document.getElementById('btn-ev-pdfall');
-    if (pa) pa.addEventListener('click', function(){
-      var tim = (evAdm.tim || []).filter(function(t){ return t.minggu === evAdm.minggu; })[0];
-      var pages = evAdm.rapor.map(evPdfPage); if (tim) pages.unshift(evPdfTim(tim));
-      evPdf(pages, 'Rapor ' + evAdm.minggu + ' - semua.pdf');
-    });
+    if (pa) pa.addEventListener('click', function(){ pdfRapor(evAdm.rapor, evAdm.tim, 'Rapor ' + evAdm.periode.label + ' - semua.pdf'); });
+    var pt = document.getElementById('btn-ev-pdftim');
+    if (pt) pt.addEventListener('click', function(){ pdfRapor([], evAdm.tim, 'Rapor Tim ' + evAdm.periode.label + '.pdf'); });
     document.querySelectorAll('[data-ev-pdf]').forEach(function(b){ b.addEventListener('click', function(){
-      var r = evAdm.rapor.filter(function(x){ return x.id === b.getAttribute('data-ev-pdf'); })[0]; if (r) evPdf([evPdfPage(r)], 'Rapor ' + r.minggu + ' - ' + r.nama + '.pdf');
+      var r = evAdm.rapor.filter(function(x){ return x.id === b.getAttribute('data-ev-pdf'); })[0]; if (r) pdfRapor([r], null, 'Rapor ' + evAdm.periode.label + ' - ' + r.nama + '.pdf');
     }); });
     document.querySelectorAll('[data-ev-cf]').forEach(function(b){ b.addEventListener('click', function(){
       var k = b.getAttribute('data-ev-cf'), wrap = b.closest('[data-cf-wrap]');
       var ab = b.getAttribute('data-ev-skip') === '1';
       var dec = ab ? { abaikan: true } : { kategori: wrap.querySelector('[data-cf="kat"]').value, keparahan: wrap.querySelector('[data-cf="sev"]').value, untuk: wrap.querySelector('[data-cf="untuk"]').value };
       if (!ab && (!dec.kategori || !dec.untuk)) { toast('Pilih kategori dan untuk siapa dulu.'); return; }
-      evAdmAct('apiEvalConfirm', [evAdm.minggu, k, dec]);
+      evAdmAct('apiRaporConfirm', [k, dec]);
     }); });
   }
-  /** PDF: dibuat langsung di HP/laptop (html2pdf dari cdnjs, dimuat saat tombol ditekan). Selalu tema terang. */
-  function evLoadPdf(){
-    if (window.html2pdf) return Promise.resolve();
-    return new Promise(function(res, rej){ var sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); });
+
+  /* ---------- PDF formal (jsPDF + AutoTable, teks asli — bukan screenshot) ---------- */
+  var LEAD_NAME = 'Jun Limbong';
+  function pdfLoad(){
+    function load(src){ return new Promise(function(res, rej){ var sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = rej; document.head.appendChild(sc); }); }
+    var p = window.jspdf ? Promise.resolve() : load('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    return p.then(function(){ var J = window.jspdf && window.jspdf.jsPDF; if (J && J.API && J.API.autoTable) return; return load('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'); });
   }
-  function evPdfPage(r){
-    var d = r.data || {};
-    return '<div class="pdf-page"><div class="pdf-head"><div><div class="pdf-kicker">Rapor Evaluasi Mingguan</div><h1>' + esc(r.nama || d.nama || '') + '</h1></div><div class="pdf-meta">' + evWeekLabel(d.minggu, d.mulai, d.selesai) + '<br>Dashboard Videographer &amp; Editor</div></div>'
-      + evRaporHtml(r, false, true) + '</div>';
+  /** Font standar PDF hanya mengenal huruf Latin; simbol lain diganti / dibuang. */
+  function pdfTxt(s){
+    return String(s == null ? '' : s).replace(/≤/g, '<=').replace(/≥/g, '>=').replace(/▲/g, 'naik').replace(/▼/g, 'turun').replace(/→/g, '->').replace(/[\u2010\u2011]/g, '-')
+      .replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF–—‘’“”•…]/g, '');
   }
-  function evPdf(pages, filename){
+  function pdfNow(){ try { return new Date().toLocaleString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Jakarta' }) + ' WIB'; } catch(e){ return ''; } }
+  function pdfTgl(ymd){ try { return new Date(ymd + 'T00:00:00+07:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }); } catch(e){ return ymd || ''; } }
+  function pdfDoc(){
+    var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    var W = 210, M = 18, CW = W - 2 * M, y = 0, draftMark = false;
+    var T = {
+      doc: doc, M: M, CW: CW,
+      header: function(kanan, isDraft){
+        draftMark = isDraft;
+        doc.setTextColor(20); doc.setFont('helvetica', 'bold'); doc.setFontSize(12.5); doc.text('SUNEEDAY CREATIVE', M, 17);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(90); doc.text('Divisi Videographer & Editor  ·  Dashboard Videographer & Editor', M, 22);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(20); doc.text(pdfTxt(kanan), W - M, 17, { align: 'right' });
+        if (isDraft) { doc.setTextColor(170, 40, 40); doc.text('DRAFT — BELUM FINAL', W - M, 22, { align: 'right' }); }
+        doc.setDrawColor(20); doc.setLineWidth(0.6); doc.line(M, 25.5, W - M, 25.5); doc.setLineWidth(0.2); doc.line(M, 26.6, W - M, 26.6);
+        y = 34; doc.setTextColor(20);
+      },
+      newPage: function(kanan, isDraft){ doc.addPage(); T.header(kanan, isDraft); },
+      need: function(h, kanan){ if (y + h > 297 - 22) { T.newPage(kanan || T.kanan, draftMark); } },
+      title: function(a, b){
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.text(pdfTxt(a), W / 2, y, { align: 'center' }); y += 6.5;
+        if (b) { doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(70); doc.text(pdfTxt(b), W / 2, y, { align: 'center' }); doc.setTextColor(20); y += 8; }
+      },
+      h1: function(t){ T.need(16); doc.setFont('helvetica', 'bold'); doc.setFontSize(11.5); doc.setFillColor(236, 233, 226); doc.rect(M, y - 4.6, CW, 7, 'F'); doc.text(pdfTxt(t), M + 2, y); y += 8; },
+      h2: function(t){ T.need(12); doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.text(pdfTxt(t), M, y); y += 5; },
+      p: function(t, opt){
+        opt = opt || {}; doc.setFont('helvetica', opt.bold ? 'bold' : (opt.italic ? 'italic' : 'normal')); doc.setFontSize(opt.size || 9.5); doc.setTextColor(opt.gray ? 90 : 20);
+        var ind = opt.indent || 0, lines = doc.splitTextToSize(pdfTxt(t), CW - ind), lh = (opt.size || 9.5) * 0.43;
+        lines.forEach(function(l, i){ T.need(lh + 1); if (opt.bullet && i === 0) doc.text('•', M + ind - 3.5, y); doc.text(l, M + ind, y); y += lh; });
+        y += opt.after == null ? 1.6 : opt.after; doc.setTextColor(20);
+      },
+      bullets: function(list){ (list || []).forEach(function(t){ T.p(t, { bullet: true, indent: 5, after: 0.8 }); }); y += 1.2; },
+      table: function(head, body, opt){
+        opt = opt || {};
+        doc.autoTable({ startY: y, head: head ? [head.map(pdfTxt)] : undefined, body: body.map(function(r){ return r.map(function(c){ return typeof c === 'object' && c ? c : pdfTxt(c); }); }),
+          theme: 'grid', margin: { left: M, right: M, top: 32, bottom: 22 },
+          styles: { font: 'helvetica', fontSize: opt.size || 8.8, cellPadding: 1.8, textColor: 20, lineColor: [175, 175, 175], lineWidth: 0.2, overflow: 'linebreak', valign: 'top' },
+          headStyles: { fillColor: [38, 38, 40], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: opt.zebra === false ? {} : { fillColor: [247, 246, 243] },
+          columnStyles: opt.cols || {},
+          willDrawPage: function(dd){ if (dd.pageNumber > 1) T.header(T.kanan, draftMark); } });
+        y = doc.lastAutoTable.finalY + (opt.after == null ? 5 : opt.after);
+      },
+      kv: function(rows){ T.table(null, rows, { zebra: false, cols: { 0: { cellWidth: 52, fontStyle: 'bold', fillColor: [244, 242, 237] } } }); },
+      gap: function(h){ y += h; },
+      y: function(){ return y; },
+      finish: function(filename){
+        var n = doc.getNumberOfPages();
+        for (var i = 1; i <= n; i++) {
+          doc.setPage(i); doc.setDrawColor(160); doc.setLineWidth(0.2); doc.line(M, 297 - 15, W - M, 297 - 15);
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(110);
+          doc.text(pdfTxt('Dokumen ini dibuat otomatis dari Dashboard Videographer & Editor · dicetak ' + pdfNow()), M, 297 - 10.5);
+          doc.text('Halaman ' + i + ' dari ' + n, W - M, 297 - 10.5, { align: 'right' });
+        }
+        doc.save(filename);
+      }
+    };
+    return T;
+  }
+  function pdfPeran(T, p, peran, jenis, no){
+    var s = p.ringkas || {}, w = evPeriodWord(jenis);
+    T.h1(no + '. PENILAIAN SEBAGAI ' + EV_PERAN[peran].toUpperCase());
+    T.h2(no + '.1 Ringkasan nilai');
+    var delta = s.skorLalu == null ? 'Belum ada pembanding' : ((s.skor - s.skorLalu >= 0 ? '+' : '') + (Math.round((s.skor - s.skorLalu) * 10) / 10) + ' dari ' + w + ' lalu (' + s.skorLalu + ')');
+    var rows = [['Skor akhir (0–100)', String(s.skor)], ['Nilai berbobot', s.nilai + ' dari ' + s.nilaiMaks + ' poin maksimal'],
+      ['Peringkat', s.ikutRanking ? s.peringkat + ' dari ' + s.dari + ' orang' : 'Tidak masuk ranking (kurang dari 3 video)'], ['Perubahan', delta],
+      ['Video direview', s.video + ' video (' + evKelasText(s.kelas) + ')'], ['Video setara (bobot)', String(s.videoSetara)],
+      ['Jumlah catatan', String(s.komentar)], ['Poin catatan / video setara', String(s.poinPerVideo)], ['Rata-rata draft', String(s.rataRonde)], ['ACC di draft 1', s.acc1 + ' video'],
+      ['Skor kualitas', String(s.skorKualitas)]];
+    if (peran === 'Editor') rows.push(['Skor kecepatan revisi', String(s.skorRevisi)]);
+    T.kv(rows);
+    T.h2(no + '.2 Rincian catatan per kategori');
+    var kat = p.kategori || {}, ks = Object.keys(kat).sort(function(a, b){ var f = function(k){ return kat[k][0] + kat[k][1] * 2 + kat[k][2] * 4; }; return f(b) - f(a); });
+    if (ks.length) T.table(['Kategori', 'Minor', 'Sedang', 'Major', 'Total', 'Poin'], ks.map(function(k){ var v = kat[k]; return [k, v[0], v[1], v[2], v[0] + v[1] + v[2], v[0] + v[1] * 2 + v[2] * 4]; }),
+      { cols: { 1: { halign: 'center', cellWidth: 16 }, 2: { halign: 'center', cellWidth: 16 }, 3: { halign: 'center', cellWidth: 16 }, 4: { halign: 'center', cellWidth: 16 }, 5: { halign: 'center', cellWidth: 16 } } });
+    else T.p('Tidak ada catatan reviewer di periode ini.');
+    T.h2(no + '.3 Poin evaluasi utama dan saran');
+    if ((p.poinUtama || []).length) T.table(['No', 'Kategori', 'Contoh catatan reviewer', 'Saran perbaikan'], p.poinUtama.map(function(u, i){
+      var c = (u.contoh || [])[0];
+      return [String(i + 1), u.kategori + ' (' + u.jumlah + ' catatan)', c ? '"' + c.poin + '" — ' + c.judul + ', draft ' + c.draft + ', ' + c.keparahan : '-', EV_SARAN[u.kategori] || ''];
+    }), { cols: { 0: { cellWidth: 9, halign: 'center' }, 1: { cellWidth: 34 } } });
+    else T.p('Tidak ada catatan utama.');
+    T.h2(no + '.4 Kekuatan');
+    T.bullets(p.kekuatan);
+    if ((p.berulang || []).length) { T.h2(no + '.5 Masalah berulang (prioritas)'); T.bullets(p.berulang.map(function(b){ return b[0] + ': muncul di ' + b[1] + ' video, dalam ' + b[2] + ' minggu.'; })); }
+    T.h2(no + '.6 Target');
+    if ((p.actionLalu || []).length) T.table(['Target ' + w + ' lalu', 'Status'], p.actionLalu.map(function(a){ return [a.teks, a.status]; }), { cols: { 1: { cellWidth: 28 } } });
+    if ((p.actionBaru || []).length) { T.p('Target ' + w + ' berikutnya:', { bold: true, after: 1 }); T.bullets(p.actionBaru.map(function(a){ return a.teks; })); }
+    if ((p.videos || []).length) {
+      T.h2(no + '.7 Rincian nilai per video');
+      T.table(['No', 'Judul video', 'Kelas', 'Bobot', 'Draft', 'Poin', 'Nilai'], p.videos.map(function(v, i){ return [String(i + 1), v[0], v[1], String(v[2]).replace('.', ','), v[3], v[4], v[5] + ' / ' + v[6]]; }),
+        { size: 8, cols: { 0: { cellWidth: 9, halign: 'center' }, 2: { cellWidth: 20 }, 3: { cellWidth: 13, halign: 'center' }, 4: { cellWidth: 12, halign: 'center' }, 5: { cellWidth: 12, halign: 'center' }, 6: { cellWidth: 22, halign: 'right' } } });
+    }
+  }
+  function pdfMetode(T){
+    T.h2('Metode penilaian');
+    T.p('Setiap catatan reviewer diberi poin: minor 1, sedang 2, major 4. Setiap video punya bobot kesulitan: daily 1; endorse & series 1,25; flagship 2; non-video 0,5. Nilai maksimal per video = 100 × bobot. ' +
+      'Skor kualitas per video = 100 × (1 - (poin ÷ bobot) ÷ 10). Untuk editor, skor revisi = 100 × (1 - (draft - 1) ÷ (2 × bobot)) dan skor video = 70% kualitas + 30% revisi. ' +
+      'Skor akhir = total nilai ÷ total nilai maksimal × 100. Ranking hanya untuk yang memiliki minimal 3 video di periode tersebut.', { size: 8.3, gray: true });
+  }
+  function pdfTtd(T, nama){
+    T.need(44); T.gap(4);
+    var doc = T.doc, x1 = T.M, x2 = T.M + T.CW / 2 + 6, y = T.y();
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(20);
+    doc.text(pdfTxt('Jakarta, ' + pdfTgl(new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10))), x2, y);
+    doc.text('Dibuat oleh,', x1, y + 6); doc.text('Diterima oleh,', x2, y + 6);
+    doc.setFont('helvetica', 'bold'); doc.text(LEAD_TITLE, x1, y + 11); doc.text('Yang dinilai', x2, y + 11);
+    doc.setFont('helvetica', 'normal'); doc.setDrawColor(90); doc.line(x1, y + 33, x1 + 60, y + 33); doc.line(x2, y + 33, x2 + 60, y + 33);
+    doc.text(pdfTxt(LEAD_NAME), x1, y + 38); doc.text(pdfTxt(nama), x2, y + 38);
+    T.gap(42);
+  }
+  function pdfOrang(T, r, first){
+    var d = r.data || {}, kanan = 'RAPOR EVALUASI KINERJA · ' + String(EV_JENIS[d.jenis] || '').toUpperCase(), draft = r.status !== 'published';
+    T.kanan = kanan;
+    if (first) T.header(kanan, draft); else T.newPage(kanan, draft);
+    T.title('RAPOR EVALUASI KINERJA', d.label + ' (' + pdfTgl(d.mulai) + ' – ' + pdfTgl(d.selesai) + ')');
+    var peran = Object.keys(d.peran || {}).sort();
+    T.kv([['Nama', r.nama || d.nama], ['Peran yang dinilai', peran.map(function(k){ return EV_PERAN[k]; }).join(' dan ')], ['Jenis rapor', 'Rapor ' + (EV_JENIS[d.jenis] || '').toLowerCase()],
+      ['Periode', pdfTgl(d.mulai) + ' s/d ' + pdfTgl(d.selesai)], ['Nomor dokumen', r.id || '-'], ['Status', draft ? 'Draft (belum dipublish)' : 'Final' + (r.dipublish ? ', dipublish ' + r.dipublish + ' WIB' : '')],
+      ['Sumber data', 'Seluruh catatan reviewer di spreadsheet review Suneeday']]);
+    peran.forEach(function(k, i){ pdfPeran(T, d.peran[k], k, d.jenis, ['I', 'II'][i]); });
+    T.h1('CATATAN ' + LEAD_TITLE.toUpperCase());
+    T.p(r.catatan || '—', { after: 3 });
+    pdfMetode(T);
+    pdfTtd(T, r.nama || d.nama);
+  }
+  function pdfTim(T, t, first){
+    var d = t.data || {}, s = d.ringkas || {}, kanan = 'RAPOR TIM · ' + String(EV_JENIS[d.jenis] || '').toUpperCase(), draft = t.status && t.status !== 'published';
+    T.kanan = kanan;
+    if (first) T.header(kanan, draft); else T.newPage(kanan, draft);
+    T.title('RAPOR TIM VIDEOGRAPHER & EDITOR', d.label + ' (' + pdfTgl(d.mulai) + ' – ' + pdfTgl(d.selesai) + ')');
+    T.kv([['Video direview', s.video + ' video (' + evKelasText(s.kelas) + ')'], ['Catatan reviewer', String(s.catatan)], ['Rata-rata draft', String(s.rataRonde)], ['ACC di draft 1', s.acc1 + ' video'], ['Orang dinilai', s.orang + ' orang']]);
+    ['Editor', 'VG'].forEach(function(k, i){
+      T.h1((i + 1) + '. RANKING ' + EV_PERAN[k].toUpperCase());
+      var l = (d.ranking || {})[k] || [];
+      if (l.length) T.table(['Peringkat', 'Nama', 'Skor', 'Video', 'Video setara'], l.map(function(x){ return [x.peringkat, x.nama, x.skor, x.video, x.videoSetara == null ? '' : x.videoSetara]; }),
+        { cols: { 0: { cellWidth: 22, halign: 'center' }, 2: { cellWidth: 20, halign: 'center' }, 3: { cellWidth: 18, halign: 'center' }, 4: { cellWidth: 26, halign: 'center' } } });
+      else T.p('Belum ada yang memenuhi syarat ranking (minimal 3 video).');
+    });
+    T.h1('3. MASALAH TERBANYAK TIM');
+    if ((d.banding || []).length) T.table(['Kategori', 'Jumlah catatan', '% dari semua catatan', '% periode lalu'], (d.banding || []).map(function(m, i){ var t5 = (d.topMasalah || [])[i] || {}; return [m.kategori, t5.jumlah == null ? '' : t5.jumlah, m.persen + '%', m.persenLalu == null ? '-' : m.persenLalu + '%']; }));
+    T.bullets(d.pola);
+    if ((d.bagus || []).length) { T.h2('Yang sudah bagus'); T.bullets(d.bagus); }
+    if ((d.actionTim || []).length) { T.h2('Target tim periode berikutnya'); T.bullets(d.actionTim); }
+    if ((d.materi || []).length) {
+      T.h1('4. MATERI BELAJAR');
+      d.materi.forEach(function(m, i){ T.h2((i + 1) + '. ' + m.judul + ' (' + m.kategori + ')'); T.p(m.ringkas); T.p('Kenapa penting: ' + m.relevansi); T.p('Tips praktis: ' + m.tips); T.p('Rujukan: ' + m.rujukan + (m.verifikasi && t.status ? ' — klaim perlu dicek admin' : ''), { gray: true, size: 8.5, after: 3 }); });
+    }
+  }
+  function pdfRapor(list, tim, filename){
     toast('Menyiapkan PDF…');
-    evLoadPdf().then(function(){
-      var hold = document.createElement('div'); hold.className = 'pdf-hold';
-      var box = document.createElement('div'); box.className = 'pdf-sheet';
-      box.innerHTML = pages.join('<div class="pdf-break"></div>');
-      hold.appendChild(box); document.body.appendChild(hold);
-      return window.html2pdf().set({ margin: [10, 10, 12, 10], filename: filename, image: { type: 'jpeg', quality: 0.85 }, html2canvas: { scale: 1.6, backgroundColor: '#ffffff', useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'], before: '.pdf-break', avoid: ['.row', '.stat', '.evbar', '.hrow', 'tr'] } })
-        .from(box).save().then(function(){ hold.remove(); toast('PDF diunduh.'); }, function(){ hold.remove(); toast('Gagal membuat PDF.'); });
-    }).catch(function(){ toast('Gagal memuat pembuat PDF. Cek internet.'); });
+    pdfLoad().then(function(){
+      var T = pdfDoc(), first = true;
+      if (tim) { pdfTim(T, tim, true); first = false; }
+      (list || []).forEach(function(r){ pdfOrang(T, r, first); first = false; });
+      T.finish(filename.replace(/[\\/:*?"<>|]/g, '-'));
+      toast('PDF diunduh.');
+    }).catch(function(e){ toast('Gagal membuat PDF. Cek internet lalu coba lagi.'); if (window.console) console.error(e); });
   }
-  function evPdfTim(t){
-    return '<div class="pdf-page"><div class="pdf-head"><div><div class="pdf-kicker">Evaluasi Tim</div><h1>Ringkasan Tim</h1></div><div class="pdf-meta">Dashboard Videographer &amp; Editor</div></div>' + evTimHtml(t, false) + '</div>';
+
+  /* ================= MADING VGE ================= */
+  var mading = null, md = { form: false, edit: null };
+  var MD_PILL = { Pengumuman: 'pill-danger', Info: 'pill-info', Jadwal: 'pill-warn', Apresiasi: 'pill-ok', Lainnya: 'pill-neutral' };
+  function madingCard(p, i){
+    var tgl = p.dibuat ? esc(String(p.dibuat).slice(0, 10)) : '';
+    return '<article class="mcard' + (p.pin ? ' pinned' : '') + (p.status === 'arsip' ? ' archived' : '') + '" style="--tilt:' + ((i % 3) - 1) * 0.6 + 'deg">'
+      + '<span class="mpin" aria-hidden="true"></span>'
+      + '<div class="meta"><span class="pill ' + (MD_PILL[p.kategori] || 'pill-neutral') + '">' + esc(p.kategori) + '</span>' + (p.pin ? '<span class="pill pill-neutral">' + ic('pin', 12) + ' Disematkan</span>' : '') + (p.status === 'arsip' ? '<span class="pill pill-neutral">Arsip</span>' : '') + '</div>'
+      + '<h3>' + esc(p.judul) + '</h3>'
+      + (p.gambar ? '<img src="' + esc(p.gambar) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '')
+      + (p.isi ? '<p class="misi">' + esc(p.isi) + '</p>' : '')
+      + (p.link ? '<a class="btn btn-ghost btn-sm" href="' + esc(p.link) + '" target="_blank" rel="noopener">Buka tautan</a>' : '')
+      + '<div class="faint mfoot">' + esc(p.oleh || '') + (tgl ? ' &middot; ' + tgl : '') + (p.sampai ? ' &middot; sampai ' + esc(p.sampai) : '') + '</div>'
+      + (isAdmin() ? '<div class="bulk" style="margin:8px 0 0;"><button type="button" class="btn btn-ghost btn-sm" data-md-edit="' + esc(p.id) + '">Ubah</button><button type="button" class="btn btn-ghost btn-sm" data-md-arc="' + esc(p.id) + '" data-to="' + (p.status === 'arsip' ? '0' : '1') + '">' + (p.status === 'arsip' ? 'Tempel lagi' : 'Lepas') + '</button></div>' : '')
+      + '</article>';
+  }
+  function madingForm(){
+    var e = md.edit || {}, kats = (mading && mading.kategori) || ['Pengumuman', 'Info', 'Jadwal', 'Apresiasi', 'Lainnya'];
+    return '<form class="card" id="form-md" style="margin-bottom:16px;"><div class="form-row"><div class="field"><label for="md-judul">Judul</label><input id="md-judul" type="text" maxlength="120" required value="' + esc(e.judul || '') + '"></div>'
+      + '<div class="field"><label for="md-kat">Kategori</label><select id="md-kat">' + kats.map(function(k){ return '<option' + (k === (e.kategori || 'Pengumuman') ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('') + '</select></div></div>'
+      + '<div class="field"><label for="md-isi">Isi</label><textarea id="md-isi" rows="4" maxlength="4000">' + esc(e.isi || '') + '</textarea></div>'
+      + '<div class="form-row"><div class="field"><label for="md-img">Link gambar (opsional, Google Drive / https)</label><input id="md-img" type="url" value="' + esc(e.gambarAsli || '') + '"></div>'
+      + '<div class="field"><label for="md-link">Tautan (opsional)</label><input id="md-link" type="url" value="' + esc(e.link || '') + '"></div></div>'
+      + '<div class="form-row"><div class="field"><label for="md-sampai">Tampil sampai (opsional)</label><input id="md-sampai" type="date" value="' + esc(e.sampai || '') + '"></div>'
+      + '<div class="field"><label class="chk" style="display:flex; gap:8px; align-items:center; min-height:44px; margin-top:18px; text-transform:none; letter-spacing:0; font-size:.9rem;"><input id="md-pin" type="checkbox"' + (e.pin ? ' checked' : '') + ' style="width:20px; height:20px;"> Sematkan di paling atas</label></div></div>'
+      + '<div class="bulk"><button type="submit" class="btn btn-primary btn-sm">' + (e.id ? 'Simpan perubahan' : 'Tempel di Mading') + '</button><button type="button" class="btn btn-ghost btn-sm" id="btn-md-cancel">Batal</button></div></form>';
+  }
+  function renderMading(){
+    var l = mading.posts || [];
+    var head = pageHead('mading', 'Mading VGE', 'Pengumuman, info, dan apa pun yang perlu ditempel untuk tim',
+      isAdmin() && !md.form ? '<button type="button" class="btn btn-primary btn-sm" id="btn-md-new">+ Tempel baru</button>' : '');
+    return head + (md.form ? madingForm() : '')
+      + (l.length ? '<div class="mboard">' + l.map(madingCard).join('') + '</div>' : '<div class="card empty">' + ic('pin', 28) + '<br>Mading masih kosong.' + (isAdmin() ? ' Tekan "Tempel baru" untuk menempel pengumuman.' : '') + '</div>');
+  }
+  function loadMading(){ call('apiMadingList', auth.token).then(function(res){ var ok = handle(res); if (!ok) return; mading = ok; if (view === 'home' && tab === 'mading') render(); }); }
+  function bindMading(){
+    var nb = document.getElementById('btn-md-new'); if (nb) nb.addEventListener('click', function(){ md.form = true; md.edit = null; render(); });
+    var cb = document.getElementById('btn-md-cancel'); if (cb) cb.addEventListener('click', function(){ md.form = false; md.edit = null; render(); });
+    var f = document.getElementById('form-md');
+    if (f) f.addEventListener('submit', function(e){
+      e.preventDefault(); if (evBusy) return; evBusy = true;
+      var data = { id: md.edit && md.edit.id, judul: val('md-judul'), kategori: val('md-kat'), isi: val('md-isi'), gambar: val('md-img'), link: val('md-link'), sampai: val('md-sampai'), pin: document.getElementById('md-pin').checked };
+      call('apiMadingSave', auth.token, data).then(function(res){ evBusy = false; var ok = handle(res); if (!ok) return; toast(ok.message); md.form = false; md.edit = null; loadMading(); });
+    });
+    document.querySelectorAll('[data-md-edit]').forEach(function(b){ b.addEventListener('click', function(){
+      var p = mading.posts.filter(function(x){ return x.id === b.getAttribute('data-md-edit'); })[0]; if (!p) return;
+      md.edit = Object.assign({}, p, { gambarAsli: p.gambar }); md.form = true; render(); window.scrollTo(0, 0);
+    }); });
+    document.querySelectorAll('[data-md-arc]').forEach(function(b){ b.addEventListener('click', function(){
+      call('apiMadingArchive', auth.token, b.getAttribute('data-md-arc'), b.getAttribute('data-to') === '1').then(function(res){ var ok = handle(res); if (!ok) return; toast(ok.message); loadMading(); });
+    }); });
+  }
+
+  /* ================= FITUR YANG SEDANG DIBUAT ================= */
+  var SOON = {
+    wlb: { t: 'Worklife Balance', d: 'Ruang santai anggota VG & editor, seperti Threads.', b: ['Posting teks dan gambar', 'Balas dan beri reaksi ke postingan teman', 'Tempat seru-seruan di luar urusan kerja'] },
+    ws: { t: 'Working Space', d: 'Ruang chat kerja tim.', b: ['Grup chat Jakarta, Purbalingga, atau gabungan', 'Kirim file', 'Mention satu orang atau semua', 'Chat pribadi antar akun', 'Jendela chat pop-up saat ada pesan aktif'] },
+    kpi: { t: 'Tracking KPI', d: 'KPI pribadi yang terhubung ke sheet KPI masing-masing. Hanya pemilik akun dan admin yang bisa melihat.', b: ['Masukkan link sheet KPI sendiri', 'Pengingat isi KPI setiap akhir bulan', 'Ringkasan KPI dan target bulan depan'] },
+    kal: { t: 'Kalender Konten', d: 'Mading jadwal untuk konten flagship dan endorsement Suneeday.', b: ['Kalender jadwal konten flagship & endorsement', 'Tersambung ke papan deadline Suneeday'] }
+  };
+  function renderSoon(k){
+    var s = SOON[k];
+    return pageHead(k, s.t, s.d) + '<div class="card soon"><div class="soon-ic">' + ic(NAV_IC[k], 44) + '</div><h2>Fitur ini sedang dalam proses</h2>'
+      + '<p class="sub">Sedang kami siapkan. Ini yang akan ada di sini:</p><ul class="evlist">' + s.b.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'
+      + '<span class="pill pill-warn">Segera hadir</span></div>';
   }
 
   /* ---------- boot ---------- */
-  function startLoggedIn(){ if (view === 'tool') refreshTool(); else { if (isAdmin()) tab = 'admin'; render(); loadTab(); } }
+  function startLoggedIn(){ if (view === 'tool') refreshTool(); else { render(); loadTab(); } }
   if (PARAM_LOGIN) {
     // Link / QR login pribadi: sekali buka, HP langsung tersambung ke akun itu.
     try { QS.delete('login'); history.replaceState(null, '', location.pathname + (QS.toString() ? '?' + QS.toString() : '') + location.hash); } catch(e){}
