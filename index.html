@@ -262,6 +262,13 @@
   .evkonf{margin-top:14px; padding:12px; border:1px dashed var(--warn); border-radius:var(--radius); background:var(--warn-soft);}
   .evkonf-item{padding:10px 0; border-top:1px solid var(--line);} .evkonf-item:first-of-type{border-top:none;}
   .evkonf-ctl{display:grid; grid-template-columns:1fr; gap:6px;} @media (min-width:560px){ .evkonf-ctl{grid-template-columns:2fr 1fr 2fr;} }
+  .selrow{cursor:pointer;} .selrow .tick{flex:0 0 26px; width:26px; height:26px; border-radius:7px; border:2px solid rgba(255,255,255,.38); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--accent-ink); font-size:15px; text-shadow:none;}
+  .selrow.on{box-shadow:inset 0 0 0 2px var(--accent);} .selrow.on .tick{background:var(--accent); border-color:var(--accent);}
+  .nav-dot{position:absolute; top:3px; right:5px; color:#FFD66B; font-size:12px; line-height:1; text-shadow:0 0 7px rgba(255,214,107,.85) !important; pointer-events:none;}
+  .nav-it.on .nav-dot{color:#7A4E00; text-shadow:none !important;}
+  .kelsel{padding:4px 6px; border-radius:8px; border:1px solid var(--line); background:rgba(255,255,255,.06) !important; color:var(--ink) !important; font-size:14px; min-height:32px;}
+  .evsaran{font-size:.78rem; color:var(--ink-dim); margin:6px 0 0;} .evsaran b{color:var(--accent);}
+  .evcek ul{margin:6px 0 0 18px; padding:0;} .evcek li{margin:3px 0;}
   .evkonf-ctl select{padding:9px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:16px; min-height:42px;}
   #print-area{display:none;}
   /* ---- evaluasi ---- */
@@ -436,7 +443,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   var view = BOOT.toolId ? 'tool' : 'home';
   var tab = 'wlb';
   var toolState = { toolId: BOOT.toolId, tool: BOOT.tool, opens: [], group: null, sel: {}, selInit: false, loaded: false, note: null };
-  var home = null, admin = null;
+  var home = null, admin = null, stopSel = {}, badges = {}, badgeAt = 0;
   var busy = false, cooldownUntil = 0, mutSeq = 0;
   var lg = { team: null, teamFailed: false, pick: null, pin: '', checking: false, manual: false, linking: !!PARAM_LOGIN };
   var ui = { gedung: 'Semua', query: '', adminGedung: 'Semua', histFilter: 'semua', qrGedung: 'Semua', qrMode: 'alat', qrQuery: '', qrStep: 'pilih', qrJenis: 'Semua', loginError: '', toolErr: '', userErr: '' };
@@ -677,7 +684,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var cur = navKey(tab);
     return '<nav class="nav no-print" aria-label="Menu">' + navItems().map(function(x){
       return '<button type="button" class="nav-it' + (cur === x[0] ? ' on' : '') + '" data-nav="' + x[0] + '" aria-label="' + esc(x[1]) + '" title="' + esc(x[1]) + '"' + (cur === x[0] ? ' aria-current="page"' : '') + '>'
-        + ic(NAV_IC[x[0]], 22) + '<span class="nav-lbl">' + esc(x[1]) + '</span></button>';
+        + ic(NAV_IC[x[0]], 22) + (badges[x[0]] ? '<span class="nav-dot" aria-label="ada info baru">&#9733;</span>' : '') + '<span class="nav-lbl">' + esc(x[1]) + '</span></button>';
     }).join('') + '</nav>';
   }
   function renderTopbar(){
@@ -882,8 +889,27 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   /* ---------- home ---------- */
+  /* ---------- tanda info baru (bintang kecil di ikon tab) ---------- */
+  function paintBadges(){
+    document.querySelectorAll('[data-nav]').forEach(function(b){
+      var k = b.getAttribute('data-nav'), d = b.querySelector('.nav-dot');
+      if (badges[k] && !d) { var sp = document.createElement('span'); sp.className = 'nav-dot'; sp.setAttribute('aria-label', 'ada info baru'); sp.innerHTML = '&#9733;'; b.insertBefore(sp, b.querySelector('.nav-lbl')); }
+      if (!badges[k] && d) d.remove();
+    });
+  }
+  function loadBadges(force){
+    if (!auth || (!force && Date.now() - badgeAt < 60000)) return;
+    badgeAt = Date.now();
+    call('apiBadges', auth.token).then(function(res){ if (!res || !res.ok || !auth) return; badges = res.badges || {}; var k = navKey(tab); if (badges[k]) { badges[k] = false; call('apiSeen', auth.token, k); } paintBadges(); });
+  }
+  function markSeen(){
+    var k = navKey(tab);
+    if (badges[k]) { badges[k] = false; paintBadges(); }
+    if (k === 'mading' || k === 'rapor' || k === 'tim') call('apiSeen', auth.token, k);
+  }
   function loadTab(){
     if (!auth || view !== 'home') return;
+    markSeen(); loadBadges();
     if (SOON[tab]) return;
     if (tab === 'mading') { loadMading(); return; }
     if (tab === 'rapor') {
@@ -925,8 +951,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var open = home.mineOpen;
     var overdue = open.filter(function(s){ return s.overdue; });
     var banner = overdue.length ? '<div class="section"><div class="banner warn">' + ICON.warn + '<div><p><strong>' + overdue.length + ' sesi belum ditutup</strong> dari hari sebelumnya (tercatat sebagai pelanggaran SOP).</p><p>Tekan Selesai di bawah kalau alatnya sudah tidak dipakai.</p></div></div></div>' : '';
-    var list = open.length ? open.map(function(s){
-      return '<div class="row"><div class="grow"><div class="nm">' + esc(s.toolNama) + '</div>'
+    Object.keys(stopSel).forEach(function(id){ if (!open.some(function(s){ return s.toolId === id; })) delete stopSel[id]; });
+    var multi = open.length > 1, nSel = Object.keys(stopSel).length;
+    var bar = multi ? '<div class="bulk" style="margin-top:0;"><button type="button" class="btn btn-ghost btn-sm" id="btn-sel-all">' + (nSel === open.length ? 'Batal pilih semua' : 'Pilih semua (' + open.length + ')') + '</button>'
+      + '<button type="button" class="btn btn-danger btn-sm" id="btn-stop-sel"' + (nSel ? '' : ' disabled') + '>Selesai yang dipilih (' + nSel + ')</button></div>'
+      + '<p class="faint" style="margin:-4px 0 8px;">Ketuk alat untuk mencentang, lalu tekan <strong>Selesai yang dipilih</strong>.</p>' : '';
+    var list = open.length ? bar + open.map(function(s){
+      var on = !!stopSel[s.toolId];
+      return '<div class="row' + (multi ? ' selrow' + (on ? ' on' : '') : '') + '"' + (multi ? ' data-sel-tool="' + esc(s.toolId) + '" role="checkbox" aria-checked="' + on + '" tabindex="0"' : '') + '>'
+        + (multi ? '<span class="tick">' + (on ? '&#10003;' : '') + '</span>' : '') + '<div class="grow"><div class="nm">' + esc(s.toolNama) + '</div>'
         + '<div class="meta"><span class="tag">' + esc(s.toolId) + '</span><span>Gedung ' + esc(s.gedung) + '</span><span>sejak ' + esc(fmtTime(s.start)) + ' WIB' + (s.overdue ? ' ' + esc(fmtDay(s.start)) : '') + '</span>' + (s.status === 'overlap' ? statusPill('overlap') : '') + (s.overdue ? '<span class="pill pill-warn">Belum ditutup</span>' : '') + '</div>'
         + '<div class="mono" style="color:var(--accent); font-weight:600; margin-top:4px;">' + esc(fmtDur(s.start)) + '</div></div>'
         + '<button type="button" class="btn btn-danger btn-sm" data-stop="' + esc(s.toolId) + '">Selesai</button></div>';
@@ -941,6 +974,19 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
   function bindSaya(){
     var sb = document.getElementById('btn-scan-big'); if (sb) sb.addEventListener('click', scanStart);
+    document.querySelectorAll('[data-sel-tool]').forEach(function(r){
+      var tg = function(e){ if (e.target.closest('button')) return; var id = r.getAttribute('data-sel-tool'); if (stopSel[id]) delete stopSel[id]; else stopSel[id] = true; render(); };
+      r.addEventListener('click', tg);
+      r.addEventListener('keydown', function(e){ if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); tg(e); } });
+    });
+    var sa = document.getElementById('btn-sel-all');
+    if (sa) sa.addEventListener('click', function(){ var all = home.mineOpen.length === Object.keys(stopSel).length; stopSel = {}; if (!all) home.mineOpen.forEach(function(s){ stopSel[s.toolId] = true; }); render(); });
+    var ss = document.getElementById('btn-stop-sel');
+    if (ss) ss.addEventListener('click', function(){
+      var ids = Object.keys(stopSel); if (!ids.length || busy) return;
+      busy = true; ss.disabled = true; ss.textContent = 'Menyelesaikan ' + ids.length + ' alat…';
+      call('apiStopMany', auth.token, ids, ids[0]).then(function(res){ busy = false; var ok = handle(res); if (ok) { toast(ok.message || (ids.length + ' alat selesai dipakai.')); stopSel = {}; } loadTab(); });
+    });
     document.querySelectorAll('[data-stop]').forEach(function(b){
       b.addEventListener('click', function(){
         if (busy) return;
@@ -1511,7 +1557,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
    * Admin Rapor : hitung rapor periode apa pun (minggu/bulan/kuartal/tahun) dari database, catatan, publish,
    *               jawab "perlu konfirmasi", video, unduh PDF formal. */
   var evMe = null, evTim = null, evAdm = null, evBusy = false;
-  var ev = { meJenis: '', meIdx: 0, timJenis: '', timIdx: 0, jenis: 'minggu', kode: '', open: '', peranMe: '', showVid: {}, konfAll: {} };
+  var ev = { meJenis: '', meIdx: 0, timJenis: '', timIdx: 0, jenis: 'minggu', kode: '', open: '', peranMe: '', showVid: {}, konfAll: {}, cf: {} };
   var EV_SARAN = {
     'audio/mixing': 'Sebelum export, dengarkan full pakai headphone sekali jalan tanpa melihat layar. Samakan level dialog/VO, musik di bawahnya, dan cek tiap VO sudah masuk.',
     'subtitle & typography': 'Cocokkan subtitle dengan skrip baris per baris. Satu orang bicara = satu baris; pisahkan kalau ganti pembicara. Jangan menutupi wajah.',
@@ -1526,7 +1572,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   };
   var EV_PERAN = { Editor: 'Editor', VG: 'Videografer' };
   var EV_JENIS = { minggu: 'Mingguan', bulan: 'Bulanan', kuartal: 'Kuartal', tahun: 'Tahunan' };
-  var EV_KELAS = { Daily: 'Daily (bobot 1)', Endorse: 'Endorse & series (bobot 1,25)', Flagship: 'Flagship (bobot 2)', 'Non-Video': 'Non-video (bobot 0,5)' };
+  var EV_KELAS = { Daily: 'Daily (bobot 100)', Endorse: 'Endorse & series (bobot 125)', Flagship: 'Flagship (bobot 400)', 'Non-Video': 'Non-video (bobot 50)' };
+  var EV_KELAS_LIST = ['Daily', 'Endorse', 'Flagship', 'Non-Video'];
   var EV_JORDER = ['minggu', 'bulan', 'kuartal', 'tahun'];
   var LEAD_TITLE = 'Head of Videographer';
 
@@ -1591,7 +1638,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<div class="stat"><div class="num">' + esc(s.poinPerVideo) + '</div><div class="lbl">Poin catatan / video setara</div></div>'
       + '<div class="stat"><div class="num">' + esc(s.rataRonde) + '</div><div class="lbl">Rata-rata draft</div></div>'
       + '<div class="stat ok"><div class="num">' + esc(s.acc1) + '</div><div class="lbl">ACC di draft 1</div></div></div>'
-      + (s.kelas ? '<p class="faint" style="margin:-8px 0 12px;">Jenis konten: ' + esc(evKelasText(s.kelas)) + '</p>' : '');
+      + (s.kelas ? '<p class="faint" style="margin:-8px 0 12px;">Jenis konten: ' + esc(evKelasText(s.kelas)) + (s.berulang ? ' &middot; ' + esc(s.berulang) + ' kesalahan berulang (ke-3 dst. di video yang sama) dihitung 1,5×' : '') + '</p>' : '');
     var utama = (p.poinUtama || []).map(function(u, i){
       var c = (u.contoh || [])[0];
       return '<div class="row" style="align-items:flex-start;"><span class="evnum">' + (i + 1) + '</span><div class="grow"><div class="nm">' + esc(u.kategori) + ' <span class="faint">(' + esc(u.jumlah) + ' catatan)</span></div>'
@@ -1605,23 +1652,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     var vid = '';
     if ((p.videos || []).length) {
       var vk = key + peran, open = !!ev.showVid[vk];
-      vid = '<details class="hist evvids"' + (open ? ' open' : '') + ' data-ev-vids="' + esc(vk) + '"><summary>Rincian nilai per video (' + p.videos.length + ')</summary><div class="scroll-x"><table class="tbl"><thead><tr><th>Judul</th><th>Kelas</th><th class="num">Draft</th><th class="num">Poin</th><th class="num">Nilai</th></tr></thead><tbody>'
-        + p.videos.map(function(v){ return '<tr><td>' + esc(v[0]) + '</td><td><span class="tag">' + esc(v[1]) + '</span></td><td class="num">' + esc(v[3]) + '</td><td class="num">' + esc(v[4]) + '</td><td class="num">' + esc(v[5]) + '<span class="faint">/' + esc(v[6]) + '</span></td></tr>'; }).join('')
+      vid = '<details class="hist evvids"' + (open ? ' open' : '') + ' data-ev-vids="' + esc(vk) + '"><summary>Rincian nilai per video (' + p.videos.length + ')' + (forAdmin ? ' &middot; kelas bisa diubah' : '') + '</summary><div class="scroll-x"><table class="tbl"><thead><tr><th>Judul</th><th>Kelas</th><th class="num">Draft</th><th class="num">Poin</th><th class="num">Nilai</th></tr></thead><tbody>'
+        + p.videos.map(function(v){ return '<tr><td>' + esc(v[0]) + '</td><td>' + (forAdmin && v[7] ? '<select class="kelsel" data-ev-kelas="' + esc(v[7]) + '" aria-label="Kelas konten">' + EV_KELAS_LIST.map(function(k){ return '<option value="' + k + '"' + (k === v[1] ? ' selected' : '') + '>' + k + ' (' + ({ Daily: 100, Endorse: 125, Flagship: 400, 'Non-Video': 50 })[k] + ')</option>'; }).join('') + '<option value="">Kembalikan otomatis</option></select>' : '<span class="tag">' + esc(v[1]) + '</span>') + '</td><td class="num">' + esc(v[3]) + '</td><td class="num">' + esc(v[4]) + '</td><td class="num">' + esc(v[5]) + '<span class="faint">/' + esc(v[6]) + '</span></td></tr>'; }).join('')
         + '</tbody></table></div></details>';
     }
     var konf = '';
-    if (forAdmin && (p.perluKonfirmasi || []).length) {
-      var katOpt = '<option value="">Pilih jenis kesalahan…</option>' + Object.keys(EV_SARAN).map(function(k){ return '<option value="' + esc(k) + '">' + esc(k) + '</option>'; }).join('');
-      konf = '<div class="evkonf"><h3 class="evh" style="margin-top:4px;">Perlu kamu jawab (' + (p.jumlahKonfirmasi || p.perluKonfirmasi.length) + ') — belum dihitung</h3>'
-        + p.perluKonfirmasi.slice(0, ev.konfAll[key + peran] ? 40 : 6).map(function(it){
-            return '<div class="evkonf-item" data-cf-wrap="1"><div class="evquote" style="margin-top:0;">"' + esc(it.poin) + '"<div class="faint">' + esc(it.judul || '') + (it.draft ? ' &middot; draft ' + esc(it.draft) : '') + ' &middot; ' + esc(it.log) + '</div></div>'
-              + '<div class="evkonf-ctl"><select data-cf="kat" aria-label="Jenis kesalahan">' + katOpt + '</select>'
-              + '<select data-cf="sev" aria-label="Keparahan"><option value="sedang">sedang</option><option value="minor">minor</option><option value="major">major</option></select>'
-              + '<select data-cf="untuk" aria-label="Kesalahan siapa"><option value="">Kesalahan siapa?</option><option value="Editor">Editor: ' + esc(nmUser(it.ed)) + '</option><option value="VG">VG: ' + esc(nmUser(it.vg)) + '</option></select></div>'
-              + '<div class="bulk" style="margin:8px 0 0;"><button type="button" class="btn btn-primary btn-sm" data-ev-cf="' + esc(it.k) + '">Masukkan ke rapor</button><button type="button" class="btn btn-ghost btn-sm" data-ev-cf="' + esc(it.k) + '" data-ev-skip="1">Bukan kesalahan</button></div></div>';
-          }).join('') + (!ev.konfAll[key + peran] && p.perluKonfirmasi.length > 6 ? '<button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;" data-ev-konfall="' + esc(key + peran) + '">Tampilkan ' + (p.perluKonfirmasi.length - 6) + ' lainnya</button>' : '')
-          + (p.jumlahKonfirmasi > p.perluKonfirmasi.length ? '<p class="faint" style="margin:8px 0 0;">Ditampilkan ' + p.perluKonfirmasi.length + ' dari ' + p.jumlahKonfirmasi + '. Sisanya muncul setelah yang ini dijawab.</p>' : '') + '</div>';
-    }
     return '<div class="card evcard">' + head + stats
       + '<div class="evgrid"><div><h3 class="evh">Tren skor</h3>' + evTrendSvg(p.tren) + '</div><div><h3 class="evh">Catatan per kategori</h3>' + evKatBars(p.kategori) + '</div></div>'
       + '<div class="evgrid"><div><h3 class="evh">3 poin evaluasi utama</h3>' + utama + '</div><div>'
@@ -1641,8 +1676,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
   function evMetodeHtml(){
     return '<details class="hist" style="margin-top:14px;"><summary>Cara nilai dihitung</summary><div style="padding:0 14px 14px;" class="sub">'
-      + '<p>Setiap catatan reviewer diberi poin: minor 1, sedang 2, major 4. Setiap video punya <strong>bobot kesulitan</strong>: daily 1, endorse & series 1,25, flagship 2, non-video 0,5. Nilai sempurna per video = 100 × bobot (daily 100, flagship 200).</p>'
-      + '<p>Skor kualitas per video = 100 × (1 - (poin ÷ bobot) ÷ 10). Untuk editor, skor revisi = 100 × (1 - (draft - 1) ÷ (2 × bobot)), dan skor video = 70% kualitas + 30% revisi. Video flagship boleh lebih banyak catatan & draft sebelum nilainya turun.</p>'
+      + '<p>Setiap catatan reviewer diberi poin: minor 1, sedang 2, major 4. Setiap video punya <strong>bobot konten</strong> = nilai sempurnanya: daily 100, endorse & series 125, flagship 400, non-video 50.</p>'
+      + '<p>Skor kualitas per video = 100 × (1 - (poin ÷ toleransi) ÷ 10). Untuk editor, skor revisi = 100 × (1 - (draft - 1) ÷ (2 × toleransi)), dan skor video = 70% kualitas + 30% revisi. Toleransi = bobot ÷ 100, maksimal 2 (daily 1, endorse 1,25, flagship 2): flagship boleh sedikit lebih banyak catatan & draft, tapi nilainya 4× daily.</p>'
+      + '<p>Kesalahan dari tab CATATAN KESALAHAN (mis. reshot) dan input manual admin ikut dihitung untuk pelakunya. Kesalahan bisa milik editor, VG, atau keduanya.</p>'
+      + '<p>Kesalahan yang sama (kategori sama) berulang di video yang sama: kesalahan ke-3 dan seterusnya poinnya dihitung 1,5× lebih berat.</p>'
       + '<p>Skor akhir = total nilai ÷ total nilai maksimal × 100. Ranking hanya untuk yang punya minimal 3 video di periode itu.</p></div></details>';
   }
   /** Chip jenis periode + chip periode dari daftar rapor [{jenis,label}] */
@@ -1741,11 +1778,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<button type="button" class="btn btn-ghost btn-sm" id="btn-ev-sync">' + ICON.sync + ' Sinkron data review</button></div>'
       + '<p class="faint" style="margin:8px 0 0;">Data review terakhir disinkron: ' + esc(si.waktu || '-') + ' WIB &middot; ' + esc(si.review || 0) + ' review, ' + esc(si.catatan || 0) + ' catatan. Sinkron otomatis tiap hari jam 05.00.'
       + ((si.namaTakCocok || []).length ? ' <span class="pill pill-warn">Nama belum dikenali: ' + esc(si.namaTakCocok.join(', ')) + '</span>' : '')
-      + ((si.jenisBaru || []).length ? ' <span class="pill pill-warn">Jenis konten baru (bobot 1): ' + esc(si.jenisBaru.join(', ')) + '</span>' : '') + '</p></div>';
+      + ((si.jenisBaru || []).length ? ' <span class="pill pill-warn">Jenis baru (cek tab Rapor Bobot / Rapor Jenis Kesalahan): ' + esc(si.jenisBaru.join(', ')) + '</span>' : '') + '</p></div>';
     var pub = a.rapor.filter(function(r){ return r.status === 'published'; }).length, nk = 0;
     a.rapor.forEach(function(r){ Object.keys(r.data.peran || {}).forEach(function(k){ nk += r.data.peran[k].jumlahKonfirmasi || 0; }); });
     var stat = '<div class="banner ' + (pub === a.rapor.length && a.tim.status === 'published' ? 'ok' : 'warn') + '" style="margin-bottom:12px;">' + ICON.info + '<div><p><strong>' + esc(P.label) + ':</strong> ' + a.rapor.length + ' orang dinilai &rarr; ' + pub + ' rapor dipublish &rarr; ringkasan tim ' + (a.tim.status === 'published' ? 'dipublish' : 'masih draft') + '.'
-      + (nk ? ' Ada <strong>' + nk + '</strong> catatan yang perlu kamu jawab (buka tiap orang).' : '') + '</p></div></div>';
+      + (nk ? ' Ada catatan yang perlu kamu jawab — lihat bagian <strong>Perlu kamu jawab</strong> di bawah.' : '') + '</p></div></div>';
     var acts = '<div class="bulk"><button type="button" class="btn btn-primary btn-sm" id="btn-ev-pubweek">Publish semua (' + esc(P.label) + ')</button>'
       + '<button type="button" class="btn btn-ghost btn-sm" id="btn-ev-pdfall">' + ICON.doc + ' Unduh PDF semua</button></div>';
     var rows = a.rapor.slice().sort(function(x, y){ var s = function(r){ var p = r.data.peran; return p.Editor ? p.Editor.ringkas.skor : (p.VG ? p.VG.ringkas.skor : 0); }; return s(y) - s(x); }).map(function(r){
@@ -1778,7 +1815,73 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<div class="field"><label for="ev-v-link">Link Google Drive (akses: siapa saja yang punya link)</label><input id="ev-v-link" type="url" placeholder="https://drive.google.com/file/d/…" required></div>'
       + '<button type="submit" class="btn btn-primary btn-sm">Simpan sebagai draft</button></form></div>'
       + '<div class="card" style="padding:0; overflow:hidden; margin-top:10px;">' + vids + '</div></div>';
-    return head + sel + stat + acts + '<div class="section"><div class="section-head"><h2>Rapor per orang</h2><span class="faint">' + a.rapor.length + ' orang</span></div><div class="evpeople">' + rows + '</div></div>' + timSec + vidSec + evMetodeHtml();
+    return head + sel + evCekHtml(si) + stat + acts + evKonfHtml(a) + '<div class="section"><div class="section-head"><h2>Rapor per orang</h2><span class="faint">' + a.rapor.length + ' orang</span></div><div class="evpeople">' + rows + '</div></div>' + timSec + vidSec + evMetodeHtml();
+  }
+  /* ----- "perlu konfirmasi": satu daftar untuk semua orang, bisa dikirim sekaligus ----- */
+  function evKonfList(a){
+    var seen = {}, out = [];
+    (a.rapor || []).forEach(function(r){ Object.keys(r.data.peran || {}).forEach(function(k){ (r.data.peran[k].perluKonfirmasi || []).forEach(function(it){ if (!seen[it.k]) { seen[it.k] = 1; out.push(it); } }); }); });
+    return out;
+  }
+  function evKonfPilihan(it){
+    var c = ev.cf[it.k];
+    if (c) return c;
+    var sr = it.saran;
+    if (sr) return { kat: sr.abaikan ? '__abaikan' : (sr.kategori || ''), sev: sr.keparahan || 'sedang', untuk: sr.abaikan ? '' : (sr.untuk || ''), dariSaran: true };
+    return { kat: '', sev: 'sedang', untuk: '' };
+  }
+  function evKonfKeputusan(c){
+    if (c.kat === '__abaikan') return { abaikan: true };
+    if (!c.kat || !c.untuk) return null;
+    return { kategori: c.kat, keparahan: c.sev || 'sedang', untuk: c.untuk };
+  }
+  function evKonfHtml(a){
+    var l = evKonfList(a); if (!l.length) return '';
+    var kats = (a.kategoriList && a.kategoriList.length ? a.kategoriList : Object.keys(EV_SARAN));
+    var siap = l.filter(function(it){ return evKonfKeputusan(evKonfPilihan(it)); }).length, nShow = ev.konfAll.global ? 200 : 8;
+    var items = l.slice(0, nShow).map(function(it){
+      var c = evKonfPilihan(it), sr = it.saran;
+      var opt = function(v, t, cur){ return '<option value="' + esc(v) + '"' + (v === cur ? ' selected' : '') + '>' + esc(t) + '</option>'; };
+      var katOpt = opt('', 'Pilih jenis kesalahan…', c.kat) + kats.map(function(k){ return opt(k, k, c.kat); }).join('') + opt('__abaikan', 'Bukan kesalahan (abaikan)', c.kat);
+      var sevOpt = ['sedang', 'minor', 'major'].map(function(k){ return opt(k, k, c.sev); }).join('');
+      var untOpt = opt('', 'Kesalahan siapa?', c.untuk) + (it.ed ? opt('Editor', 'Editor: ' + nmUser(it.ed), c.untuk) : '') + (it.vg ? opt('VG', 'VG: ' + nmUser(it.vg), c.untuk) : '')
+        + (it.ed && it.vg ? opt('Keduanya', 'Keduanya (editor & VG)', c.untuk) : '');
+      var src = it.sumber === 'SE' ? '<span class="pill pill-info">CATATAN KESALAHAN</span> ' : (it.sumber === 'manual' ? '<span class="pill pill-info">Input manual</span> ' : '');
+      return '<div class="evkonf-item" data-cf-wrap="' + esc(it.k) + '"><div class="evquote" style="margin-top:0;">' + src + '"' + esc(it.poin) + '"<div class="faint">' + esc(it.judul || '') + (it.draft ? ' &middot; draft ' + esc(it.draft) : '') + ' &middot; Editor: ' + esc(nmUser(it.ed)) + ' &middot; VG: ' + esc(nmUser(it.vg)) + '</div></div>'
+        + '<div class="evkonf-ctl"><select data-cf="kat" aria-label="Jenis kesalahan">' + katOpt + '</select><select data-cf="sev" aria-label="Keparahan">' + sevOpt + '</select><select data-cf="untuk" aria-label="Kesalahan siapa">' + untOpt + '</select></div>'
+        + (sr ? '<p class="evsaran"><b>Saran sistem</b> (mirip ' + Math.round((sr.skor || 0) * 100) + '% dengan jawabanmu untuk: "' + esc(sr.contoh || '') + '")' + (c.dariSaran ? ' — sudah diisi, cek lalu kirim.' : '') + '</p>' : '')
+        + '<div class="bulk" style="margin:8px 0 0;"><button type="button" class="btn btn-ghost btn-sm" data-ev-cf="' + esc(it.k) + '">Masukkan yang ini saja</button></div></div>';
+    }).join('');
+    return '<div class="section"><div class="evkonf"><div class="section-head" style="margin-top:0;"><h2 style="margin:0;">Perlu kamu jawab (' + l.length + ')</h2></div>'
+      + '<p class="faint" style="margin:4px 0 8px;">Belum dihitung di rapor. Pilih jenis, keparahan, dan kesalahan siapa — lalu kirim sekaligus. Semakin banyak yang kamu jawab, sistem makin pintar: catatan yang mirip akan diisi otomatis di sinkron berikutnya.</p>'
+      + '<div class="bulk" style="margin-top:0;"><button type="button" class="btn btn-primary btn-sm" data-ev-cfall="1"' + (siap ? '' : ' disabled') + '>Masukkan semua yang sudah diisi ke rapor (' + siap + ')</button></div>'
+      + items + (l.length > nShow ? '<button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;" data-ev-konfall="global">Tampilkan ' + (l.length - nShow) + ' lainnya</button>' : '')
+      + (l.length > 6 ? '<div class="bulk"><button type="button" class="btn btn-primary btn-sm" data-ev-cfall="1"' + (siap ? '' : ' disabled') + '>Masukkan semua yang sudah diisi ke rapor (' + siap + ')</button></div>' : '') + '</div></div>';
+  }
+  /** Cek kelengkapan data hasil sinkron (apa saja yang terbaca dan apa yang perlu dibereskan). */
+  function evCekHtml(si){
+    var c = si.cek; if (!c) return '';
+    var masalah = [], ok = [];
+    var prod = Object.keys(c.produksi || {}).map(function(t){ return t + ' ' + c.produksi[t]; }).join(', ');
+    ok.push('Tab produksi terbaca: ' + (prod || '-') + ' video.');
+    ok.push('Log review: ' + esc(si.review) + ' dari ' + esc(si.reviewTotal || si.review) + ' baris terbaca, ' + esc(si.video || 0) + ' video, ' + esc(si.catatan) + ' catatan (' + esc(si.masalah) + ' kesalahan, ' + esc(si.konfirmasi) + ' perlu dijawab).');
+    ok.push('CATATAN KESALAHAN (SE): ' + c.se.dibaca + ' baris — ' + c.se.dihitung + ' dihitung, ' + c.se.digabung + ' digabung dengan catatan reviewer yang sama, ' + c.se.info + ' info saja (Revisi ≥ 3x sudah dihitung dari nomor draft)' + (c.se.konfirmasi ? ', ' + c.se.konfirmasi + ' perlu dijawab' : '') + '.');
+    ok.push('Input manual (tab Rapor Kesalahan Manual): ' + c.manual.dibaca + ' baris, ' + c.manual.dihitung + ' dihitung.');
+    ok.push('Belajar dari jawabanmu: ' + c.belajar.contoh + ' contoh tersimpan → ' + c.belajar.otomatis + ' catatan diisi otomatis, ' + c.belajar.saran + ' diberi saran.');
+    if (c.override) ok.push(c.override + ' video memakai kelas konten pilihan manual.');
+    if (c.waktuGagal) masalah.push(c.waktuGagal + ' baris log review tanggalnya tidak terbaca (tidak ikut dihitung).');
+    if (c.tanpaVideoId) masalah.push(c.tanpaVideoId + ' baris log review tanpa VIDEO_ID.');
+    if (si.tanpaPemilik) masalah.push(si.tanpaPemilik + ' review videonya tidak ditemukan di tab produksi (tidak ada editor/VG): ' + esc((c.tanpaPemilikList || []).slice(0, 8).join('; ')));
+    if (c.tanpaEditor) masalah.push(c.tanpaEditor + ' video tanpa nama EDITOR di tab produksi.');
+    if (c.tanpaVG) masalah.push(c.tanpaVG + ' video tanpa nama VG SYUTING di tab produksi.');
+    if ((si.namaTakCocok || []).length) masalah.push('Nama belum dikenali (tambahkan di tab Rapor Alias): ' + esc(si.namaTakCocok.join(', ')));
+    if ((si.jenisBaru || []).length) masalah.push('Jenis baru belum ada di tab bobot / jenis kesalahan: ' + esc(si.jenisBaru.join(', ')));
+    (c.se.gagal || []).forEach(function(g){ masalah.push('SE: ' + esc(g)); });
+    (c.manual.gagal || []).forEach(function(g){ masalah.push('Manual: ' + esc(g)); });
+    return '<details class="hist evcek" style="margin-bottom:12px;"' + (masalah.length && ev.cekOpen ? ' open' : '') + ' data-ev-cek="1"><summary>Cek kelengkapan data ' + (masalah.length ? '<span class="pill pill-warn">' + masalah.length + ' perlu dicek</span>' : '<span class="pill pill-ok">lengkap</span>') + '</summary><div style="padding:0 14px 12px;" class="sub">'
+      + '<ul>' + ok.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>'
+      + (masalah.length ? '<p style="margin:10px 0 0;"><strong>Perlu dicek:</strong></p><ul>' + masalah.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>' : '')
+      + '<p class="faint" style="margin:10px 0 0;">Tambah kesalahan sendiri di tab <strong>Rapor Kesalahan Manual</strong>, tambah jenis kesalahan di tab <strong>Rapor Jenis Kesalahan</strong>, dan ubah kelas konten di tab <strong>Rapor Override Konten</strong> (atau langsung di tabel per video). Lalu tekan Sinkron.</p></div></details>';
   }
   function evAdmAct(fn, args, after){
     if (evBusy) return; evBusy = true;
@@ -1814,13 +1917,30 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     document.querySelectorAll('[data-ev-pdf]').forEach(function(b){ b.addEventListener('click', function(){
       var r = evAdm.rapor.filter(function(x){ return x.id === b.getAttribute('data-ev-pdf'); })[0]; if (r) pdfRapor([r], null, 'Rapor ' + evAdm.periode.label + ' - ' + r.nama + '.pdf');
     }); });
+    document.querySelectorAll('[data-cf-wrap]').forEach(function(w){
+      var k = w.getAttribute('data-cf-wrap');
+      w.querySelectorAll('select[data-cf]').forEach(function(sl){ sl.addEventListener('change', function(){
+        ev.cf[k] = { kat: w.querySelector('[data-cf="kat"]').value, sev: w.querySelector('[data-cf="sev"]').value, untuk: w.querySelector('[data-cf="untuk"]').value };
+        var n = evKonfList(evAdm).filter(function(it){ return evKonfKeputusan(evKonfPilihan(it)); }).length;
+        document.querySelectorAll('[data-ev-cfall]').forEach(function(x){ x.disabled = !n; x.textContent = 'Masukkan semua yang sudah diisi ke rapor (' + n + ')'; });
+      }); });
+    });
     document.querySelectorAll('[data-ev-cf]').forEach(function(b){ b.addEventListener('click', function(){
-      var k = b.getAttribute('data-ev-cf'), wrap = b.closest('[data-cf-wrap]');
-      var ab = b.getAttribute('data-ev-skip') === '1';
-      var dec = ab ? { abaikan: true } : { kategori: wrap.querySelector('[data-cf="kat"]').value, keparahan: wrap.querySelector('[data-cf="sev"]').value, untuk: wrap.querySelector('[data-cf="untuk"]').value };
-      if (!ab && (!dec.kategori || !dec.untuk)) { toast('Pilih kategori dan untuk siapa dulu.'); return; }
-      evAdmAct('apiRaporConfirm', [k, dec]);
+      var k = b.getAttribute('data-ev-cf'), it = evKonfList(evAdm).filter(function(x){ return x.k === k; })[0];
+      var dec = it && evKonfKeputusan(evKonfPilihan(it));
+      if (!dec) { toast('Pilih jenis kesalahan dan kesalahan siapa dulu.'); return; }
+      evAdmAct('apiRaporConfirm', [k, dec], function(){ delete ev.cf[k]; });
     }); });
+    document.querySelectorAll('[data-ev-cfall]').forEach(function(b){ b.addEventListener('click', function(){
+      var items = evKonfList(evAdm).map(function(it){ var d = evKonfKeputusan(evKonfPilihan(it)); return d ? { kunci: it.k, keputusan: d } : null; }).filter(Boolean);
+      if (!items.length) { toast('Belum ada jawaban yang lengkap.'); return; }
+      b.disabled = true; b.textContent = 'Mengirim ' + items.length + ' jawaban…';
+      evAdmAct('apiRaporConfirmMany', [items], function(){ items.forEach(function(x){ delete ev.cf[x.kunci]; }); });
+    }); });
+    document.querySelectorAll('[data-ev-kelas]').forEach(function(sl){ sl.addEventListener('change', function(){
+      sl.disabled = true; evAdmAct('apiRaporKelas', [sl.getAttribute('data-ev-kelas'), sl.value]);
+    }); });
+    var ck = document.querySelector('[data-ev-cek]'); if (ck) ck.addEventListener('toggle', function(){ ev.cekOpen = ck.open; });
   }
 
   /* ---------- PDF formal (jsPDF + AutoTable, teks asli — bukan screenshot) ---------- */
@@ -1924,14 +2044,16 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     if ((p.actionBaru || []).length) { T.p('Target ' + w + ' berikutnya:', { bold: true, after: 1 }); T.bullets(p.actionBaru.map(function(a){ return a.teks; })); }
     if ((p.videos || []).length) {
       T.h2(no + '.7 Rincian nilai per video');
-      T.table(['No', 'Judul video', 'Kelas', 'Bobot', 'Draft', 'Poin', 'Nilai'], p.videos.map(function(v, i){ return [String(i + 1), v[0], v[1], String(v[2]).replace('.', ','), v[3], v[4], v[5] + ' / ' + v[6]]; }),
+      T.table(['No', 'Judul video', 'Kelas', 'Bobot', 'Draft', 'Poin', 'Nilai'], p.videos.map(function(v, i){ return [String(i + 1), v[0], v[1], String(Math.round(Number(v[2]) * 100)), v[3], v[4], v[5] + ' / ' + v[6]]; }),
         { size: 8, cols: { 0: { cellWidth: 9, halign: 'center' }, 2: { cellWidth: 20 }, 3: { cellWidth: 13, halign: 'center' }, 4: { cellWidth: 12, halign: 'center' }, 5: { cellWidth: 12, halign: 'center' }, 6: { cellWidth: 22, halign: 'right' } } });
     }
   }
   function pdfMetode(T){
     T.h2('Metode penilaian');
-    T.p('Setiap catatan reviewer diberi poin: minor 1, sedang 2, major 4. Setiap video punya bobot kesulitan: daily 1; endorse & series 1,25; flagship 2; non-video 0,5. Nilai maksimal per video = 100 × bobot. ' +
-      'Skor kualitas per video = 100 × (1 - (poin ÷ bobot) ÷ 10). Untuk editor, skor revisi = 100 × (1 - (draft - 1) ÷ (2 × bobot)) dan skor video = 70% kualitas + 30% revisi. ' +
+    T.p('Setiap catatan reviewer diberi poin: minor 1, sedang 2, major 4. Setiap video punya bobot konten = nilai maksimalnya: daily 100; endorse & series 125; flagship 400; non-video 50. ' +
+      'Skor kualitas per video = 100 × (1 - (poin ÷ toleransi) ÷ 10). Untuk editor, skor revisi = 100 × (1 - (draft - 1) ÷ (2 × toleransi)) dan skor video = 70% kualitas + 30% revisi. Toleransi = bobot ÷ 100, maksimal 2. ' +
+      'Kesalahan dari tab CATATAN KESALAHAN dan input manual admin ikut dihitung untuk pelakunya (editor, VG, atau keduanya). ' +
+      'Kesalahan sejenis yang berulang di video yang sama: kesalahan ke-3 dan seterusnya dihitung 1,5x lebih berat. ' +
       'Skor akhir = total nilai ÷ total nilai maksimal × 100. Ranking hanya untuk yang memiliki minimal 3 video di periode tersebut.', { size: 8.3, gray: true });
   }
   function pdfTtd(T, nama){
