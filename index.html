@@ -395,6 +395,10 @@
   .mfoot{margin-top:8px;}
   .mcard .mimg{width:100%; border-radius:var(--radius-sm); margin:6px 0 8px; display:block; background:rgba(255,255,255,.05); min-height:60px; object-fit:cover;}
   .mprev{margin-top:8px; max-width:320px;}
+  .mvideo{position:relative; width:100%; aspect-ratio:16/9; background:#000; border-radius:var(--radius-sm); overflow:hidden; margin:6px 0 4px;}
+  .mvideo.tegak{aspect-ratio:9/16; max-width:340px; margin-left:auto; margin-right:auto;}
+  .mvideo iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+  .mvlink{display:inline-block; font-size:.8rem; margin:2px 0 4px;}
   .mkomen{margin-top:10px; padding-top:8px; border-top:1px solid var(--line);}
   .mkbtn{display:inline-flex; align-items:center; gap:6px; font-size:.86rem;}
   .mklist{margin-top:6px;}
@@ -2157,6 +2161,21 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<div class="mk-in"><textarea rows="2" maxlength="1500" data-md-kin="' + esc(p.id) + '" placeholder="' + (rp ? 'Tulis balasan…' : 'Tulis komentar atau pertanyaan…') + '">' + esc(md.draft[p.id] || '') + '</textarea>'
       + '<button type="button" class="btn btn-primary btn-sm" data-md-ksend="' + esc(p.id) + '">Kirim</button></div></div>';
   }
+  /** Link Google Drive / YouTube -> pemutar video langsung di kartu (seperti video Rapor Tim). Link lain -> tombol biasa. */
+  function mdVideo(link){
+    var u = String(link || ''), m;
+    if ((m = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([-\w]{25,})/))) return { src: 'https://drive.google.com/file/d/' + m[1] + '/preview', tegak: true };
+    if ((m = u.match(/youtube\.com\/shorts\/([-\w]{11})/))) return { src: 'https://www.youtube-nocookie.com/embed/' + m[1], tegak: true };
+    if ((m = u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|live\/)|youtu\.be\/)([-\w]{11})/))) return { src: 'https://www.youtube-nocookie.com/embed/' + m[1], tegak: false };
+    return null;
+  }
+  function mdLinkHtml(p){
+    if (!p.link) return '';
+    var v = mdVideo(p.link);
+    if (!v) return '<a class="btn btn-ghost btn-sm" href="' + esc(p.link) + '" target="_blank" rel="noopener">Buka tautan</a>';
+    return '<div class="mvideo' + (v.tegak ? ' tegak' : '') + '"><iframe src="' + esc(v.src) + '" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="Video tempelan"></iframe></div>'
+      + '<a class="linkbtn mvlink" href="' + esc(p.link) + '" target="_blank" rel="noopener">Buka di tab baru</a>';
+  }
   function madingCard(p, i){
     var tgl = p.dibuat ? esc(String(p.dibuat).slice(0, 16)) : '';
     return '<article class="mcard' + (p.pin ? ' pinned' : '') + (p.status === 'arsip' ? ' archived' : '') + '" style="--tilt:' + ((i % 3) - 1) * 0.6 + 'deg">'
@@ -2165,7 +2184,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + (p.judul ? '<h3>' + esc(p.judul) + '</h3>' : '')
       + mdImgTag(p.gambar)
       + (p.isi ? '<p class="misi">' + esc(p.isi) + '</p>' : '')
-      + (p.link ? '<a class="btn btn-ghost btn-sm" href="' + esc(p.link) + '" target="_blank" rel="noopener">Buka tautan</a>' : '')
+      + mdLinkHtml(p)
       + '<div class="faint mfoot">' + esc(p.oleh || '') + (tgl ? ' &middot; ' + tgl : '') + (p.diubah ? ' &middot; diubah' : '') + (p.sampai ? ' &middot; sampai ' + esc(p.sampai) : '') + '</div>'
       + (p.bisaUbah || isAdmin() ? '<div class="bulk" style="margin:8px 0 0;">' + (p.bisaUbah ? '<button type="button" class="btn btn-ghost btn-sm" data-md-edit="' + esc(p.id) + '">Ubah</button><button type="button" class="btn btn-ghost btn-sm" data-md-del="' + esc(p.id) + '">Hapus</button>' : '')
         + (isAdmin() ? '<button type="button" class="btn btn-ghost btn-sm" data-md-arc="' + esc(p.id) + '" data-to="' + (p.status === 'arsip' ? '0' : '1') + '">' + (p.status === 'arsip' ? 'Tempel lagi' : 'Lepas') + '</button>' : '') + '</div>' : '')
@@ -2181,7 +2200,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       + '<div class="field"><label>Gambar (opsional)</label><div class="bulk" style="margin:0;"><label class="btn btn-ghost btn-sm" for="md-file" style="cursor:pointer;">' + ic('camera', 15) + ' Pilih / foto gambar</label>'
       + '<input id="md-file" type="file" accept="image/*" style="display:none;">'
       + (pv ? '<button type="button" class="btn btn-ghost btn-sm" id="btn-md-noimg">Hapus gambar</button>' : '') + '</div>' + (pv ? '<div class="mprev">' + pv + '</div>' : '') + '</div>'
-      + '<div class="field"><label for="md-link">Tautan (opsional)</label><input id="md-link" type="url" placeholder="https://…" value="' + esc(e.link || '') + '"></div>'
+      + '<div class="field"><label for="md-link">Tautan / video (opsional — link YouTube atau Google Drive langsung bisa diputar)</label><input id="md-link" type="url" placeholder="https://…" value="' + esc(e.link || '') + '"></div>'
       + (adm ? '<div class="form-row"><div class="field"><label for="md-sampai">Tampil sampai (opsional)</label><input id="md-sampai" type="date" value="' + esc(e.sampai || '') + '"></div>'
         + '<div class="field"><label class="chk" style="display:flex; gap:8px; align-items:center; min-height:44px; margin-top:18px; text-transform:none; letter-spacing:0; font-size:.9rem;"><input id="md-pin" type="checkbox"' + (e.pin ? ' checked' : '') + ' style="width:20px; height:20px;"> Sematkan di paling atas</label></div></div>' : '')
       + '<div class="bulk"><button type="submit" class="btn btn-primary btn-sm" id="btn-md-save">' + (e.id ? 'Simpan perubahan' : 'Tempel di Mading') + '</button><button type="button" class="btn btn-ghost btn-sm" id="btn-md-cancel">Batal</button></div></form>';
