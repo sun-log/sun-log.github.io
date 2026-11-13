@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bfCw16exGmc/4Tb5RPmSpxZZzzgBarfAPvA+AH3b8Io=' 'sha256-6M0ucdpPq8BFbApkh/qpcofnh6Y9qNxPo1DDBcBOw8g=' 'sha256-Ncr0fAfxQI1qFJnFb/ndFQdsfjyeuLq5CBmW6MuRJbs=' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://drive.google.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bfCw16exGmc/4Tb5RPmSpxZZzzgBarfAPvA+AH3b8Io=' 'sha256-6M0ucdpPq8BFbApkh/qpcofnh6Y9qNxPo1DDBcBOw8g=' 'sha256-HxA6955pjcquwNRLFq5ab/dRIbA0iCpcUQ2jVY0fMkQ=' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://drive.google.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0F11">
@@ -590,6 +590,8 @@
   .ws-tickb{background:none; border:0; padding:0 2px; color:inherit; font:inherit; cursor:pointer; display:inline-flex; align-items:baseline;}
   .ws-tickb small{font-size:.66rem; margin-left:2px; letter-spacing:0;}
   .ws-info .ws-h3{display:flex; align-items:center; gap:6px;}
+  .ws-email{display:grid; gap:8px; margin:6px 0 4px; max-width:420px;}
+  .ws-check-in{display:flex; align-items:center; gap:8px; font-size:.9rem;}
 </style>
 </head>
 <body>
@@ -2581,7 +2583,7 @@ if (typeof module !== 'undefined') module.exports = WSC;
   var ws = { R: null, st: 'awal', priv: null, open: '', msgs: {}, dek: {}, keys: {}, cursor: 0, habis: {}, draft: {}, stage: [], stageSel: 0, reply: null, q: '',
     panel: '', edit: null, err: '', busy: false, pops: [], blob: {}, scroll: {}, lastRead: {}, initing: null, coba: {}, kirimQ: Promise.resolve(), ingat: true, mn: null, pin1: '' };
   var WS_MAX_FILE = 45 * 1024 * 1024;
-  function wsReset(){ ws.R = null; ws.st = 'awal'; ws.priv = null; ws.open = ''; ws.msgs = {}; ws.dek = {}; ws.keys = {}; ws.cursor = 0; ws.habis = {}; ws.stage = []; ws.reply = null; ws.panel = ''; ws.initing = null; ws.pops = []; paintPops(); }
+  function wsReset(){ ws.R = null; ws.st = 'awal'; ws.priv = null; ws.open = ''; ws.msgs = {}; ws.dek = {}; ws.keys = {}; ws.cursor = 0; ws.habis = {}; ws.stage = []; ws.reply = null; ws.panel = ''; ws.initing = null; ws.pops = []; mailSt = null; pushTim = null; paintPops(); }
   function wsMe(){ return auth && auth.user.id; }
   function wsRoom(id){ return ws.R ? ws.R.rooms.filter(function(r){ return r.id === id; })[0] || null : null; }
   function wsPerson(id){ return ws.R ? ws.R.people.filter(function(p){ return p.id === id; })[0] || null : null; }
@@ -2969,6 +2971,7 @@ if (typeof module !== 'undefined') module.exports = WSC;
       var st = pushStatus();
       return '<div class="ws-head">' + back + '<b class="grow">Pengaturan chat</b></div><div class="ws-pbody">'
         + '<h3 class="ws-h3">Notifikasi HP</h3>' + pushCardHtml(st)
+        + '<h3 class="ws-h3">Notifikasi email</h3>' + emailHtml()
         + '<h3 class="ws-h3">Keamanan</h3><p class="sub">Kunci keamanan kamu: <code>' + esc((wsPerson(wsMe()) || {}).fp || '—') + '</code></p>'
         + '<div class="bulk"><button type="button" class="btn btn-ghost btn-sm" id="ws-gpin">Ganti PIN chat</button><button type="button" class="btn btn-ghost btn-sm" id="ws-lupa">Keluar chat di perangkat ini</button></div>'
         + (ws.gantiPin ? '<form id="ws-gpform" class="card" style="margin-top:10px;"><div class="field"><label for="ws-p0">PIN chat lama</label><input id="ws-p0" class="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div><div class="field"><label for="ws-p1">PIN chat baru (6 angka)</label><input id="ws-p1" class="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div><div class="bulk"><button type="submit" class="btn btn-primary btn-sm">Simpan PIN baru</button></div></form>' : '')
@@ -3277,14 +3280,23 @@ if (typeof module !== 'undefined') module.exports = WSC;
       .then(function(reg){ return call('apiPushKey', auth.token).then(function(k){ if (!k || !k.ok) throw new Error((k && k.message) || 'Gagal.'); return reg.pushManager.getSubscription().then(function(s){ return s || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: WSC.unb64u(k.key) }); }); }); })
       .then(function(s){ pushSt.sub = s; return call('apiPushSubscribe', auth.token, s.toJSON(), perangkat()); });
   }
+  var mailSt = null, mailMuat = false;
+  function emailHtml(){
+    if (!mailSt) { if (!mailMuat && auth) { mailMuat = true; call('apiEmailGet', auth.token).then(function(res){ mailMuat = false; if (res && res.ok) { mailSt = res; wsPaint(); } }); } return '<p class="sub">Memuat…</p>'; }
+    return '<p class="sub">Cadangan kalau notifikasi HP tidak muncul: email dari <b>Suneeday VGE</b> saat ada chat baru (isi chat tidak ikut dikirim). Paling banyak 1 email per chat tiap 10 menit.</p>'
+      + '<form id="ws-email-form" class="ws-email"><input id="ws-email" type="email" inputmode="email" autocomplete="email" placeholder="nama@gmail.com" value="' + esc(mailSt.email || '') + '">'
+      + '<label class="ws-check-in"><input type="checkbox" id="ws-email-on"' + (mailSt.aktif ? ' checked' : '') + '> Kirim email saat ada chat baru</label>'
+      + '<button type="submit" class="btn btn-primary btn-sm">Simpan</button></form>'
+      + (mailSt.aktif ? '<p class="sub">' + ICON.check + ' Aktif ke ' + esc(mailSt.email) + '. Pastikan notifikasi aplikasi Gmail di HP menyala.</p>' : '');
+  }
   var pushTim = null;
   function pushTimHtml(){
     if (!pushTim) return '<button type="button" class="btn btn-ghost btn-sm" id="ws-pushtim">Lihat status notifikasi tim</button>';
-    var aktif = pushTim.filter(function(x){ return x.alat.length; }).length;
+    var aktif = pushTim.filter(function(x){ return x.alat.length || x.email; }).length;
     return '<p class="sub"><b>' + aktif + ' dari ' + pushTim.length + '</b> orang sudah aktif.</p><div class="ws-people">' + pushTim.map(function(x){
       return '<div class="ws-item">' + wsAv(x.nama) + '<span class="grow"><span class="ws-l1"><b>' + esc(x.nama) + '</b></span><span class="ws-l2"><span class="ws-prev">'
-        + (x.alat.length ? x.alat.map(function(a){ return esc(a.perangkat) + (a.status ? ' · ' + esc(a.status.indexOf('terkirim') === 0 ? 'terakhir terkirim ' + a.kirim : a.status) : ''); }).join(' | ') : 'Belum mengaktifkan notifikasi') + '</span></span></span>'
-        + '<span class="pill ' + (x.alat.length ? 'pill-ok' : 'pill-warn') + '">' + (x.alat.length ? 'Aktif' : 'Belum') + '</span></div>';
+        + (x.alat.length ? x.alat.map(function(a){ return esc(a.perangkat) + (a.status ? ' · ' + esc(a.status.indexOf('terkirim') === 0 ? 'terakhir terkirim ' + a.kirim : a.status) : ''); }).join(' | ') : 'Belum mengaktifkan notifikasi HP') + (x.email ? ' · Email aktif' : '') + '</span></span></span>'
+        + '<span class="pill ' + (x.alat.length || x.email ? 'pill-ok' : 'pill-warn') + '">' + (x.alat.length || x.email ? 'Aktif' : 'Belum') + '</span></div>';
     }).join('') + '</div>';
   }
   function pushMatikan(){
@@ -3309,6 +3321,8 @@ if (typeof module !== 'undefined') module.exports = WSC;
     var off = document.getElementById('push-off'); if (off) off.addEventListener('click', pushMatikan);
     var ts = document.getElementById('push-tes'); if (ts) ts.addEventListener('click', function(){ call('apiPushTest', auth.token).then(function(res){ var ok = handle(res); if (ok) toast(ok.message); }); });
     var pt = document.getElementById('ws-pushtim'); if (pt) pt.addEventListener('click', function(){ pt.disabled = true; call('apiPushTim', auth.token).then(function(res){ var ok = handle(res); if (!ok) { pt.disabled = false; return; } pushTim = ok.tim; wsPaint(); }); });
+    var ef = document.getElementById('ws-email-form'); if (ef) ef.addEventListener('submit', function(e){ e.preventDefault(); var b = ef.querySelector('button'); b.disabled = true;
+      call('apiEmailSet', auth.token, document.getElementById('ws-email').value, document.getElementById('ws-email-on').checked).then(function(res){ b.disabled = false; var ok = handle(res); if (!ok) return; mailSt = ok; toast(ok.message); wsPaint(); }); });
     var nt = document.getElementById('push-nanti'); if (nt) nt.addEventListener('click', function(){ try { localStorage.setItem('vge.push.nanti', String(Date.now())); } catch(e){} var c = document.getElementById('app-nudge'); if (c) c.remove(); });
   }
 
