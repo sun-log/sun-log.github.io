@@ -1,14 +1,27 @@
 {
-  "name": "Dashboard Videographer & Editor",
-  "short_name": "Dashboard VGE",
+  "id": "/",
+  "name": "Suneeday VGE",
+  "short_name": "Suneeday VGE",
+  "description": "Dashboard Videographer & Editor Suneeday Creative: scan alat, rapor, Mading, dan Working Space. Untuk tim internal.",
+  "lang": "id",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0E0F11",
   "theme_color": "#0E0F11",
+  "categories": ["productivity", "business"],
+  "prefer_related_applications": false,
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Scan QR alat", "short_name": "Scan", "url": "./?tab=saya&scan=1", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Working Space", "short_name": "Chat", "url": "./?tab=ws", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Mading VGE", "short_name": "Mading", "url": "./?tab=mading", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Rapor", "short_name": "Rapor", "url": "./?tab=rapor", "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }] }
   ]
 }
