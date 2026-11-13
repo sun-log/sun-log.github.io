@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bfCw16exGmc/4Tb5RPmSpxZZzzgBarfAPvA+AH3b8Io=' 'sha256-6M0ucdpPq8BFbApkh/qpcofnh6Y9qNxPo1DDBcBOw8g=' 'sha256-U5NmFEfaTx9YUla+5/kM3zdbZYeXOKrvxltLU9H7MCI=' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://drive.google.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bfCw16exGmc/4Tb5RPmSpxZZzzgBarfAPvA+AH3b8Io=' 'sha256-6M0ucdpPq8BFbApkh/qpcofnh6Y9qNxPo1DDBcBOw8g=' 'sha256-bk/M9dmnkf6dToZPz0Zk8uMYvugmDo3E1RbGmHEXxJ8=' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://drive.google.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0F11">
@@ -10,9 +10,10 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Dashboard VGE">
-<title>DASHBOARD VIDEOGRAPHER &amp; EDITOR</title>
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Suneeday VGE">
+<meta name="application-name" content="Suneeday VGE">
+<title>Suneeday VGE · Dashboard Videographer &amp; Editor</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
   /* Tema "Onyx Glass": gelap, minimalis, panel kaca (blur) di atas cahaya ambient lembut. */
@@ -562,6 +563,26 @@
     #ws-pop-host{left:12px; right:12px; width:auto;}
     .wsm{max-width:86%;}
   }
+  /* ===== Aplikasi (PWA): lembar Pasang, banner versi baru, status offline ===== */
+  .app-overlay{position:fixed; inset:0; z-index:80; background:rgba(5,6,8,.62); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); display:flex; align-items:flex-end; justify-content:center; padding:16px; padding-bottom:calc(env(safe-area-inset-bottom) + 16px); overflow-y:auto;}
+  @media (min-width:640px){ .app-overlay{align-items:center;} }
+  .app-sheet{width:100%; max-width:520px; margin:0 !important; background:var(--surface-solid) !important; animation:pagein .22s ease both;}
+  .app-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:12px;}
+  .app-head h2{font-size:1.2rem; margin:0;}
+  .app-head .sub{margin:4px 0 0;}
+  .app-os{display:flex; width:100%; margin-bottom:12px;}
+  .app-os button{flex:1;}
+  .app-sheet .banner{margin-bottom:12px;}
+  .app-sheet #app-instal{margin-bottom:12px;}
+  .app-sub{font-size:.95rem; margin:4px 0 8px;}
+  .app-steps{margin:0 0 12px; padding-left:22px; display:grid; gap:8px; line-height:1.45;}
+  .app-steps li::marker{color:var(--accent); font-weight:700;}
+  .app-sheet .faint{margin:0 0 6px; font-size:.82rem;}
+  .app-login-link{text-align:center; margin:14px 0 0;}
+  .app-login-link .linkbtn{display:inline-flex; align-items:center; gap:6px;}
+  .app-update,.app-offline{position:fixed; left:50%; transform:translateX(-50%); z-index:70; display:flex; align-items:center; gap:12px; padding:10px 12px 10px 16px; border-radius:16px; border:1px solid var(--line); background:var(--surface-solid); box-shadow:0 10px 30px rgba(0,0,0,.45); font-size:.88rem; max-width:calc(100vw - 24px);}
+  .app-update{top:calc(env(safe-area-inset-top) + 70px);}
+  .app-offline{top:calc(env(safe-area-inset-top) + 70px); padding:10px 16px; color:#F6C9A0; border-color:rgba(240,138,128,.35);}
 </style>
 </head>
 <body>
@@ -857,7 +878,7 @@ if (typeof module !== 'undefined') module.exports = WSC;
       + body
       + '<p class="faint" style="text-align:center; margin:16px 0 0;">Cukup <strong>sekali</strong> di HP ini. Setelah itu scan QR alat langsung ke tombol Start / Selesai.</p>'
       + (!lg.manual && !lg.teamFailed && !lg.linking ? '<p style="text-align:center; margin:4px 0 0;"><button type="button" class="linkbtn" id="btn-to-manual">Login pakai username</button></p>' : '')
-      + '</div></div>';
+      + '</div>' + appLinkLogin() + '</div>';
   }
   function updatePinDots(){
     var d = document.getElementById('pin-dots'); if (!d) return;
@@ -950,6 +971,7 @@ if (typeof module !== 'undefined') module.exports = WSC;
       + (view === 'tool'
           ? '<button type="button" class="btn btn-ghost btn-sm" id="btn-home">' + ICON.back + ' Dashboard</button><div class="brand"></div>'
           : '<div class="brand">' + ICON.mark + '<div class="brand-t"><small>DASHBOARD</small><b title="DASHBOARD VIDEOGRAPHER &amp; EDITOR">VIDEOGRAPHER &amp; EDITOR</b></div><b class="brand-full">DASHBOARD VIDEOGRAPHER &amp; EDITOR</b></div>')
+      + appTombolTop()
       + '<button type="button" class="btn btn-primary btn-sm" id="btn-scan-top" aria-label="Scan QR alat">' + ICON.scan + '<span class="hide-xs"> Scan</span></button>'
       + '<span class="userchip" title="' + esc(auth.user.nama) + '"><span class="av">' + esc(initials(auth.user.nama)) + '</span><span class="hide-xs">' + esc(auth.user.nama) + '</span></span>'
       + '<button type="button" class="linkbtn" id="btn-logout">Keluar</button>'
@@ -964,7 +986,7 @@ if (typeof module !== 'undefined') module.exports = WSC;
         setTimeout(function(){ if (lo.isConnected) { lo.removeAttribute('data-armed'); lo.textContent = 'Keluar'; } }, 3000);
         return;
       }
-      wsKeluar(); clearAuth(); view = BOOT.toolId ? 'tool' : 'home'; lg.pick = null; lg.pin = ''; render(); if (!lg.team) loadTeam();
+      wsKeluar(); clearAuth(); appBadge(); view = BOOT.toolId ? 'tool' : 'home'; lg.pick = null; lg.pin = ''; render(); if (!lg.team) loadTeam();
     });
     var hb = document.getElementById('btn-home');
     if (hb) hb.addEventListener('click', function(){ view = 'home'; tab = 'saya'; render(); loadTab(); });
@@ -1154,6 +1176,7 @@ if (typeof module !== 'undefined') module.exports = WSC;
       if (badges[k] && !d) { var sp = document.createElement('span'); sp.className = 'nav-dot'; sp.setAttribute('aria-label', 'ada info baru'); sp.innerHTML = '&#9733;'; b.insertBefore(sp, b.querySelector('.nav-lbl')); }
       if (!badges[k] && d) d.remove();
     });
+    appBadge();
   }
   function loadBadges(force){
     if (!auth || (!force && Date.now() - badgeAt < 60000)) return;
@@ -3280,7 +3303,7 @@ if (typeof module !== 'undefined') module.exports = WSC;
   });
   function wsMulai(){
     if (!auth) return;
-    pushCek();
+    pushCek(); appSetelahLogin();
     wsInit(); if (!pulse.jalan) pulseJalan();
   }
   function wsKeluar(){
@@ -3289,6 +3312,111 @@ if (typeof module !== 'undefined') module.exports = WSC;
     if (uid) WSC.simpanLokal(uid, null);
     clearTimeout(pulse.t); pulse.v = null; pulse.jalan = false; wsReset();
   }
+
+  /* ================= APLIKASI (PWA): pasang, pembaruan versi, badge ikon ================= */
+  var app = { prompt: null, reg: null, lihat: '', sw: false };
+  var APP_SCAN = QS.get('scan') === '1';
+  var APP_IC = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v11"/><path d="M7.5 10.5l4.5 4.5 4.5-4.5"/><path d="M4.5 16.5v2a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-2"/></svg>';
+  function appStandalone(){ return isStandalone() || !!(window.matchMedia && (matchMedia('(display-mode: window-controls-overlay)').matches || matchMedia('(display-mode: minimal-ui)').matches)); }
+  function appOS(){ var u = navigator.userAgent; if (isIOS()) return 'ios'; if (/Android/.test(u)) return 'android'; if (/Mac/.test(u)) return 'mac'; if (/Windows/.test(u)) return 'windows'; return 'windows'; }
+  function appBrowser(){ var u = navigator.userAgent; return /Edg[A-Z]*\//.test(u) ? 'edge' : /CriOS|Chrome\//.test(u) ? 'chrome' : /Firefox|FxiOS/.test(u) ? 'firefox' : /Safari\//.test(u) ? 'safari' : 'lain'; }
+  function appTombolTop(){ return appStandalone() ? '' : '<button type="button" class="btn btn-ghost btn-sm" data-pasang aria-label="Pasang aplikasi" title="Pasang aplikasi Suneeday VGE">' + APP_IC + '<span class="hide-xs"> Pasang</span></button>'; }
+  function appLinkLogin(){ return appStandalone() ? '' : '<p class="app-login-link"><button type="button" class="linkbtn" data-pasang>' + APP_IC + ' Pasang aplikasi Suneeday VGE di perangkat ini</button></p>'; }
+
+  var APP_LANGKAH = {
+    android: { t: 'Android (Chrome)', l: [
+      'Buka <b>sun-log.github.io</b> di <b>Chrome</b>.',
+      'Ketuk menu <b>&#8942;</b> (kanan atas) &rarr; <b>Instal aplikasi</b> atau <b>Tambahkan ke layar utama</b>.',
+      'Ketuk <b>Instal</b>. Ikon <b>Suneeday VGE</b> muncul di layar HP.',
+      'Buka dari ikon itu. Scan QR pakai kamera HP pun langsung membuka aplikasi.'] },
+    ios: { t: 'iPhone / iPad (Safari)', l: [
+      'Buka <b>sun-log.github.io</b> di <b>Safari</b> (bukan Chrome / Instagram / WhatsApp).',
+      'Ketuk tombol <b>Bagikan</b> (kotak dengan panah ke atas) di bawah layar.',
+      'Gulir, pilih <b>Tambah ke Layar Utama</b>, lalu ketuk <b>Tambah</b>.',
+      'Buka <b>Suneeday VGE</b> dari ikon baru, <b>login sekali lagi</b>, lalu aktifkan notifikasi di Working Space.',
+      'Untuk alat: pakai tombol <b>Scan</b> di dalam aplikasi, bukan kamera iPhone, supaya langsung tercatat di akunmu.'],
+      n: 'Notifikasi di iPhone butuh iOS 16.4 ke atas (Pengaturan &rarr; Umum &rarr; Mengenai &rarr; Versi iOS).' },
+    windows: { t: 'Windows (Chrome / Edge)', l: [
+      'Buka <b>sun-log.github.io</b> di <b>Chrome</b> atau <b>Edge</b>.',
+      'Klik ikon <b>Instal</b> (layar dengan panah) di ujung kanan kolom alamat. Kalau tidak ada: menu <b>&#8942;</b> &rarr; cari <b>Instal Suneeday VGE</b>.',
+      'Klik <b>Instal</b>. Aplikasi terbuka di jendela sendiri dan ada di Start Menu.',
+      'Opsional: klik kanan ikon di taskbar &rarr; <b>Sematkan ke taskbar</b>.'] },
+    mac: { t: 'Mac (Chrome / Safari)', l: [
+      '<b>Chrome:</b> buka sun-log.github.io &rarr; klik ikon <b>Instal</b> di ujung kanan kolom alamat &rarr; <b>Instal</b>.',
+      '<b>Safari</b> (macOS Sonoma ke atas): buka sun-log.github.io &rarr; menu <b>File</b> &rarr; <b>Add to Dock</b> &rarr; <b>Add</b>.',
+      'Aplikasi <b>Suneeday VGE</b> muncul di Dock dan Launchpad, terbuka di jendela sendiri.',
+      'Buka dari Dock, login sekali, lalu aktifkan notifikasi di Working Space.'] }
+  };
+  function appSheetHtml(){
+    var os = app.lihat || appOS(), L = APP_LANGKAH[os], br = appBrowser(), cat = '';
+    if (os === appOS()) {
+      if (os === 'ios' && br !== 'safari') cat = '<div class="banner warn">' + ICON.warn + '<div>Kamu sedang tidak di Safari. Salin alamat <b>sun-log.github.io</b> lalu buka di <b>Safari</b> dulu.</div></div>';
+      if (os !== 'ios' && br === 'firefox') cat = '<div class="banner warn">' + ICON.warn + '<div>Firefox belum bisa memasang aplikasi. Buka di <b>Chrome</b>' + (os === 'mac' ? ' atau <b>Safari</b>' : ' atau <b>Edge</b>') + '.</div></div>';
+    }
+    var tombol = app.prompt && os === appOS() ? '<button type="button" class="btn btn-primary btn-block" id="app-instal">' + APP_IC + ' Pasang sekarang</button>' : '';
+    return '<div class="app-sheet card" role="dialog" aria-modal="true" aria-labelledby="app-judul">'
+      + '<div class="app-head"><div><h2 id="app-judul">Pasang Suneeday VGE</h2><p class="sub">Jadi aplikasi di HP / PC: ikon sendiri, jendela sendiri, tanpa buka browser.</p></div><button type="button" class="btn btn-ghost btn-sm" id="app-tutup">Tutup</button></div>'
+      + '<div class="seg app-os">' + ['android', 'ios', 'windows', 'mac'].map(function(k){ return '<button type="button" data-app-os="' + k + '" class="' + (k === os ? 'on' : '') + '">' + { android: 'Android', ios: 'iPhone', windows: 'Windows', mac: 'Mac' }[k] + '</button>'; }).join('') + '</div>'
+      + cat + tombol
+      + '<h3 class="app-sub">' + esc(L.t) + '</h3><ol class="app-steps">' + L.l.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ol>'
+      + (L.n ? '<p class="faint">' + L.n + '</p>' : '')
+      + '<p class="faint">Data tetap sama: akun, alat, rapor, dan chat ikut. Hanya untuk tim internal Suneeday.</p></div>';
+  }
+  function appPasang(){
+    var lama = document.getElementById('app-overlay'); if (lama) lama.remove();
+    var o = document.createElement('div'); o.id = 'app-overlay'; o.className = 'app-overlay no-print';
+    o.innerHTML = appSheetHtml(); document.body.appendChild(o);
+    o.addEventListener('click', function(e){
+      if (e.target === o || e.target.closest('#app-tutup')) { o.remove(); return; }
+      var b = e.target.closest('[data-app-os]'); if (b) { app.lihat = b.getAttribute('data-app-os'); o.innerHTML = appSheetHtml(); return; }
+      if (e.target.closest('#app-instal') && app.prompt) {
+        var p = app.prompt; app.prompt = null; p.prompt();
+        Promise.resolve(p.userChoice).then(function(c){ if (c && c.outcome === 'accepted') o.remove(); else { o.innerHTML = appSheetHtml(); } });
+      }
+    });
+    document.addEventListener('keydown', function esc_(e){ if (e.key === 'Escape') { o.remove(); document.removeEventListener('keydown', esc_); } });
+  }
+  document.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('[data-pasang]')) { e.preventDefault(); appPasang(); } });
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); app.prompt = e; });
+  window.addEventListener('appinstalled', function(){ app.prompt = null; var o = document.getElementById('app-overlay'); if (o) o.remove(); toast('Suneeday VGE terpasang. Buka dari ikon aplikasinya.'); });
+
+  /* pembaruan: service worker baru = versi halaman baru (versi diisi otomatis oleh build) */
+  function appVersiBaru(){
+    if (document.getElementById('app-update')) return;
+    var d = document.createElement('div'); d.id = 'app-update'; d.className = 'app-update no-print'; d.setAttribute('role', 'status');
+    d.innerHTML = '<span>Versi baru Suneeday VGE tersedia.</span><button type="button" class="btn btn-primary btn-sm" id="app-muat">Muat ulang</button>';
+    document.body.appendChild(d);
+    document.getElementById('app-muat').addEventListener('click', function(){ location.reload(); });
+  }
+  function appDaftarSW(){
+    if (!('serviceWorker' in navigator) || (navigator.webdriver && !window.__VGE_SW_TEST) || !window.isSecureContext) return;
+    var punya = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', function(){ if (!punya) { punya = true; return; } appVersiBaru(); });
+    navigator.serviceWorker.register('sw.js', { scope: './' }).then(function(reg){
+      app.reg = reg; app.sw = true;
+      setInterval(function(){ reg.update().catch(function(){}); }, 30 * 60000);
+      document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'visible') reg.update().catch(function(){}); });
+    }).catch(function(){});
+  }
+
+  /* angka di ikon aplikasi (Android, Windows, Mac, iPhone 16.4+) */
+  function appBadge(){
+    if (!('setAppBadge' in navigator)) return;
+    var n = auth ? wsUnread() + Object.keys(badges).filter(function(k){ return k !== 'ws' && badges[k]; }).length : 0;
+    try { (n ? navigator.setAppBadge(n) : navigator.clearAppBadge()).catch(function(){}); } catch (e) {}
+  }
+  function appSetelahLogin(){
+    appBadge();
+    if (APP_SCAN) { APP_SCAN = false; try { QS.delete('scan'); history.replaceState(null, '', location.pathname + (QS.toString() ? '?' + QS.toString() : '') + location.hash); } catch (e) {} setTimeout(function(){ if (auth && view === 'home') scanStart(); }, 300); }
+  }
+  /* status koneksi */
+  function appKoneksi(){
+    var off = navigator.onLine === false, d = document.getElementById('app-offline');
+    if (off && !d) { d = document.createElement('div'); d.id = 'app-offline'; d.className = 'app-offline no-print'; d.setAttribute('role', 'status'); d.textContent = 'Tidak ada koneksi internet. Data akan dimuat lagi saat online.'; document.body.appendChild(d); }
+    if (!off && d) { d.remove(); if (auth) { if (view === 'home') loadTab(); pulseJalan(); } }
+  }
+  window.addEventListener('online', appKoneksi); window.addEventListener('offline', appKoneksi);
+  setTimeout(function(){ appDaftarSW(); appKoneksi(); }, 0);
 
   /* ================= FITUR YANG SEDANG DIBUAT ================= */
   var SOON = {
