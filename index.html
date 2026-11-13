@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bfCw16exGmc/4Tb5RPmSpxZZzzgBarfAPvA+AH3b8Io=' 'sha256-6M0ucdpPq8BFbApkh/qpcofnh6Y9qNxPo1DDBcBOw8g=' 'sha256-bk/M9dmnkf6dToZPz0Zk8uMYvugmDo3E1RbGmHEXxJ8=' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://drive.google.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-bfCw16exGmc/4Tb5RPmSpxZZzzgBarfAPvA+AH3b8Io=' 'sha256-6M0ucdpPq8BFbApkh/qpcofnh6Y9qNxPo1DDBcBOw8g=' 'sha256-Ncr0fAfxQI1qFJnFb/ndFQdsfjyeuLq5CBmW6MuRJbs=' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' blob: data:; connect-src https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://drive.google.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E0F11">
@@ -583,6 +583,13 @@
   .app-update,.app-offline{position:fixed; left:50%; transform:translateX(-50%); z-index:70; display:flex; align-items:center; gap:12px; padding:10px 12px 10px 16px; border-radius:16px; border:1px solid var(--line); background:var(--surface-solid); box-shadow:0 10px 30px rgba(0,0,0,.45); font-size:.88rem; max-width:calc(100vw - 24px);}
   .app-update{top:calc(env(safe-area-inset-top) + 70px);}
   .app-offline{top:calc(env(safe-area-inset-top) + 70px); padding:10px 16px; color:#F6C9A0; border-color:rgba(240,138,128,.35);}
+  .app-nudge{display:flex; align-items:center; gap:12px; flex-wrap:wrap; border-color:rgba(214,196,163,.35) !important;}
+  .app-nudge .grow{min-width:200px; display:grid; gap:2px;}
+  .app-nudge span{color:var(--ink-dim); font-size:.88rem;}
+  .app-nudge .bulk{margin:0;}
+  .ws-tickb{background:none; border:0; padding:0 2px; color:inherit; font:inherit; cursor:pointer; display:inline-flex; align-items:baseline;}
+  .ws-tickb small{font-size:.66rem; margin-left:2px; letter-spacing:0;}
+  .ws-info .ws-h3{display:flex; align-items:center; gap:6px;}
 </style>
 </head>
 <body>
@@ -827,9 +834,9 @@ if (typeof module !== 'undefined') module.exports = WSC;
     var root = document.getElementById('root');
     if (!auth) { root.innerHTML = renderLogin(); bindLogin(); return; }
     var nav = view === 'home';
-    root.innerHTML = renderTopbar() + (nav ? renderNav() : '') + '<main class="' + (nav ? 'has-nav' : '') + '"><div class="wrap' + (nav ? ' wide' : '') + '" id="content" data-page="' + esc(view === 'tool' ? 'tool' : tab) + '">' + (view === 'tool' ? renderTool() : renderHome()) + '</div></main>';
+    root.innerHTML = renderTopbar() + (nav ? renderNav() : '') + '<main class="' + (nav ? 'has-nav' : '') + '"><div class="wrap' + (nav ? ' wide' : '') + '" id="content" data-page="' + esc(view === 'tool' ? 'tool' : tab) + '">' + (view === 'tool' ? renderTool() : appNudgeHtml() + renderHome()) + '</div></main>';
     bindTopbar();
-    if (view === 'tool') bindTool(); else bindHome();
+    if (view === 'tool') bindTool(); else { bindHome(); if (tab !== 'ws') bindPushCard(); }
     wsBodyClass();
   }
 
@@ -2872,7 +2879,12 @@ if (typeof module !== 'undefined') module.exports = WSC;
     if (m.hapus) isi = '<div class="txt faint"><i>Pesan dihapus</i></div>';
     else if (!o) isi = '<div class="txt faint">' + (m.err === 'tunggu' ? ic('lock', 13) + ' Menunggu kunci grup dari anggota lain…' : (m.err === 'gagal' ? ic('lock', 13) + ' Tidak bisa dibuka (kunci keamanan berubah).' : '<span class="spinner"></span>')) + '</div>';
     else isi = (o.r ? '<div class="ws-quote" data-ws-goto="' + esc(o.r.id) + '"><b>' + esc(o.r.n) + '</b><span>' + esc(o.r.t) + '</span></div>' : '') + (o.f ? wsFileHtml(m) : '') + (o.t ? '<div class="txt">' + wsTeksHtml(o.t) + '</div>' : '');
-    var cek = mine && r.jenis === 'pribadi' && m.seq ? (m.seq <= (r.dibacaLawan || 0) ? '<span class="ws-tick on" title="Dibaca">&#10003;&#10003;</span>' : '<span class="ws-tick" title="Terkirim">&#10003;</span>') : '';
+    var cek = '';
+    if (mine && m.seq && !m.hapus) {
+      if (r.jenis === 'pribadi') cek = m.seq <= (r.dibacaLawan || 0) ? '<span class="ws-tick on" title="Dibaca">&#10003;&#10003;</span>' : '<span class="ws-tick" title="Terkirim, belum dibaca">&#10003;</span>';
+      else { var lain = r.anggota.length - 1, nb = wsDibaca(r, m.seq).length;
+        cek = '<button type="button" class="ws-tick ws-tickb' + (lain && nb >= lain ? ' on' : '') + '" data-ws-info="' + esc(m.id) + '" title="' + (nb ? 'Dibaca ' + nb + ' dari ' + lain : 'Terkirim, belum dibaca') + ' (ketuk untuk detail)">' + (nb ? '&#10003;&#10003;' : '&#10003;') + (nb && nb < lain ? '<small>' + nb + '</small>' : '') + '</button>'; }
+    }
     var meta = '<div class="wsm-meta">' + (m.gagal ? '<span class="ws-err">' + esc(m.gagal) + '</span>' : (m.kirim ? '<span class="faint">mengirim…</span>' : esc(wsJam(m.waktu)))) + cek + '</div>';
     var act = !m.hapus && m.seq ? '<div class="wsm-act"><button type="button" data-ws-rep="' + esc(m.id) + '" title="Balas">' + ic('reply', 15) + '</button>'
       + (mine || (grup && r.kelola) ? '<button type="button" data-ws-del="' + esc(m.id) + '" title="Hapus">' + ic('trash', 15) + '</button>' : '') + '</div>' : '';
@@ -2960,6 +2972,7 @@ if (typeof module !== 'undefined') module.exports = WSC;
         + '<h3 class="ws-h3">Keamanan</h3><p class="sub">Kunci keamanan kamu: <code>' + esc((wsPerson(wsMe()) || {}).fp || '—') + '</code></p>'
         + '<div class="bulk"><button type="button" class="btn btn-ghost btn-sm" id="ws-gpin">Ganti PIN chat</button><button type="button" class="btn btn-ghost btn-sm" id="ws-lupa">Keluar chat di perangkat ini</button></div>'
         + (ws.gantiPin ? '<form id="ws-gpform" class="card" style="margin-top:10px;"><div class="field"><label for="ws-p0">PIN chat lama</label><input id="ws-p0" class="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div><div class="field"><label for="ws-p1">PIN chat baru (6 angka)</label><input id="ws-p1" class="pin" type="password" inputmode="numeric" maxlength="6" autocomplete="off"></div><div class="bulk"><button type="submit" class="btn btn-primary btn-sm">Simpan PIN baru</button></div></form>' : '')
+        + (R.admin ? '<h3 class="ws-h3">Notifikasi tim</h3><p class="sub">Siapa yang sudah mengaktifkan notifikasi (chat tetap masuk walau aplikasi ditutup).</p>' + pushTimHtml() : '')
         + (R.admin ? '<h3 class="ws-h3">Co-Partner admin</h3><p class="sub">Co-Partner bisa membuat grup dan mengatur anggotanya.</p><div class="ws-people">' + R.people.filter(function(x){ return x.role !== 'admin'; }).map(function(x){ return '<label class="ws-item ws-check"><input type="checkbox" data-ws-cop="' + esc(x.id) + '"' + (x.cop ? ' checked' : '') + '>' + wsAv(x.nama) + '<span class="grow"><b>' + esc(x.nama) + '</b></span></label>'; }).join('') + '</div>' : '')
         + '</div>';
     }
@@ -3063,11 +3076,25 @@ if (typeof module !== 'undefined') module.exports = WSC;
     var bk = document.getElementById('ws-back'); if (bk) bk.addEventListener('click', function(){ wsSimpanDraft(); ws.open = ''; wsPaint(true); });
     document.querySelectorAll('#ws-head [data-ws-panel]').forEach(bindPanelBtn);
   }
+  function wsDibaca(r, seq){ var b = r.baca || {}; return r.anggota.filter(function(u){ return u !== wsMe() && (b[u] || 0) >= seq; }); }
+  function wsInfo(id){
+    var m = wsCariMsg(id), r = wsRoom(ws.open); if (!m || !r) return;
+    var sudah = wsDibaca(r, m.seq), belum = r.anggota.filter(function(u){ return u !== wsMe() && sudah.indexOf(u) < 0; });
+    var orang = function(u, t){ return '<div class="ws-item">' + wsAv(wsNama(u)) + '<span class="grow"><span class="ws-l1"><b>' + esc(wsNama(u)) + '</b></span>' + (t ? '<span class="ws-l2"><span class="ws-prev">' + esc(t) + '</span></span>' : '') + '</span></div>'; };
+    var o = document.createElement('div'); o.id = 'app-overlay'; o.className = 'app-overlay no-print';
+    o.innerHTML = '<div class="app-sheet card ws-info" role="dialog" aria-modal="true" aria-label="Info pesan"><div class="app-head"><div><h2>Info pesan</h2><p class="sub">' + esc(wsJam(m.waktu)) + ' · ' + esc(wsRingkas(m)).slice(0, 80) + '</p></div><button type="button" class="btn btn-ghost btn-sm" id="app-tutup">Tutup</button></div>'
+      + '<h3 class="ws-h3"><span class="ws-tick on">&#10003;&#10003;</span> Dibaca (' + sudah.length + ')</h3><div class="ws-people">' + (sudah.length ? sudah.map(function(u){ var t = (r.bacaT || {})[u]; return orang(u, t ? 'terakhir membuka chat ' + (wsTgl(t) === 'Hari ini' ? '' : wsTgl(t) + ' ') + wsJam(t) : ''); }).join('') : '<p class="sub">Belum ada yang membaca.</p>') + '</div>'
+      + '<h3 class="ws-h3"><span class="ws-tick">&#10003;</span> Belum dibaca (' + belum.length + ')</h3><div class="ws-people">' + (belum.length ? belum.map(function(u){ return orang(u, ''); }).join('') : '<p class="sub">Semua sudah membaca.</p>') + '</div></div>';
+    var lama = document.getElementById('app-overlay'); if (lama) lama.remove();
+    document.body.appendChild(o);
+    o.addEventListener('click', function(e){ if (e.target === o || e.target.closest('#app-tutup')) o.remove(); });
+  }
   function wsCariMsg(id){ var a = ws.msgs[ws.open] || []; return a.filter(function(m){ return m.id === id; })[0]; }
   function bindWsMsgs(){
     var lm = document.getElementById('ws-lama'); if (lm) lm.addEventListener('click', wsMuatLama);
     document.querySelectorAll('[data-ws-fpok]').forEach(function(b){ b.addEventListener('click', function(){ delete ws.fpUbah[b.getAttribute('data-ws-fpok')]; wsPaintMsgs(); }); });
     document.querySelectorAll('.wsm').forEach(function(el){ el.addEventListener('click', function(e){ if (e.target.closest('button,a,video,audio')) return; var on = el.classList.contains('act'); document.querySelectorAll('.wsm.act').forEach(function(x){ x.classList.remove('act'); }); if (!on) el.classList.add('act'); }); });
+    document.querySelectorAll('[data-ws-info]').forEach(function(b){ b.addEventListener('click', function(e){ e.stopPropagation(); wsInfo(b.getAttribute('data-ws-info')); }); });
     document.querySelectorAll('[data-ws-rep]').forEach(function(b){ b.addEventListener('click', function(){ ws.reply = wsCariMsg(b.getAttribute('data-ws-rep')); wsPaintComp(); var t = document.getElementById('ws-text'); if (t) t.focus(); }); });
     document.querySelectorAll('[data-ws-goto]').forEach(function(b){ b.addEventListener('click', function(){ var e = document.getElementById('m-' + b.getAttribute('data-ws-goto')); if (e) { e.scrollIntoView({ block: 'center', behavior: 'smooth' }); e.classList.add('kedip'); setTimeout(function(){ e.classList.remove('kedip'); }, 1400); } }); });
     document.querySelectorAll('[data-ws-del]').forEach(function(b){ b.addEventListener('click', function(){
@@ -3232,19 +3259,33 @@ if (typeof module !== 'undefined') module.exports = WSC;
     return navigator.serviceWorker.getRegistration('/').then(function(reg){ return reg ? reg.pushManager.getSubscription() : null; }).then(function(s){
       pushSt.sub = s; pushSt.cek = true;
       if (s && auth) call('apiPushSubscribe', auth.token, s.toJSON(), perangkat()); // pastikan tercatat atas akun yang sedang login
+      else if (!s && auth && Notification.permission === 'granted' && pushStatus() !== 'ios') return pushLangganan().catch(function(){ return null; }); // izin sudah ada: aktifkan lagi tanpa bertanya
       return s;
-    }).catch(function(){ return null; });
+    }).catch(function(){ return null; }).then(function(s){ if (typeof appNudgeCek === 'function') appNudgeCek(); return s; });
   }
   function pushAktifkan(){
     if (pushSt.sibuk) return Promise.resolve();
     pushSt.sibuk = true;
     var izin = Notification.requestPermission(); // harus langsung dari ketukan (iPhone)
-    return Promise.resolve(izin).then(function(p){ if (p !== 'granted') throw new Error('Izin notifikasi belum diberikan. Buka pengaturan browser → Notifikasi → izinkan untuk sun-log.github.io.'); return navigator.serviceWorker.register('sw.js', { scope: './' }); })
+    return Promise.resolve(izin).then(function(p){ if (p !== 'granted') throw new Error('Izin notifikasi belum diberikan. Buka pengaturan browser → Notifikasi → izinkan untuk sun-log.github.io.'); return pushLangganan(); })
+      .then(function(res){ pushSt.sibuk = false; var ok = handle(res); if (ok) toast('Notifikasi aktif. Chat tetap masuk walau aplikasi ditutup.'); render(); })
+      .catch(function(e){ pushSt.sibuk = false; toast(e.message || 'Gagal mengaktifkan notifikasi.'); render(); });
+  }
+  function pushLangganan(){
+    return navigator.serviceWorker.register('sw.js', { scope: './' })
       .then(function(){ return navigator.serviceWorker.ready; })
       .then(function(reg){ return call('apiPushKey', auth.token).then(function(k){ if (!k || !k.ok) throw new Error((k && k.message) || 'Gagal.'); return reg.pushManager.getSubscription().then(function(s){ return s || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: WSC.unb64u(k.key) }); }); }); })
-      .then(function(s){ pushSt.sub = s; return call('apiPushSubscribe', auth.token, s.toJSON(), perangkat()); })
-      .then(function(res){ pushSt.sibuk = false; var ok = handle(res); if (ok) toast('Notifikasi HP aktif.'); render(); })
-      .catch(function(e){ pushSt.sibuk = false; toast(e.message || 'Gagal mengaktifkan notifikasi.'); render(); });
+      .then(function(s){ pushSt.sub = s; return call('apiPushSubscribe', auth.token, s.toJSON(), perangkat()); });
+  }
+  var pushTim = null;
+  function pushTimHtml(){
+    if (!pushTim) return '<button type="button" class="btn btn-ghost btn-sm" id="ws-pushtim">Lihat status notifikasi tim</button>';
+    var aktif = pushTim.filter(function(x){ return x.alat.length; }).length;
+    return '<p class="sub"><b>' + aktif + ' dari ' + pushTim.length + '</b> orang sudah aktif.</p><div class="ws-people">' + pushTim.map(function(x){
+      return '<div class="ws-item">' + wsAv(x.nama) + '<span class="grow"><span class="ws-l1"><b>' + esc(x.nama) + '</b></span><span class="ws-l2"><span class="ws-prev">'
+        + (x.alat.length ? x.alat.map(function(a){ return esc(a.perangkat) + (a.status ? ' · ' + esc(a.status.indexOf('terkirim') === 0 ? 'terakhir terkirim ' + a.kirim : a.status) : ''); }).join(' | ') : 'Belum mengaktifkan notifikasi') + '</span></span></span>'
+        + '<span class="pill ' + (x.alat.length ? 'pill-ok' : 'pill-warn') + '">' + (x.alat.length ? 'Aktif' : 'Belum') + '</span></div>';
+    }).join('') + '</div>';
   }
   function pushMatikan(){
     var s = pushSt.sub; if (!s) return Promise.resolve();
@@ -3267,6 +3308,8 @@ if (typeof module !== 'undefined') module.exports = WSC;
     var on = document.getElementById('push-on'); if (on) on.addEventListener('click', pushAktifkan);
     var off = document.getElementById('push-off'); if (off) off.addEventListener('click', pushMatikan);
     var ts = document.getElementById('push-tes'); if (ts) ts.addEventListener('click', function(){ call('apiPushTest', auth.token).then(function(res){ var ok = handle(res); if (ok) toast(ok.message); }); });
+    var pt = document.getElementById('ws-pushtim'); if (pt) pt.addEventListener('click', function(){ pt.disabled = true; call('apiPushTim', auth.token).then(function(res){ var ok = handle(res); if (!ok) { pt.disabled = false; return; } pushTim = ok.tim; wsPaint(); }); });
+    var nt = document.getElementById('push-nanti'); if (nt) nt.addEventListener('click', function(){ try { localStorage.setItem('vge.push.nanti', String(Date.now())); } catch(e){} var c = document.getElementById('app-nudge'); if (c) c.remove(); });
   }
 
   /* ================= REALTIME: cek pembaruan tiap beberapa detik ================= */
@@ -3408,6 +3451,27 @@ if (typeof module !== 'undefined') module.exports = WSC;
   function appSetelahLogin(){
     appBadge();
     if (APP_SCAN) { APP_SCAN = false; try { QS.delete('scan'); history.replaceState(null, '', location.pathname + (QS.toString() ? '?' + QS.toString() : '') + location.hash); } catch (e) {} setTimeout(function(){ if (auth && view === 'home') scanStart(); }, 300); }
+  }
+  /* ajakan aktifkan notifikasi (tampil di semua menu sampai aktif) */
+  function appNudgeTampil(){
+    if (!auth || !pushSt.cek || view !== 'home' || tab === 'ws') return '';
+    var st = pushStatus(); if (st !== 'mati' && st !== 'ios' && st !== 'ditolak') return '';
+    var t = 0; try { t = Number(localStorage.getItem('vge.push.nanti')) || 0; } catch (e) {}
+    if (Date.now() - t < 2 * 864e5) return '';
+    return st;
+  }
+  function appNudgeHtml(){
+    var st = appNudgeTampil(); if (!st) return '';
+    var isi = st === 'ios' ? '<b>iPhone: pasang aplikasinya dulu</b><span>Notifikasi chat di iPhone hanya bisa masuk dari aplikasi Suneeday VGE di Layar Utama.</span>'
+      : st === 'ditolak' ? '<b>Notifikasi diblokir</b><span>Buka pengaturan situs (ikon gembok di kolom alamat) &rarr; Notifikasi &rarr; Izinkan, lalu muat ulang.</span>'
+      : '<b>Aktifkan notifikasi</b><span>Supaya chat Working Space dan info baru tetap masuk walau aplikasi ditutup.</span>';
+    var tombol = st === 'ios' ? '<button type="button" class="btn btn-primary btn-sm" data-pasang>Cara pasang</button>' : st === 'mati' ? '<button type="button" class="btn btn-primary btn-sm" id="push-on">Aktifkan</button>' : '';
+    return '<div class="card app-nudge no-print" id="app-nudge"><div class="grow">' + isi + '</div><div class="bulk">' + tombol + '<button type="button" class="btn btn-ghost btn-sm" id="push-nanti">Nanti</button></div></div>';
+  }
+  function appNudgeCek(){
+    var ada = document.getElementById('app-nudge'), mau = !!appNudgeTampil();
+    if (mau && !ada && !sedangMengetik() && !busy) render();
+    else if (!mau && ada) ada.remove();
   }
   /* status koneksi */
   function appKoneksi(){
