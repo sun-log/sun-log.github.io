@@ -1,7 +1,7 @@
 /* Service worker Suneeday VGE. Versi diisi otomatis oleh build_index.py (= sidik halaman).
    Halaman: selalu ambil dari internet dulu (versi terbaru); salinan hanya dipakai saat offline.
    Data (Apps Script), rapor, chat, dan token TIDAK pernah disimpan di cache. */
-var VERSI = '851a252c';
+var VERSI = 'eb5cb798';
 var CACHE = 'vge-' + VERSI;
 var SHELL = ['./', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'badge-72.png'];
 var CDN = 'https://cdn.jsdelivr.net/npm/';
